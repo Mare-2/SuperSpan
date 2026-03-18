@@ -52,11 +52,15 @@ class BottomOvalShape(private val curveDepth: androidx.compose.ui.unit.Dp) : and
     }
 }
 @Composable
-fun Login(padding: PaddingValues) {
+fun Login(
+
+) {
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
+    var isLogin by rememberSaveable { mutableStateOf(false) }
+    var text by rememberSaveable { mutableStateOf("Accedi") }
     Column(
-        Modifier.padding(padding),
+        Modifier.padding(0.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -69,7 +73,15 @@ fun Login(padding: PaddingValues) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Bottom
             ) {
-                Box(Modifier.weight(8f))
+                Box(Modifier.weight(8f).fillMaxSize()) {
+                    Column(
+                        Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text("LOGO", fontSize = 100.sp)
+                    }
+                }
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
@@ -90,7 +102,9 @@ fun Login(padding: PaddingValues) {
                 Spacer(Modifier
                     .size(40.dp)
                     .weight(1.8f))
-                CreateButton("Accedi", {}) //TODO: inserire funzione
+                /*if (isLogin) text = "Accedi"
+                else text = "Registrati"*/
+                CreateButton(text, {isLogin = !isLogin}) //TODO: inserire funzione
                 Spacer(Modifier
                     .size(20.dp)
                     .weight(0.7f))
@@ -112,7 +126,5 @@ fun CreateButton(text: String, func: () -> Unit) {
 @Composable
 @Preview(showBackground = true)
 fun LoginPreview() {
-    Scaffold {
-        innerPadding -> Login(innerPadding)
-    }
+    Login()
 }

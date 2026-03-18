@@ -21,9 +21,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             SuperSpanTheme {
-                Scaffold() {
-                    innerPadding -> Login(innerPadding)
-                }
+
             }
         }
     }
