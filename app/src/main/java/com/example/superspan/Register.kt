@@ -2,6 +2,9 @@ package com.example.superspan
 
 import android.graphics.drawable.shapes.OvalShape
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.ScrollableState
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -39,27 +43,15 @@ import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 
-
-class BottomOvalShape(private val curveDepth: androidx.compose.ui.unit.Dp) : androidx.compose.ui.graphics.Shape {
-    override fun createOutline(size: androidx.compose.ui.geometry.Size, layoutDirection: androidx.compose.ui.unit.LayoutDirection, density: androidx.compose.ui.unit.Density): androidx.compose.ui.graphics.Outline {
-        val depthPx = with(density) { curveDepth.toPx() }
-        val path = androidx.compose.ui.graphics.Path().apply {
-            moveTo(0f, 0f)
-            lineTo(size.width, 0f)
-            lineTo(size.width, size.height - depthPx)
-            quadraticBezierTo(size.width / 2f, size.height + depthPx, 0f, size.height - depthPx)
-            close()
-        }
-        return androidx.compose.ui.graphics.Outline.Generic(path)
-    }
-}
 @Composable
-fun Login(
+fun Register(
     padding: PaddingValues
 ) {
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
-    var text by rememberSaveable { mutableStateOf("Accedi") }
+    var confirmPassword by rememberSaveable { mutableStateOf("") }
+    var text by rememberSaveable { mutableStateOf("Registrati") }
+    val scrollState = rememberScrollState()
     Column(
         Modifier.padding(padding),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -69,10 +61,10 @@ fun Login(
             Modifier
                 .weight(3.5f)
                 .clip(BottomOvalShape(30.dp))
-                .fillMaxSize()
+                .fillMaxWidth()
                 .background(Color.Gray),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Bottom
+            //verticalArrangement = Arrangement.Center
         ) {
             Column(
                 Modifier
@@ -81,55 +73,87 @@ fun Login(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Bottom
             ) {
-                Spacer(Modifier.weight(2f))
-                Text("LOGO", fontSize = 35.sp)
-                Spacer(Modifier.weight(1f))
-                Text("Bentornato!", fontSize = 25.sp)
+                Text("LOGO", fontSize = 35.sp, modifier = Modifier.padding(bottom = 35.dp))
+                Text("Benvenuto!", fontSize = 25.sp, modifier = Modifier.padding(bottom = 30.dp))
             }
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(5f),
+                    .weight(5f)
+                    .verticalScroll(scrollState),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.Top
             ) {
-                Spacer(Modifier.weight(0.4f))
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
                     label = { Text("E-mail") },
-                    modifier = Modifier.padding(bottom = 20.dp),
+                    modifier = Modifier.padding(bottom = 15.dp),
                     shape = RoundedCornerShape(30.dp),
                     singleLine = true
                 )
                 OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    label = {Text("Confirm Password") },
-                    modifier = Modifier.padding(bottom = 20.dp),
+                    value = "",
+                    onValueChange = { },
+                    label = {Text("Placeholder") },
+                    modifier = Modifier.padding(bottom = 15.dp),
                     shape = RoundedCornerShape(30.dp),
                     singleLine = true
                 )
-                Spacer(Modifier.weight(0.6f))
+                OutlinedTextField(
+                    value = "",
+                    onValueChange = { },
+                    label = {Text("Placeholder") },
+                    modifier = Modifier.padding(bottom = 15.dp),
+                    shape = RoundedCornerShape(30.dp),
+                    singleLine = true
+                )
+                OutlinedTextField(
+                    value = "",
+                    onValueChange = { },
+                    label = {Text("Placeholder") },
+                    modifier = Modifier.padding(bottom = 15.dp),
+                    shape = RoundedCornerShape(30.dp),
+                    singleLine = true
+                )
+                Column(
+                    Modifier
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(Color.LightGray)
+                        .padding(10.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    OutlinedTextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        label = {Text("Password") },
+                        modifier = Modifier.padding(bottom = 15.dp),
+                        shape = RoundedCornerShape(30.dp),
+                        singleLine = true
+                    )
+                    OutlinedTextField(
+                        value = confirmPassword,
+                        onValueChange = { confirmPassword = it },
+                        label = {Text("Confirm Password") },
+                        modifier = Modifier.padding(bottom = 15.dp),
+                        shape = RoundedCornerShape(30.dp),
+                        singleLine = true
+                    )
+                }
+                Spacer(Modifier.size(80.dp))
             }
         }
-        Box(Modifier.weight(0.5f)) {
+        Box(Modifier.weight(0.5f), contentAlignment = Alignment.Center) {
             CreateButton(text, {})
         }
     }
 }
 
-@Composable
-fun CreateButton(text: String, func: () -> Unit) {
-    Button(
-        modifier = Modifier.padding(top = 10.dp),
-        onClick = func
-    ) { Text(text) }
-}
 
 @ExperimentalMaterial3Api
 @Composable
 @Preview(showBackground = true)
-fun LoginPreview() {
-    Login(PaddingValues(0.dp))
+fun RegisterPreview() {
+    Register(PaddingValues(0.dp))
 }
