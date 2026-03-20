@@ -47,9 +47,12 @@ import androidx.compose.ui.unit.*
 fun Register(
     padding: PaddingValues
 ) {
+    val newUser: User = User()
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     var confirmPassword by rememberSaveable { mutableStateOf("") }
+    var nome by rememberSaveable { mutableStateOf("") }
+    var cognome by rememberSaveable { mutableStateOf("") }
     var text by rememberSaveable { mutableStateOf("Registrati") }
     val scrollState = rememberScrollState()
     Column(
@@ -73,49 +76,17 @@ fun Register(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Bottom
             ) {
-                Text("LOGO", fontSize = 35.sp, modifier = Modifier.padding(bottom = 35.dp))
-                Text("Benvenuto!", fontSize = 25.sp, modifier = Modifier.padding(bottom = 30.dp))
+                Text("LOGO", fontSize = 55.sp, modifier = Modifier.padding(bottom = 35.dp))
+                Text("Benvenuto!", fontSize = 40.sp, modifier = Modifier.padding(bottom = 30.dp))
             }
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(5f)
-                    .verticalScroll(scrollState),
+                    .weight(5f),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top
             ) {
-                OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = { Text("E-mail") },
-                    modifier = Modifier.padding(bottom = 15.dp),
-                    shape = RoundedCornerShape(30.dp),
-                    singleLine = true
-                )
-                OutlinedTextField(
-                    value = "",
-                    onValueChange = { },
-                    label = {Text("Placeholder") },
-                    modifier = Modifier.padding(bottom = 15.dp),
-                    shape = RoundedCornerShape(30.dp),
-                    singleLine = true
-                )
-                OutlinedTextField(
-                    value = "",
-                    onValueChange = { },
-                    label = {Text("Placeholder") },
-                    modifier = Modifier.padding(bottom = 15.dp),
-                    shape = RoundedCornerShape(30.dp),
-                    singleLine = true
-                )
-                OutlinedTextField(
-                    value = "",
-                    onValueChange = { },
-                    label = {Text("Placeholder") },
-                    modifier = Modifier.padding(bottom = 15.dp),
-                    shape = RoundedCornerShape(30.dp),
-                    singleLine = true
-                )
+
                 Column(
                     Modifier
                         .clip(RoundedCornerShape(10.dp))

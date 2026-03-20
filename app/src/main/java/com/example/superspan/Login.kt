@@ -82,9 +82,9 @@ fun Login(
                 verticalArrangement = Arrangement.Bottom
             ) {
                 Spacer(Modifier.weight(2f))
-                Text("LOGO", fontSize = 35.sp)
+                Text("LOGO", fontSize = 55.sp)
                 Spacer(Modifier.weight(1f))
-                Text("Bentornato!", fontSize = 25.sp)
+                Text("Bentornato!", fontSize = 40.sp)
             }
             Column(
                 modifier = Modifier
@@ -111,10 +111,10 @@ fun Login(
                     singleLine = true
                 )
                 Spacer(Modifier.weight(0.6f))
+                CreateButton(text, {})
             }
         }
         Box(Modifier.weight(0.5f)) {
-            CreateButton(text, {})
         }
     }
 }
