@@ -81,10 +81,8 @@ fun Login(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Bottom
             ) {
-                Spacer(Modifier.weight(2f))
-                Text("LOGO", fontSize = 55.sp)
-                Spacer(Modifier.weight(1f))
-                Text("Bentornato!", fontSize = 40.sp)
+                Text("LOGO", fontSize = 55.sp, modifier = Modifier.padding(bottom = 35.dp))
+                Text("Bentornato!", fontSize = 40.sp, modifier = Modifier.padding(bottom = 30.dp))
             }
             Column(
                 modifier = Modifier
@@ -111,20 +109,12 @@ fun Login(
                     singleLine = true
                 )
                 Spacer(Modifier.weight(0.6f))
-                CreateButton(text, {})
+                Button(onClick = {}, modifier = Modifier.padding(bottom = 15.dp)) { Text(text) }
             }
         }
         Box(Modifier.weight(0.5f)) {
         }
     }
-}
-
-@Composable
-fun CreateButton(text: String, func: () -> Unit) {
-    Button(
-        modifier = Modifier.padding(top = 10.dp),
-        onClick = func
-    ) { Text(text) }
 }
 
 @ExperimentalMaterial3Api

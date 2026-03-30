@@ -42,19 +42,21 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
+import androidx.navigation.NavController
 
 @Composable
 fun Register(
-    padding: PaddingValues
+    padding: PaddingValues,
+    navController: NavController?
 ) {
-    val newUser: User = User()
     var email by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
-    var confirmPassword by rememberSaveable { mutableStateOf("") }
     var nome by rememberSaveable { mutableStateOf("") }
     var cognome by rememberSaveable { mutableStateOf("") }
+    var password by rememberSaveable { mutableStateOf("") }
+    var formPass by rememberSaveable { mutableStateOf(false) }
+    var check by rememberSaveable { mutableStateOf(false) }
+    //var debug by rememberSaveable { mutableStateOf(false) }
     var text by rememberSaveable { mutableStateOf("Registrati") }
-    val scrollState = rememberScrollState()
     Column(
         Modifier.padding(padding),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -66,8 +68,7 @@ fun Register(
                 .clip(BottomOvalShape(30.dp))
                 .fillMaxWidth()
                 .background(Color.Gray),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            //verticalArrangement = Arrangement.Center
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Column(
                 Modifier
@@ -84,41 +85,103 @@ fun Register(
                     .fillMaxWidth()
                     .weight(5f),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Top
+                verticalArrangement = Arrangement.Center
             ) {
-
-                Column(
-                    Modifier
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(Color.LightGray)
-                        .padding(10.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    OutlinedTextField(
-                        value = password,
-                        onValueChange = { password = it },
-                        label = {Text("Password") },
-                        modifier = Modifier.padding(bottom = 15.dp),
-                        shape = RoundedCornerShape(30.dp),
-                        singleLine = true
-                    )
-                    OutlinedTextField(
-                        value = confirmPassword,
-                        onValueChange = { confirmPassword = it },
-                        label = {Text("Confirm Password") },
-                        modifier = Modifier.padding(bottom = 15.dp),
-                        shape = RoundedCornerShape(30.dp),
-                        singleLine = true
-                    )
-                }
-                Spacer(Modifier.size(80.dp))
+                if (!formPass) FormDati(email, nome, cognome, {email = it}, {nome = it}, {cognome = it}, {formPass = it})
+                else FormPassword({password = it}, {check = it})
             }
         }
         Box(Modifier.weight(0.5f), contentAlignment = Alignment.Center) {
-            CreateButton(text, {})
+            Button({
+                ListOfUser.add(User(nome, cognome, email, password))
+                navController?.navigate(Destination.HOME.route)}, enabled = check) {Text("Registrati")}
         }
     }
+}
+
+@Composable
+fun FormDati(
+    _email: String,
+    _nome: String,
+    _cognome: String,
+    onEmailChange: (String)-> Unit,
+    onNameChange: (String)-> Unit,
+    onSecondNameChange: (String)-> Unit,
+    onAdvance: (Boolean)-> Unit
+    ) {
+    var email by rememberSaveable { mutableStateOf(_email) }
+    var nome by rememberSaveable { mutableStateOf(_nome) }
+    var cognome by rememberSaveable { mutableStateOf(_cognome) }
+    var check by rememberSaveable { mutableStateOf(false) }
+    check = !email.isEmpty() && !nome.isEmpty() && !cognome.isEmpty()
+    OutlinedTextField(
+        value = email,
+        onValueChange = {
+                email = it
+                onEmailChange(email)
+            },
+        label = {Text("E-mail") },
+        modifier = Modifier.padding(bottom = 25.dp),
+        shape = RoundedCornerShape(30.dp),
+        singleLine = true
+    )
+    OutlinedTextField(
+        value = nome,
+        onValueChange = {
+                nome = it
+                onNameChange(nome)
+            },
+        label = {Text("Nome") },
+        modifier = Modifier.padding(bottom = 25.dp),
+        shape = RoundedCornerShape(30.dp),
+        singleLine = true
+    )
+    OutlinedTextField(
+        value = cognome,
+        onValueChange = {
+                cognome = it
+                onSecondNameChange(cognome)
+            },
+        label = {Text("Cognome") },
+        modifier = Modifier.padding(bottom = 50.dp),
+        shape = RoundedCornerShape(30.dp),
+        singleLine = true
+    )
+    Spacer(Modifier.size(70.dp))
+    Button({onAdvance(true)}, enabled = check, modifier = Modifier.padding(bottom = 15.dp)) {Text("Avanti")}
+}
+
+@Composable
+fun FormPassword(
+    onPasswordChange: (String)-> Unit,
+    checking: (Boolean)-> Unit
+) {
+    var password by rememberSaveable { mutableStateOf("") }
+    var confirmPassword by rememberSaveable { mutableStateOf("") }
+    var check by rememberSaveable { mutableStateOf(false) }
+    OutlinedTextField(
+        value = password,
+        onValueChange = {
+            password = it
+            onPasswordChange(password) },
+        label = {Text("Password") },
+        modifier = Modifier.padding(bottom = 25.dp),
+        shape = RoundedCornerShape(30.dp),
+        singleLine = true
+    )
+    OutlinedTextField(
+        value = confirmPassword,
+        onValueChange = {
+            confirmPassword = it
+            check = !password.isEmpty() && !confirmPassword.isEmpty() && password==confirmPassword
+            checking(check)
+        },
+        label = {Text("Confirm Password") },
+        modifier = Modifier.padding(bottom = 50.dp),
+        shape = RoundedCornerShape(30.dp),
+        singleLine = true
+    )
+    Spacer(Modifier.size(80.dp))
 }
 
 
@@ -126,5 +189,5 @@ fun Register(
 @Composable
 @Preview(showBackground = true)
 fun RegisterPreview() {
-    Register(PaddingValues(0.dp))
+    Register(PaddingValues(0.dp), null)
 }

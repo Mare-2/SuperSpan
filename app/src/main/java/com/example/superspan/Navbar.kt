@@ -37,7 +37,7 @@ fun Navigation(navController: NavHostController, startDestination: Destination, 
             composable(destination.route) {
                 when(destination) {
                     Destination.LOGIN -> Login(paddingValues)
-                    Destination.REGISTER -> Register(paddingValues)
+                    Destination.REGISTER -> Register(paddingValues, navController)
                     else -> {}
                 }
             }
