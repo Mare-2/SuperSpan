@@ -1,45 +1,34 @@
 package com.example.superspan
 
-import android.graphics.drawable.shapes.OvalShape
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.ScrollableState
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.BottomAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Face
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Outline
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import androidx.navigation.NavController
@@ -53,7 +42,7 @@ fun Register(
     var nome by rememberSaveable { mutableStateOf("") }
     var cognome by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
-    var formPass by rememberSaveable { mutableStateOf(false) }
+    var formPass by rememberSaveable { mutableStateOf(true) }
     var check by rememberSaveable { mutableStateOf(false) }
     //var debug by rememberSaveable { mutableStateOf(false) }
     var text by rememberSaveable { mutableStateOf("Registrati") }
@@ -72,20 +61,20 @@ fun Register(
         ) {
             Column(
                 Modifier
-                    .weight(2f)
+                    .weight(2.5f)
                     .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Bottom
             ) {
                 Text("LOGO", fontSize = 55.sp, modifier = Modifier.padding(bottom = 35.dp))
-                Text("Benvenuto!", fontSize = 40.sp, modifier = Modifier.padding(bottom = 30.dp))
+                Text("Benvenuto!", fontSize = 40.sp, modifier = Modifier.padding(bottom = 15.dp))
             }
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(5f),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.Bottom
             ) {
                 if (!formPass) FormDati(email, nome, cognome, {email = it}, {nome = it}, {cognome = it}, {formPass = it})
                 else FormPassword({password = it}, {check = it})
@@ -95,6 +84,11 @@ fun Register(
             Button({
                 ListOfUser.add(User(nome, cognome, email, password))
                 navController?.navigate(Destination.HOME.route)}, enabled = check) {Text("Registrati")}
+        }
+        Box(contentAlignment = Alignment.BottomStart, modifier = Modifier.fillMaxWidth()) {
+            Button({ navController?.navigate(Destination.LOGIN.route) }) {
+                Text("Cambia")
+            }
         }
     }
 }
@@ -169,6 +163,7 @@ fun FormPassword(
         shape = RoundedCornerShape(30.dp),
         singleLine = true
     )
+    CheckPassword(password, {check = it})
     OutlinedTextField(
         value = confirmPassword,
         onValueChange = {
@@ -176,11 +171,20 @@ fun FormPassword(
             check = !password.isEmpty() && !confirmPassword.isEmpty() && password==confirmPassword
             checking(check)
         },
+        isError = password!=confirmPassword && confirmPassword.isNotEmpty(),
         label = {Text("Confirm Password") },
-        modifier = Modifier.padding(bottom = 50.dp),
+        modifier = Modifier.padding(bottom = 50.dp, top = 55.dp),
         shape = RoundedCornerShape(30.dp),
         singleLine = true
     )
+
+
+    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        /*Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            if(password.count()<8)Text("Password deve contenere almeno 8 caratteri", modifier = Modifier.padding(bottom = 10.dp))
+            Text("Password stupida")
+        }*/
+    }
     Spacer(Modifier.size(80.dp))
 }
 
@@ -190,4 +194,75 @@ fun FormPassword(
 @Preview(showBackground = true)
 fun RegisterPreview() {
     Register(PaddingValues(0.dp), null)
+}
+
+@Composable
+fun CheckPassword(
+    password: String,
+    checking: (Boolean) -> Unit
+) {
+    var upperCase = false
+    var minLen = false
+    var specialChar = false
+    var digitChar = false
+    var check: Boolean
+    if (password.length>=8) minLen = true
+    password.forEach { c ->
+        if (c.isUpperCase()) upperCase = true
+        else if (c.isDigit()) digitChar = true
+        else if (!c.isLetterOrDigit()) specialChar = true
+    }
+    check = upperCase && minLen && digitChar && specialChar
+    checking(check)
+
+    Row(horizontalArrangement = Arrangement.Center) {
+        Spacer(Modifier.size(30.dp))
+        Column(horizontalAlignment = Alignment.Start, modifier = Modifier.weight(1f)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if(minLen) IconOk()
+                else IconFail()
+                Text("Deve contenere almeno 8 caratteri", fontSize = 10.sp)
+            }
+            Spacer(Modifier.size(10.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if(upperCase) IconOk()
+                else IconFail()
+                Text("Deve contenere almeno una lettera maiuscola", fontSize = 10.sp)
+            }
+        }
+        Spacer(Modifier.size(10.dp))
+        Column(horizontalAlignment = Alignment.Start, modifier = Modifier.weight(1f)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if(specialChar) IconOk()
+                else IconFail()
+                Text("Deve contenere almeno un carattere speciale", fontSize = 10.sp)
+            }
+            Spacer(Modifier.size(10.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if(digitChar) IconOk()
+                else IconFail()
+                Text("Deve contenere almeno un numero", fontSize = 10.sp)
+            }
+        }
+    }
+}
+
+@Composable
+fun IconOk() {
+    Icon(
+        Icons.Filled.CheckCircle,
+        "",
+        tint = Color.Green,
+        modifier = Modifier.padding(end = 5.dp)
+    )
+}
+
+@Composable
+fun IconFail() {
+    Icon(
+        Icons.Filled.CheckCircle,
+        "",
+        tint = Color.Red,
+        modifier = Modifier.padding(end = 5.dp)
+    )
 }

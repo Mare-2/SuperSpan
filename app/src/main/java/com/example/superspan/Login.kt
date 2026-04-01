@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
+import androidx.navigation.NavController
 
 
 class BottomOvalShape(private val curveDepth: androidx.compose.ui.unit.Dp) : androidx.compose.ui.graphics.Shape {
@@ -55,7 +56,8 @@ class BottomOvalShape(private val curveDepth: androidx.compose.ui.unit.Dp) : and
 }
 @Composable
 fun Login(
-    padding: PaddingValues
+    padding: PaddingValues,
+    navController: NavController?
 ) {
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
@@ -76,13 +78,13 @@ fun Login(
         ) {
             Column(
                 Modifier
-                    .weight(2f)
+                    .weight(2.5f)
                     .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Bottom
             ) {
                 Text("LOGO", fontSize = 55.sp, modifier = Modifier.padding(bottom = 35.dp))
-                Text("Bentornato!", fontSize = 40.sp, modifier = Modifier.padding(bottom = 30.dp))
+                Text("Benvenuto!", fontSize = 40.sp, modifier = Modifier.padding(bottom = 15.dp))
             }
             Column(
                 modifier = Modifier
@@ -112,7 +114,12 @@ fun Login(
                 Button(onClick = {}, modifier = Modifier.padding(bottom = 15.dp)) { Text(text) }
             }
         }
-        Box(Modifier.weight(0.5f)) {
+        Box(Modifier.weight(0.5f), contentAlignment = Alignment.BottomStart) {
+        }
+        Box(contentAlignment = Alignment.BottomStart, modifier = Modifier.fillMaxWidth()) {
+            Button({ navController?.navigate(Destination.REGISTER.route) }) {
+                Text("Cambia")
+            }
         }
     }
 }
@@ -121,5 +128,5 @@ fun Login(
 @Composable
 @Preview(showBackground = true)
 fun LoginPreview() {
-    Login(PaddingValues(0.dp))
+    Login(PaddingValues(0.dp), null)
 }

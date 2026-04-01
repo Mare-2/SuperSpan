@@ -1,6 +1,9 @@
 package com.example.superspan
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -9,8 +12,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -36,7 +41,7 @@ fun Navigation(navController: NavHostController, startDestination: Destination, 
         Destination.entries.forEach { destination ->
             composable(destination.route) {
                 when(destination) {
-                    Destination.LOGIN -> Login(paddingValues)
+                    Destination.LOGIN -> Login(paddingValues, navController)
                     Destination.REGISTER -> Register(paddingValues, navController)
                     else -> {}
                 }
@@ -51,7 +56,7 @@ fun Navigation(navController: NavHostController, startDestination: Destination, 
 fun MainNavigation() {
     var changeRoute = Destination.REGISTER.route
     val navController = rememberNavController()
-    val startDestination: Destination = Destination.LOGIN
+    val startDestination: Destination = Destination.REGISTER
     val navBarStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBarStackEntry?.destination?.route ?: Destination.LOGIN.route
     val showBar: Boolean = currentRoute != Destination.LOGIN.route &&
@@ -74,8 +79,8 @@ fun MainNavigation() {
                         }
                     }
                 }
-            } else {
-                BottomAppBar(containerColor = Color.Unspecified) {
+            } /*else {
+                BottomAppBar(containerColor = Color.Unspecified, modifier = Modifier.padding(top = 0.dp, bottom = 0.dp)) {
                     if (currentRoute==Destination.LOGIN.route) {
                         changeRoute = Destination.REGISTER.route
                     }
@@ -84,7 +89,7 @@ fun MainNavigation() {
                     }
                     Button({navController.navigate(changeRoute)}) { Text("Cambia")}
                 }
-            }
+            }*/
         }
     ) {
         contentPadding -> Navigation(navController, startDestination, contentPadding)
