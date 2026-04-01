@@ -1,9 +1,12 @@
 package com.example.superspan
 
+import android.graphics.drawable.Icon
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -21,18 +24,22 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.NavigationBarItemDefaults
 
 enum class Destination (
     val route: String,
-    val label: String
+    val label: String,
+    val icon: ImageVector?
 ) {
-    HOME("home", "Home"),
-    COUPON("coupon", "Coupon"),
-    OFFERTE("discount", "Offerte"),
-    LAVORO("work", "Lavoro"),
-    PROFILO("profile", "Profilo"),
-    LOGIN("login", "Login"),
-    REGISTER("register", "Registrazione")
+    HOME("home", "Home", Icons.Default.Home),
+    COUPON("coupon", "Coupon", Icons.Default.ConfirmationNumber),
+    OFFERTE("discount", "Offerte", Icons.Default.LocalOffer),
+    LAVORO("work", "Lavoro", Icons.Default.Work),
+    PROFILO("profile", "Profilo", Icons.Default.AccountCircle),
+    LOGIN("login", "Login", null),
+    REGISTER("register", "Registrazione", null)
 }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,7 +63,7 @@ fun Navigation(navController: NavHostController, startDestination: Destination, 
 fun MainNavigation() {
     var changeRoute = Destination.REGISTER.route
     val navController = rememberNavController()
-    val startDestination: Destination = Destination.REGISTER
+    val startDestination: Destination = Destination.HOME
     val navBarStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBarStackEntry?.destination?.route ?: Destination.LOGIN.route
     val showBar: Boolean = currentRoute != Destination.LOGIN.route &&
@@ -73,7 +80,20 @@ fun MainNavigation() {
                                 NavigationBarItem(
                                     selected = currentRoute==destination.route,
                                     onClick = {navController.navigate(destination.route)},
-                                    icon = {Text(destination.label)}
+                                    icon = {
+                                        androidx.compose.material3.Icon(
+                                            imageVector = destination.icon?: Icons.Default.Face,
+                                            contentDescription = destination.label,
+                                            tint = if (currentRoute == destination.route) Color.Blue else Color.Green,
+                                            modifier = Modifier.size(40.dp)
+                                        )
+                                    },
+                                    colors = NavigationBarItemDefaults.colors(
+                                        indicatorColor = Color.Transparent, // Rende il contorno invisibile
+                                        selectedIconColor = Color.Blue, // Colore dell'icona quando è selezionata
+                                        unselectedIconColor = Color.Gray // Colore dell'icona quando NON è selezionata
+                                    )
+
                                 )
                             }
                         }
