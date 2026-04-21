@@ -28,6 +28,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.NavigationBarItemDefaults
 
+
+var actualUser: User? = MapOfUser.getValue("d.tinti@superspan.it")
+
 enum class Destination (
     val route: String,
     val label: String,
@@ -50,6 +53,7 @@ fun Navigation(navController: NavHostController, startDestination: Destination, 
                 when(destination) {
                     Destination.LOGIN -> Login(paddingValues, navController)
                     Destination.REGISTER -> Register(paddingValues, navController)
+                    Destination.HOME -> Home(paddingValues, navController)
                     else -> {}
                 }
             }
@@ -99,17 +103,7 @@ fun MainNavigation() {
                         }
                     }
                 }
-            } /*else {
-                BottomAppBar(containerColor = Color.Unspecified, modifier = Modifier.padding(top = 0.dp, bottom = 0.dp)) {
-                    if (currentRoute==Destination.LOGIN.route) {
-                        changeRoute = Destination.REGISTER.route
-                    }
-                    else {
-                        changeRoute = Destination.LOGIN.route
-                    }
-                    Button({navController.navigate(changeRoute)}) { Text("Cambia")}
-                }
-            }*/
+            }
         }
     ) {
         contentPadding -> Navigation(navController, startDestination, contentPadding)

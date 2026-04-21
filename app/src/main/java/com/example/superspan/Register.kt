@@ -13,8 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -42,9 +41,8 @@ fun Register(
     var nome by rememberSaveable { mutableStateOf("") }
     var cognome by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
-    var formPass by rememberSaveable { mutableStateOf(true) }
+    var formPass by rememberSaveable { mutableStateOf(false) }
     var check by rememberSaveable { mutableStateOf(false) }
-    //var debug by rememberSaveable { mutableStateOf(false) }
     var text by rememberSaveable { mutableStateOf("Registrati") }
     Column(
         Modifier.padding(padding),
@@ -82,7 +80,7 @@ fun Register(
         }
         Box(Modifier.weight(0.5f), contentAlignment = Alignment.Center) {
             Button({
-                ListOfUser.add(User(nome, cognome, email, password))
+                MapOfUser.put(email, User(nome, cognome, email, password))
                 navController?.navigate(Destination.HOME.route)}, enabled = check) {Text("Registrati")}
         }
         Box(contentAlignment = Alignment.BottomStart, modifier = Modifier.fillMaxWidth()) {
@@ -100,16 +98,20 @@ fun FormDati(
     _cognome: String,
     onEmailChange: (String)-> Unit,
     onNameChange: (String)-> Unit,
-    onSecondNameChange: (String)-> Unit,
+    onSurnameChange: (String)-> Unit,
     onAdvance: (Boolean)-> Unit
-    ) {
+) {
     var email by rememberSaveable { mutableStateOf(_email) }
     var nome by rememberSaveable { mutableStateOf(_nome) }
     var cognome by rememberSaveable { mutableStateOf(_cognome) }
     var check by rememberSaveable { mutableStateOf(false) }
-    check = !email.isEmpty() && !nome.isEmpty() && !cognome.isEmpty()
+    var exist by rememberSaveable { mutableStateOf(false) }
+    exist = MapOfUser.contains(email)
+    check = !email.isEmpty() && !nome.isEmpty() && !cognome.isEmpty() && !exist
+    if(exist) Text("E-mail già registrata!", modifier = Modifier.padding(bottom = 10.dp, top = 2.dp), color = Color.Red)
     OutlinedTextField(
         value = email,
+        isError = exist,
         onValueChange = {
                 email = it
                 onEmailChange(email)
@@ -134,7 +136,7 @@ fun FormDati(
         value = cognome,
         onValueChange = {
                 cognome = it
-                onSecondNameChange(cognome)
+                onSurnameChange(cognome)
             },
         label = {Text("Cognome") },
         modifier = Modifier.padding(bottom = 50.dp),
@@ -163,7 +165,6 @@ fun FormPassword(
         shape = RoundedCornerShape(30.dp),
         singleLine = true
     )
-    CheckPassword(password, {check = it})
     OutlinedTextField(
         value = confirmPassword,
         onValueChange = {
@@ -177,14 +178,9 @@ fun FormPassword(
         shape = RoundedCornerShape(30.dp),
         singleLine = true
     )
+    CheckPassword(password, {check = it})
 
 
-    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-        /*Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            if(password.count()<8)Text("Password deve contenere almeno 8 caratteri", modifier = Modifier.padding(bottom = 10.dp))
-            Text("Password stupida")
-        }*/
-    }
     Spacer(Modifier.size(80.dp))
 }
 
@@ -215,34 +211,20 @@ fun CheckPassword(
     check = upperCase && minLen && digitChar && specialChar
     checking(check)
 
-    Row(horizontalArrangement = Arrangement.Center) {
-        Spacer(Modifier.size(30.dp))
-        Column(horizontalAlignment = Alignment.Start, modifier = Modifier.weight(1f)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                if(minLen) IconOk()
-                else IconFail()
-                Text("Deve contenere almeno 8 caratteri", fontSize = 10.sp)
-            }
-            Spacer(Modifier.size(10.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                if(upperCase) IconOk()
-                else IconFail()
-                Text("Deve contenere almeno una lettera maiuscola", fontSize = 10.sp)
-            }
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 15.dp).clip(RoundedCornerShape(10.dp)).background(Color.LightGray),
+        horizontalArrangement = Arrangement.spacedBy(30.dp)
+
+    ) {
+        Column(Modifier.weight(1f)) {
+            PasswordCheckItem(minLen, "Almeno 8 caratteri")
+            Spacer(Modifier.size(5.dp))
+            PasswordCheckItem(specialChar, "Almeno un carattere speciale")
         }
-        Spacer(Modifier.size(10.dp))
-        Column(horizontalAlignment = Alignment.Start, modifier = Modifier.weight(1f)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                if(specialChar) IconOk()
-                else IconFail()
-                Text("Deve contenere almeno un carattere speciale", fontSize = 10.sp)
-            }
-            Spacer(Modifier.size(10.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                if(digitChar) IconOk()
-                else IconFail()
-                Text("Deve contenere almeno un numero", fontSize = 10.sp)
-            }
+        Column(Modifier.weight(1f)) {
+            PasswordCheckItem(upperCase, "Almeno una lettera maiuscola")
+            Spacer(Modifier.size(5.dp))
+            PasswordCheckItem(digitChar, "Almeno una cifra")
         }
     }
 }
@@ -250,7 +232,7 @@ fun CheckPassword(
 @Composable
 fun IconOk() {
     Icon(
-        Icons.Filled.CheckCircle,
+        Icons.Filled.Check,
         "",
         tint = Color.Green,
         modifier = Modifier.padding(end = 5.dp)
@@ -260,9 +242,19 @@ fun IconOk() {
 @Composable
 fun IconFail() {
     Icon(
-        Icons.Filled.CheckCircle,
+        Icons.Filled.Clear,
         "",
         tint = Color.Red,
         modifier = Modifier.padding(end = 5.dp)
     )
+}
+
+@Composable
+fun PasswordCheckItem(condition: Boolean, text: String) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        if(condition) IconOk()
+        else IconFail()
+        Spacer(Modifier.size(7.dp))
+        Text(text, fontSize = 11.sp, lineHeight = 14.sp)
+    }
 }
