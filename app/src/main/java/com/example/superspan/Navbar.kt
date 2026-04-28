@@ -28,7 +28,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.NavigationBarItemDefaults
 
-
 var actualUser: User? = MapOfUser.getValue("d.tinti@superspan.it")
 
 enum class Destination (
@@ -44,6 +43,7 @@ enum class Destination (
     LOGIN("login", "Login", null),
     REGISTER("register", "Registrazione", null)
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Navigation(navController: NavHostController, startDestination: Destination, paddingValues: PaddingValues) {

@@ -1,6 +1,9 @@
 package com.example.superspan
 
 import android.media.Image
+import androidx.compose.foundation.gestures.TransformableState
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.ui.unit.Density
 
 val MapOfUser = mutableMapOf<String, User>(
     "d.tinti@superspan.it" to User(
@@ -9,13 +12,17 @@ val MapOfUser = mutableMapOf<String, User>(
 )
 
 val ListOfProduct = mutableListOf<Product>(
-    Product("a", "a", null),
+    Product("palla da calcio", "a", null),
     Product("b", "b", null),
     Product("c", "c", null),
     Product("d", "d", null),
     Product("e", "e", null),
     Product("f", "f", null),
-    Product("g", "g", null)
+    Product("g", "g", null),
+    Product("h", "h", null),
+    Product("i", "i", null),
+    Product("j", "j", null),
+    Product("k", "k", null)
 )
 
 
@@ -72,4 +79,12 @@ class BottomOvalShape(private val curveDepth: androidx.compose.ui.unit.Dp) : and
         }
         return androidx.compose.ui.graphics.Outline.Generic(path)
     }
+}
+
+fun searchProduct(prodotti: List<Product>, nome: String): List<Product> {
+    var lista: List<Product>
+    lista = prodotti.filter { product ->
+        product.nome.contains(nome)
+    }
+    return lista
 }
