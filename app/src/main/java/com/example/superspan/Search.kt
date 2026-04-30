@@ -1,6 +1,7 @@
 package com.example.superspan
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,11 +36,11 @@ import androidx.compose.material.icons.filled.Photo
 import androidx.compose.runtime.remember
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.text.font.FontWeight
-
+import androidx.compose.ui.text.style.TextAlign
 
 
 @Composable
-fun Home(
+fun SearchPage(
     padding: PaddingValues,
     navController: NavController?
 ) {
@@ -50,21 +51,7 @@ fun Home(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Column(
-            Modifier
-                .weight(1f)
-                .clip(BottomOvalShape(30.dp))
-                .fillMaxSize()
-                .background(Color.Gray),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Bottom
-        ) {
-            Text("LOGO", fontSize = 50.sp)
-            Text("Ciao ${actualUser?.nome}", fontSize = 20.sp,
-                modifier = Modifier.padding(bottom = 20.dp, top = 15.dp)
-            )
-
-        }
+        Header(Modifier.weight(1f))
         OutlinedTextField(
             search,
             {
@@ -80,25 +67,26 @@ fun Home(
             modifier = Modifier
                 .weight(4f)
                 .fillMaxSize()
-                .padding(horizontal = 40.dp),
+                .padding(horizontal = 20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(productSearchList, key = {product -> product.nome}) {
-                    product -> ProductCompose(product)
+                    product -> ProductCompose(product, navController)
             }
         }
     }
 }
 
 @Composable
-fun ProductCompose(product: Product) {
+fun ProductCompose(product: Product, navController: NavController?) {
     Box(
         Modifier
             .fillMaxSize()
             .aspectRatio(1f)
             .clip(RoundedCornerShape(20.dp))
-            .background(Color.LightGray),
+            .background(Color.LightGray)
+            .clickable(onClick = {navController?.navigate(Destination.PRODOTTO.route+"/${product.nome}")}),
         contentAlignment = Alignment.TopCenter
     ) {
         Column(
@@ -112,9 +100,13 @@ fun ProductCompose(product: Product) {
                     .weight(1f)
                     .fillMaxSize()
             )
-            Column (Modifier.fillMaxWidth().weight(0.6f)) {
-                TestoAdattabile(product.nome, Modifier.padding(end = 25.dp, start = 5.dp), 20.sp)
-                TestoAdattabile(product.descrizione, Modifier.padding(start = 25.dp, end = 5.dp), 15.sp)
+            Column (Modifier
+                .fillMaxWidth()
+                .weight(0.6f)) {
+                TestoAdattabile(product.nome, Modifier.padding(end = 25.dp, start = 10.dp), 15.sp)
+                Spacer(Modifier.weight(1f))
+                TestoAdattabile("${product.prezzo} $", Modifier.padding(start = 25.dp, end = 10.dp, bottom = 10.dp), 15.sp,
+                    TextAlign.End)
             }
         }
     }
@@ -123,26 +115,7 @@ fun ProductCompose(product: Product) {
 
 @Preview(showBackground = true)
 @Composable
-fun HomePreview() {
-    Home(PaddingValues(0.dp), null)
+fun SearchPreview() {
+    SearchPage(PaddingValues(0.dp), null)
 }
 
-@Composable
-fun TestoAdattabile(testo: String, modifier: Modifier = Modifier, fontSize: TextUnit) {
-    var dim by remember { mutableStateOf(fontSize) }
-    var check by remember { mutableStateOf(false) }
-    Text(
-        testo,
-        modifier =
-            modifier
-                .drawWithContent({if(check) drawContent()})
-                .fillMaxWidth(),
-        onTextLayout = { layout ->
-            if(layout.hasVisualOverflow) dim*=0.9f
-            else check = true },
-        fontWeight = FontWeight.Bold,
-        fontSize = dim,
-        maxLines = 1,
-        softWrap = false
-    )
-}

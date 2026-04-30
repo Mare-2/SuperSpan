@@ -1,9 +1,8 @@
 package com.example.superspan
 
+import android.graphics.drawable.Icon
 import android.media.Image
-import androidx.compose.foundation.gestures.TransformableState
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.ui.unit.Density
+import androidx.compose.ui.graphics.vector.ImageVector
 
 val MapOfUser = mutableMapOf<String, User>(
     "d.tinti@superspan.it" to User(
@@ -12,17 +11,18 @@ val MapOfUser = mutableMapOf<String, User>(
 )
 
 val ListOfProduct = mutableListOf<Product>(
-    Product("palla da calcio", "a", null),
-    Product("b", "b", null),
-    Product("c", "c", null),
-    Product("d", "d", null),
-    Product("e", "e", null),
-    Product("f", "f", null),
-    Product("g", "g", null),
-    Product("h", "h", null),
-    Product("i", "i", null),
-    Product("j", "j", null),
-    Product("k", "k", null)
+    Product("Pane Fresco", 1.20f, null),
+    Product("Latte Intero 1L", 1.50f, null),
+    Product("Pasta Barilla 500g", 0.99f, null),
+    Product("Salsa di Pomodoro", 1.10f, null),
+    Product("Mele (sacchetto 1kg)", 2.30f, null),
+    Product("Uova (confezione da 6)", 1.80f, null),
+    Product("Parmigiano Reggiano 200g", 5.50f, null),
+    Product("Biscotti al Cioccolato", 2.99f, null),
+    Product("Detersivo Piatti", 1.45f, null),
+    Product("Carta Igienica (4 rotoli)", 2.20f, null),
+    Product("Acqua Naturale 1.5L", 0.40f, null),
+    Product("Caffè Macinato 250g", 3.50f, null)
 )
 
 
@@ -53,19 +53,18 @@ data class User(
 
 class Product(
     private var _nome: String,
-    private var _descrizione: String,
-    private var _image: Image?
+    private var _prezzo: Float,
+    private var _image: ImageVector?
 ) {
     var nome get() = _nome
         set(value) {_nome=value}
 
-    var descrizione get() = _descrizione
-        set(value) {_descrizione=value}
+    var prezzo get() = _prezzo
+        set(value) {_prezzo=value}
 
     var image get() = _image
         set(value) {_image=value}
 }
-
 
 class BottomOvalShape(private val curveDepth: androidx.compose.ui.unit.Dp) : androidx.compose.ui.graphics.Shape {
     override fun createOutline(size: androidx.compose.ui.geometry.Size, layoutDirection: androidx.compose.ui.unit.LayoutDirection, density: androidx.compose.ui.unit.Density): androidx.compose.ui.graphics.Outline {
@@ -84,7 +83,40 @@ class BottomOvalShape(private val curveDepth: androidx.compose.ui.unit.Dp) : and
 fun searchProduct(prodotti: List<Product>, nome: String): List<Product> {
     var lista: List<Product>
     lista = prodotti.filter { product ->
-        product.nome.contains(nome)
+        product.nome.contains(nome, ignoreCase = true)
     }
     return lista
+}
+
+class TopOvalShape(private val curveDepth: androidx.compose.ui.unit.Dp) : androidx.compose.ui.graphics.Shape {
+    override fun createOutline(
+        size: androidx.compose.ui.geometry.Size,
+        layoutDirection: androidx.compose.ui.unit.LayoutDirection,
+        density: androidx.compose.ui.unit.Density
+    ): androidx.compose.ui.graphics.Outline {
+        val depthPx = with(density) { curveDepth.toPx() }
+
+        // Calcoliamo la metà dell'altezza totale
+        val startY = size.height / 3f
+
+        val path = androidx.compose.ui.graphics.Path().apply {
+            // 1. Partiamo da metà schermo a sinistra (scendendo di depthPx per far spazio alla curva)
+            moveTo(0f, startY + depthPx)
+
+            // 2. Disegniamo la curva. Il punto più alto toccherà esattamente 'startY - depthPx'
+            quadraticBezierTo(
+                x1 = size.width / 2f, y1 = startY - depthPx,
+                x2 = size.width,      y2 = startY + depthPx
+            )
+
+            // 3. Linea fino in basso a destra
+            lineTo(size.width, size.height)
+
+            // 4. Linea fino in basso a sinistra
+            lineTo(0f, size.height)
+
+            close()
+        }
+        return androidx.compose.ui.graphics.Outline.Generic(path)
+    }
 }

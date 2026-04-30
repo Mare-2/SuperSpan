@@ -147,42 +147,7 @@ fun FormDati(
     Button({onAdvance(true)}, enabled = check, modifier = Modifier.padding(bottom = 15.dp)) {Text("Avanti")}
 }
 
-@Composable
-fun FormPassword(
-    onPasswordChange: (String)-> Unit,
-    checking: (Boolean)-> Unit
-) {
-    var password by rememberSaveable { mutableStateOf("") }
-    var confirmPassword by rememberSaveable { mutableStateOf("") }
-    var check by rememberSaveable { mutableStateOf(false) }
-    OutlinedTextField(
-        value = password,
-        onValueChange = {
-            password = it
-            onPasswordChange(password) },
-        label = {Text("Password") },
-        modifier = Modifier.padding(bottom = 25.dp),
-        shape = RoundedCornerShape(30.dp),
-        singleLine = true
-    )
-    OutlinedTextField(
-        value = confirmPassword,
-        onValueChange = {
-            confirmPassword = it
-            check = !password.isEmpty() && !confirmPassword.isEmpty() && password==confirmPassword
-            checking(check)
-        },
-        isError = password!=confirmPassword && confirmPassword.isNotEmpty(),
-        label = {Text("Confirm Password") },
-        modifier = Modifier.padding(bottom = 50.dp, top = 55.dp),
-        shape = RoundedCornerShape(30.dp),
-        singleLine = true
-    )
-    CheckPassword(password, {check = it})
 
-
-    Spacer(Modifier.size(80.dp))
-}
 
 
 @ExperimentalMaterial3Api
@@ -192,69 +157,5 @@ fun RegisterPreview() {
     Register(PaddingValues(0.dp), null)
 }
 
-@Composable
-fun CheckPassword(
-    password: String,
-    checking: (Boolean) -> Unit
-) {
-    var upperCase = false
-    var minLen = false
-    var specialChar = false
-    var digitChar = false
-    var check: Boolean
-    if (password.length>=8) minLen = true
-    password.forEach { c ->
-        if (c.isUpperCase()) upperCase = true
-        else if (c.isDigit()) digitChar = true
-        else if (!c.isLetterOrDigit()) specialChar = true
-    }
-    check = upperCase && minLen && digitChar && specialChar
-    checking(check)
 
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 15.dp).clip(RoundedCornerShape(10.dp)).background(Color.LightGray),
-        horizontalArrangement = Arrangement.spacedBy(30.dp)
 
-    ) {
-        Column(Modifier.weight(1f)) {
-            PasswordCheckItem(minLen, "Almeno 8 caratteri")
-            Spacer(Modifier.size(5.dp))
-            PasswordCheckItem(specialChar, "Almeno un carattere speciale")
-        }
-        Column(Modifier.weight(1f)) {
-            PasswordCheckItem(upperCase, "Almeno una lettera maiuscola")
-            Spacer(Modifier.size(5.dp))
-            PasswordCheckItem(digitChar, "Almeno una cifra")
-        }
-    }
-}
-
-@Composable
-fun IconOk() {
-    Icon(
-        Icons.Filled.Check,
-        "",
-        tint = Color.Green,
-        modifier = Modifier.padding(end = 5.dp)
-    )
-}
-
-@Composable
-fun IconFail() {
-    Icon(
-        Icons.Filled.Clear,
-        "",
-        tint = Color.Red,
-        modifier = Modifier.padding(end = 5.dp)
-    )
-}
-
-@Composable
-fun PasswordCheckItem(condition: Boolean, text: String) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        if(condition) IconOk()
-        else IconFail()
-        Spacer(Modifier.size(7.dp))
-        Text(text, fontSize = 11.sp, lineHeight = 14.sp)
-    }
-}

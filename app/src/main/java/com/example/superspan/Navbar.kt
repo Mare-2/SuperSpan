@@ -1,18 +1,13 @@
 package com.example.superspan
 
-import android.graphics.drawable.Icon
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -27,6 +22,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 
 var actualUser: User? = MapOfUser.getValue("d.tinti@superspan.it")
 
@@ -36,12 +33,13 @@ enum class Destination (
     val icon: ImageVector?
 ) {
     HOME("home", "Home", Icons.Default.Home),
-    COUPON("coupon", "Coupon", Icons.Default.ConfirmationNumber),
+    SEARCH("search", "Search", Icons.Default.Search),
     OFFERTE("discount", "Offerte", Icons.Default.LocalOffer),
     LAVORO("work", "Lavoro", Icons.Default.Work),
-    PROFILO("profile", "Profilo", Icons.Default.AccountCircle),
     LOGIN("login", "Login", null),
-    REGISTER("register", "Registrazione", null)
+    REGISTER("register", "Registrazione", null),
+    PROFILO("profile", "Profilo", Icons.Default.AccountCircle),
+    PRODOTTO("product", "prodotto", null)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,10 +51,22 @@ fun Navigation(navController: NavHostController, startDestination: Destination, 
                 when(destination) {
                     Destination.LOGIN -> Login(paddingValues, navController)
                     Destination.REGISTER -> Register(paddingValues, navController)
+                    Destination.SEARCH -> SearchPage(paddingValues, navController)
                     Destination.HOME -> Home(paddingValues, navController)
                     else -> {}
                 }
             }
+        }
+        composable(Destination.PRODOTTO.route+"/{prod}", arguments = listOf(
+            navArgument("prod") {
+                type = NavType.StringType
+                defaultValue = ""
+                nullable = false
+            })
+        ) { backStackEntry ->
+                val nameProduct = backStackEntry.arguments?.getString("prod")
+                val product = ListOfProduct.find {product -> product.nome == nameProduct}
+                ProductPage(product, navController, paddingValues)
         }
     }
 }
@@ -65,7 +75,6 @@ fun Navigation(navController: NavHostController, startDestination: Destination, 
 @Composable
 @Preview(showBackground = true)
 fun MainNavigation() {
-    var changeRoute = Destination.REGISTER.route
     val navController = rememberNavController()
     val startDestination: Destination = Destination.HOME
     val navBarStackEntry by navController.currentBackStackEntryAsState()
@@ -80,6 +89,7 @@ fun MainNavigation() {
                         when(destination) {
                             Destination.LOGIN -> {}
                             Destination.REGISTER -> {}
+                            Destination.PRODOTTO -> {}
                             else -> {
                                 NavigationBarItem(
                                     selected = currentRoute==destination.route,
