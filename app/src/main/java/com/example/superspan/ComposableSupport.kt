@@ -36,6 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import androidx.navigation.NavController
 import androidx.compose.material.icons.filled.Photo
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.remember
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.text.font.FontWeight
@@ -189,6 +190,34 @@ fun TestoAdattabile(testo: String, modifier: Modifier = Modifier, fontSize: Text
         maxLines = 1,
         softWrap = false
     )
+}
+
+@Composable
+fun HeaderHomeAlt(modifier: Modifier, navController: NavController?) {
+    Column(
+        modifier
+            .clip(BottomOvalShape(30.dp))
+            .fillMaxSize()
+            .background(Color.Gray),
+        verticalArrangement = Arrangement.Top
+    ) {
+        Row(Modifier.padding(top = 20.dp, start = 10.dp, end = 20.dp)) {
+            Text("LOGO", fontSize = 50.sp)
+            Spacer(Modifier.weight(1f))
+            IconButton(
+                {navController?.navigate(Destination.PROFILO.route)},
+                content = {ProfileIcon()},
+                modifier = Modifier.size(60.dp)
+            )
+        }
+        Row(Modifier.padding(start = 10.dp, end = 10.dp).fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+            Text("Ciao ${actualUser?.nome}", fontSize = 20.sp,
+                modifier = Modifier.padding(bottom = 20.dp, top = 15.dp),
+                textAlign = TextAlign.Center
+            )
+        }
+
+    }
 }
 
 

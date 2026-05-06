@@ -41,31 +41,7 @@ import androidx.navigation.NavController
 @Composable
 fun Home(paddingValues: PaddingValues, navController: NavController?) {
     Column(Modifier.padding(paddingValues)) {
-        Column(
-            Modifier
-                .clip(BottomOvalShape(30.dp))
-                .fillMaxSize()
-                .weight(1f)
-                .background(Color.Gray),
-            verticalArrangement = Arrangement.Top
-        ) {
-            Row(Modifier.padding(top = 20.dp, start = 10.dp, end = 20.dp)) {
-                Text("LOGO", fontSize = 50.sp)
-                Spacer(Modifier.weight(1f))
-                IconButton(
-                    {navController?.navigate(Destination.PROFILO.route)},
-                    content = {ProfileIcon()},
-                    modifier = Modifier.size(60.dp)
-                )
-            }
-            Row(Modifier.padding(start = 10.dp, end = 10.dp).fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                Text("Ciao ${actualUser?.nome}", fontSize = 20.sp,
-                    modifier = Modifier.padding(bottom = 20.dp, top = 15.dp),
-                    textAlign = TextAlign.Center
-                )
-            }
-
-        }
+        Header(Modifier.weight(1f))
         Column(Modifier
             .weight(4f)
             .padding(top = 30.dp)) {

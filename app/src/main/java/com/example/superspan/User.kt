@@ -1,7 +1,8 @@
 package com.example.superspan
 
 import android.graphics.drawable.Icon
-import android.media.Image
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.ui.graphics.vector.ImageVector
 
 val MapOfUser = mutableMapOf<String, User>(
@@ -10,22 +11,31 @@ val MapOfUser = mutableMapOf<String, User>(
     )
 )
 
+enum class Category(val id: Int, val nome: String, val icon: ImageVector) {
+    PANETTERIA(0, "Panetteria", Icons.Default.Image),
+    FRUTTA_E_VERDURA(1, "Frutta e verdura", Icons.Default.Image),
+    LATTICINI(2, "Latticini", Icons.Default.Image),
+    DISPENSA(3, "Dispensa", Icons.Default.Image),
+    COLAZIONE(4, "Colazione", Icons.Default.Image),
+    PULIZIA_CASA(5, "Pulizia casa", Icons.Default.Image),
+    IGIENE_PERSONALE(6, "Igiene personale", Icons.Default.Image),
+    BEVANDE(7, "Bevande", Icons.Default.Image)
+}
+
 val ListOfProduct = mutableListOf<Product>(
-    Product("Pane Fresco", 1.20f, null),
-    Product("Latte Intero 1L", 1.50f, null),
-    Product("Pasta Barilla 500g", 0.99f, null),
-    Product("Salsa di Pomodoro", 1.10f, null),
-    Product("Mele (sacchetto 1kg)", 2.30f, null),
-    Product("Uova (confezione da 6)", 1.80f, null),
-    Product("Parmigiano Reggiano 200g", 5.50f, null),
-    Product("Biscotti al Cioccolato", 2.99f, null),
-    Product("Detersivo Piatti", 1.45f, null),
-    Product("Carta Igienica (4 rotoli)", 2.20f, null),
-    Product("Acqua Naturale 1.5L", 0.40f, null),
-    Product("Caffè Macinato 250g", 3.50f, null)
+    Product("Pane Fresco", 1.20f, null, Category.PANETTERIA),
+    Product("Latte Intero 1L", 1.50f, null, Category.LATTICINI),
+    Product("Pasta Barilla 500g", 0.99f, null, Category.DISPENSA),
+    Product("Salsa di Pomodoro", 1.10f, null, Category.DISPENSA),
+    Product("Mele (sacchetto 1kg)", 2.30f, null, Category.FRUTTA_E_VERDURA),
+    Product("Uova (confezione da 6)", 1.80f, null, Category.LATTICINI),
+    Product("Parmigiano Reggiano 200g", 5.50f, null, Category.LATTICINI),
+    Product("Biscotti al Cioccolato", 2.99f, null, Category.COLAZIONE),
+    Product("Detersivo Piatti", 1.45f, null, Category.PULIZIA_CASA),
+    Product("Carta Igienica (4 rotoli)", 2.20f, null, Category.IGIENE_PERSONALE),
+    Product("Acqua Naturale 1.5L", 0.40f, null, Category.BEVANDE),
+    Product("Caffè Macinato 250g", 3.50f, null, Category.DISPENSA)
 )
-
-
 
 data class User(
     private var _nome: String = "",
@@ -34,7 +44,6 @@ data class User(
     private var _password: String = "",
     private var _admin: Boolean = false
 ) {
-    //TODO: inserire una reference al CV
     var nome get() = _nome
         set(value) {_nome = value}
 
@@ -51,10 +60,11 @@ data class User(
         set(value) {_admin = value}
 }
 
-class Product(
+data class Product(
     private var _nome: String,
     private var _prezzo: Float,
-    private var _image: ImageVector?
+    private var _image: ImageVector?,
+    private var _categoria: Category
 ) {
     var nome get() = _nome
         set(value) {_nome=value}
@@ -64,6 +74,9 @@ class Product(
 
     var image get() = _image
         set(value) {_image=value}
+    
+    var categoria get() = _categoria
+        set(value) {_categoria = value}
 }
 
 class BottomOvalShape(private val curveDepth: androidx.compose.ui.unit.Dp) : androidx.compose.ui.graphics.Shape {
@@ -80,12 +93,23 @@ class BottomOvalShape(private val curveDepth: androidx.compose.ui.unit.Dp) : and
     }
 }
 
-fun searchProduct(prodotti: List<Product>, nome: String): List<Product> {
-    var lista: List<Product>
-    lista = prodotti.filter { product ->
-        product.nome.contains(nome, ignoreCase = true)
+fun searchProduct(prodotti: List<Product>, nome: String, categorie: List<Category>): List<Product> {
+    var list: List<Product> = ListOfProduct
+    if (categorie.isNotEmpty()) {
+        list = filterProduct(list, categorie)
     }
-    return lista
+    if (nome.isNotEmpty()) {
+        list = list.filter { product ->
+            product.nome.contains(nome, ignoreCase = true)
+        }
+    }
+    return list
+}
+
+fun filterProduct(prodotti: List<Product>, categorie: List<Category>): List<Product> {
+    return prodotti.filter { product ->
+        categorie.contains(product.categoria)
+    }
 }
 
 class TopOvalShape(private val curveDepth: androidx.compose.ui.unit.Dp) : androidx.compose.ui.graphics.Shape {
@@ -95,26 +119,15 @@ class TopOvalShape(private val curveDepth: androidx.compose.ui.unit.Dp) : androi
         density: androidx.compose.ui.unit.Density
     ): androidx.compose.ui.graphics.Outline {
         val depthPx = with(density) { curveDepth.toPx() }
-
-        // Calcoliamo la metà dell'altezza totale
         val startY = size.height / 3f
-
         val path = androidx.compose.ui.graphics.Path().apply {
-            // 1. Partiamo da metà schermo a sinistra (scendendo di depthPx per far spazio alla curva)
             moveTo(0f, startY + depthPx)
-
-            // 2. Disegniamo la curva. Il punto più alto toccherà esattamente 'startY - depthPx'
             quadraticBezierTo(
                 x1 = size.width / 2f, y1 = startY - depthPx,
                 x2 = size.width,      y2 = startY + depthPx
             )
-
-            // 3. Linea fino in basso a destra
             lineTo(size.width, size.height)
-
-            // 4. Linea fino in basso a sinistra
             lineTo(0f, size.height)
-
             close()
         }
         return androidx.compose.ui.graphics.Outline.Generic(path)
