@@ -39,7 +39,8 @@ enum class Destination (
     LOGIN("login", "Login", null),
     REGISTER("register", "Registrazione", null),
     PROFILO("profile", "Profilo", Icons.Default.AccountCircle),
-    PRODOTTO("product", "prodotto", null)
+    PRODOTTO("product", "prodotto", null),
+    ADD_COUPON("add_coupon", "Aggiungi Offerta", null)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,8 +52,10 @@ fun Navigation(navController: NavHostController, startDestination: Destination, 
                 when(destination) {
                     Destination.LOGIN -> Login(paddingValues, navController)
                     Destination.REGISTER -> Register(paddingValues, navController)
-                    Destination.SEARCH -> SearchPage(paddingValues, navController)
+                    Destination.SEARCH -> SearchPageComplete(paddingValues, navController)
                     Destination.HOME -> Home(paddingValues, navController)
+                    Destination.OFFERTE -> CouponPageComplete(paddingValues, navController)
+                    Destination.ADD_COUPON -> AddCoupon(paddingValues, navController)
                     else -> {}
                 }
             }
@@ -76,7 +79,7 @@ fun Navigation(navController: NavHostController, startDestination: Destination, 
 @Preview(showBackground = true)
 fun MainNavigation() {
     val navController = rememberNavController()
-    val startDestination: Destination = Destination.HOME
+    val startDestination: Destination = Destination.OFFERTE
     val navBarStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBarStackEntry?.destination?.route ?: Destination.LOGIN.route
     val showBar: Boolean = currentRoute != Destination.LOGIN.route &&
@@ -90,6 +93,7 @@ fun MainNavigation() {
                             Destination.LOGIN -> {}
                             Destination.REGISTER -> {}
                             Destination.PRODOTTO -> {}
+                            Destination.ADD_COUPON -> {}
                             else -> {
                                 NavigationBarItem(
                                     selected = currentRoute==destination.route,
