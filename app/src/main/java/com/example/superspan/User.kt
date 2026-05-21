@@ -220,6 +220,8 @@ data class User(
         set(value) {_admin = value}
 }
 
+//-------------------------------PRODUCTS--------------------------------------------------
+
 data class Product(
     private var _nome: String,
     private var _prezzo: Float,
@@ -237,20 +239,6 @@ data class Product(
     
     var categoria get() = _categoria
         set(value) {_categoria = value}
-}
-
-class BottomOvalShape(private val curveDepth: androidx.compose.ui.unit.Dp) : androidx.compose.ui.graphics.Shape {
-    override fun createOutline(size: androidx.compose.ui.geometry.Size, layoutDirection: androidx.compose.ui.unit.LayoutDirection, density: androidx.compose.ui.unit.Density): androidx.compose.ui.graphics.Outline {
-        val depthPx = with(density) { curveDepth.toPx() }
-        val path = androidx.compose.ui.graphics.Path().apply {
-            moveTo(0f, 0f)
-            lineTo(size.width, 0f)
-            lineTo(size.width, size.height - depthPx)
-            quadraticBezierTo(size.width / 2f, size.height + depthPx, 0f, size.height - depthPx)
-            close()
-        }
-        return androidx.compose.ui.graphics.Outline.Generic(path)
-    }
 }
 
 fun searchProduct(filterData: FilterData): List<Product> {
@@ -282,6 +270,23 @@ fun filterProduct(prodotti: List<Product>, categorie: List<Category>): List<Prod
     }
 }
 
+//-------------------------------SHAPES--------------------------------------------------
+
+
+class BottomOvalShape(private val curveDepth: androidx.compose.ui.unit.Dp) : androidx.compose.ui.graphics.Shape {
+    override fun createOutline(size: androidx.compose.ui.geometry.Size, layoutDirection: androidx.compose.ui.unit.LayoutDirection, density: androidx.compose.ui.unit.Density): androidx.compose.ui.graphics.Outline {
+        val depthPx = with(density) { curveDepth.toPx() }
+        val path = androidx.compose.ui.graphics.Path().apply {
+            moveTo(0f, 0f)
+            lineTo(size.width, 0f)
+            lineTo(size.width, size.height - depthPx)
+            quadraticBezierTo(size.width / 2f, size.height + depthPx, 0f, size.height - depthPx)
+            close()
+        }
+        return androidx.compose.ui.graphics.Outline.Generic(path)
+    }
+}
+
 class TopOvalShape(private val curveDepth: androidx.compose.ui.unit.Dp) : androidx.compose.ui.graphics.Shape {
     override fun createOutline(
         size: androidx.compose.ui.geometry.Size,
@@ -303,3 +308,41 @@ class TopOvalShape(private val curveDepth: androidx.compose.ui.unit.Dp) : androi
         return androidx.compose.ui.graphics.Outline.Generic(path)
     }
 }
+
+//-------------------------------WORK OFFERS--------------------------------------------------
+data class WorkOffer(
+    val id: Int,
+    val ruolo: String,
+    val descrizioneBreve: String,
+    val citta: String,
+    val tipoContratto: String, // es. "Determinato", "Indeterminato"
+    val orario: String,        // es. "Full-time", "Part-time"
+    val iconaRes: Int? = null  // Per un'eventuale immagine specifica
+)
+
+val WorkOfferSearchList = listOf(
+    WorkOffer(
+        id = 1,
+        ruolo = "Addetto alle vendite",
+        descrizioneBreve = "Cerchiamo personale dinamico per il reparto ortofrutta.",
+        citta = "Milano",
+        tipoContratto = "Determinato",
+        orario = "Full-time"
+    ),
+    WorkOffer(
+        id = 2,
+        ruolo = "Cassiere/a",
+        descrizioneBreve = "Gestione cassa e assistenza clienti nel punto vendita.",
+        citta = "Roma",
+        tipoContratto = "Indeterminato",
+        orario = "Part-time"
+    ),
+    WorkOffer(
+        id = 3,
+        ruolo = "Magazziniere",
+        descrizioneBreve = "Carico/scarico merci e gestione scorte di magazzino.",
+        citta = "Torino",
+        tipoContratto = "Determinato",
+        orario = "Full-time"
+    )
+)

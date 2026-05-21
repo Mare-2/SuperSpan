@@ -56,6 +56,7 @@ fun Navigation(navController: NavHostController, startDestination: Destination, 
                     Destination.HOME -> Home(paddingValues, navController)
                     Destination.OFFERTE -> CouponPageComplete(paddingValues, navController)
                     Destination.ADD_COUPON -> AddCoupon(paddingValues, navController)
+                    Destination.LAVORO -> WorkSearchPageComplete(paddingValues, navController)
                     else -> {}
                 }
             }
