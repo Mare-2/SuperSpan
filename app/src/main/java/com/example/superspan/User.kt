@@ -10,12 +10,52 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
 
+data class User(
+    private var _nome: String = "",
+    private var _cognome: String = "",
+    private var _email: String = "",
+    private var _password: String = "",
+    private var _admin: Boolean = false,
+    // Campi aggiuntivi per dati personali/lavoro
+    private var _telefono: String? = null,
+    private var _emailLavoro: String? = null,
+    private var _cvFileName: String? = null // Nome del file PDF caricato
+) {
+    // ... getter e setter ...
+    var telefono get() = _telefono; set(v) { _telefono = v }
+    var emailLavoro get() = _emailLavoro; set(v) { _emailLavoro = v }
+    var cvFileName get() = _cvFileName; set(v) { _cvFileName = v }
+    var nome get() = _nome; set(v) { _nome = v }
+    var cognome get() = _cognome; set(v) { _cognome = v }
+    var email get() = _email; set(v) { _email = v }
+    var password get() = _password; set(v) { _password = v }
+    var admin get() = _admin; set(v) { _admin = v }
+}
 val MapOfUser = mutableMapOf<String, User>(
+    // DANIELA TINTI (Admin)
     "d.tinti@superspan.it" to User(
-        "Daniela", "Tinti", "d.tinti@superspan.it", "caccacacca", true
+        _nome = "Daniela",
+        _cognome = "Tinti",
+        _email = "d.tinti@superspan.it",
+        _password = "caccacacca",
+        _admin = true
+        // telefono e infoCandidatura restano null di default
+    ),
+
+    // PAOLO CORTELLESI (Non Admin)
+    "p.cortellesi@gmail.com" to User(
+        _nome = "Paolo",
+        _cognome = "Cortellesi",
+        _email = "p.cortellesi@gmail.com",
+        _password = "password123",
+        _admin = false,
+        _telefono = "333 1234567"
     )
 )
 
+//var currentUser by mutableStateOf(MapOfUser["p.cortellesi@gmail.com"]!!)
+
+//------------------------------Da sistemare-------------------------------------------
 class FilterData() {
     var nome: String by mutableStateOf("")
     var ordinamento: String by mutableStateOf("Nome")
@@ -197,28 +237,6 @@ val ListOfCoupon = mutableListOf<Coupon>(
 )
 
 
-data class User(
-    private var _nome: String = "",
-    private var _cognome: String = "",
-    private var _email: String = "",
-    private var _password: String = "",
-    private var _admin: Boolean = false
-) {
-    var nome get() = _nome
-        set(value) {_nome = value}
-
-    var cognome get() = _cognome
-        set(value) {_cognome=value}
-
-    var email get() = _email
-        set(value) {_email=value}
-
-    var password get() = _password
-        set(value) {_password=value}
-
-    var admin get() = _admin
-        set(value) {_admin = value}
-}
 
 //-------------------------------PRODUCTS--------------------------------------------------
 
@@ -287,7 +305,7 @@ class BottomOvalShape(private val curveDepth: androidx.compose.ui.unit.Dp) : and
     }
 }
 
-class TopOvalShape(private val curveDepth: androidx.compose.ui.unit.Dp) : androidx.compose.ui.graphics.Shape {
+/*class TopOvalShape(private val curveDepth: androidx.compose.ui.unit.Dp) : androidx.compose.ui.graphics.Shape {
     override fun createOutline(
         size: androidx.compose.ui.geometry.Size,
         layoutDirection: androidx.compose.ui.unit.LayoutDirection,
@@ -301,6 +319,36 @@ class TopOvalShape(private val curveDepth: androidx.compose.ui.unit.Dp) : androi
                 x1 = size.width / 2f, y1 = startY - depthPx,
                 x2 = size.width,      y2 = startY + depthPx
             )
+            lineTo(size.width, size.height)
+            lineTo(0f, size.height)
+            close()
+        }
+        return androidx.compose.ui.graphics.Outline.Generic(path)
+    }
+}*/
+
+class TopOvalShape(private val curveDepth: androidx.compose.ui.unit.Dp) : androidx.compose.ui.graphics.Shape {
+    override fun createOutline(
+        size: androidx.compose.ui.geometry.Size,
+        layoutDirection: androidx.compose.ui.unit.LayoutDirection,
+        density: androidx.compose.ui.unit.Density
+    ): androidx.compose.ui.graphics.Outline {
+        val depthPx = with(density) { curveDepth.toPx() }
+
+        // MODIFICA: startY deve essere 0f per eliminare il vuoto in alto
+        val startY = 0f
+
+        val path = androidx.compose.ui.graphics.Path().apply {
+            // Iniziamo il disegno sul lato sinistro, un po' più in basso rispetto alla cima
+            moveTo(0f, startY + depthPx)
+
+            // Creiamo la curva che tocca il punto più alto (0) al centro dello schermo
+            quadraticBezierTo(
+                x1 = size.width / 2f, y1 = startY,
+                x2 = size.width,      y2 = startY + depthPx
+            )
+
+            // Chiudiamo il rettangolo verso il basso
             lineTo(size.width, size.height)
             lineTo(0f, size.height)
             close()
@@ -425,4 +473,15 @@ val WorkOfferSearchList = listOf(
         tipoContratto = TipoContratto.INDETERMINATO,
         orario = OrarioLavoro.FULL_TIME
     )
+)
+
+
+//-------------------------------Profile--------------------------------------------------
+
+data class UserProfile(
+    val nomeUtente: String,
+    val email: String,
+    val nome: String,
+    val cognome: String,
+    val numeroTelefono: String
 )

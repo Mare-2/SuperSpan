@@ -22,10 +22,13 @@ import androidx.navigation.compose.rememberNavController
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-
-var actualUser: User? = MapOfUser.getValue("d.tinti@superspan.it")
+//p.cortellesi@gmail.com  d.tinti@superspan.it
+var actualUser by mutableStateOf(MapOfUser["p.cortellesi@gmail.com"]!!)
+//var actualUser: User? = MapOfUser.getValue("p.cortellesi@gmail.com")
 
 enum class Destination (
     val route: String,
@@ -57,6 +60,7 @@ fun Navigation(navController: NavHostController, startDestination: Destination, 
                     Destination.OFFERTE -> CouponPageComplete(paddingValues, navController)
                     Destination.ADD_COUPON -> AddCoupon(paddingValues, navController)
                     Destination.LAVORO -> WorkSearchPageComplete(paddingValues, navController)
+                    Destination.PROFILO -> ProfilePage(user = actualUser, navController = navController, paddingValues = paddingValues)
                     else -> {}
                 }
             }

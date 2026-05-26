@@ -75,3 +75,5 @@ fun ProductPage(product: Product?, navController: NavController?, paddingValues:
 fun ProductPreview() {
     ProductPage(ListOfProduct[0], null, PaddingValues(0.dp))
 }
+
+//TODO: da aggiustare visto che cambiando topOvalShape è morto

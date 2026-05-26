@@ -87,7 +87,7 @@ fun Login(
                 Spacer(Modifier.weight(0.6f))
                 Button(
                     onClick = {
-                        _user = accessAccount(email, password)
+                        val _user = accessAccount(email, password)
                         if(_user!=null) {
                             actualUser = _user
                             navController?.navigate(Destination.HOME.route)
