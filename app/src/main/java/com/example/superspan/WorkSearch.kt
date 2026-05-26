@@ -100,69 +100,45 @@ fun WorkOfferCompose(workOffer: WorkOffer, navController: NavController?) {
     Box(
         Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp) // Spazio tra le card
+            .padding(horizontal = 16.dp, vertical = 8.dp)
             .clip(RoundedCornerShape(15.dp))
-            .background(Color(0xFFDCDCDC)) // Grigio chiaro simile alla foto
+            .background(Color(0xFFDCDCDC))
             .clickable(onClick = {
-                // Cambiato il percorso della navigazione
                 navController?.navigate("dettaglio_offerta/${workOffer.id}")
             })
     ) {
-        Row(
-            Modifier
-                .padding(12.dp)
+        // Ora usiamo solo una Column perché non dobbiamo più mettere cose a sinistra e destra
+        Column(
+            modifier = Modifier
+                .padding(16.dp) // Leggermente aumentato per estetica
                 .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            // --- BOX PER L'IMMAGINE (SINISTRA) ---
-            Box(
-                modifier = Modifier
-                    .size(100.dp) // Dimensione fissa del quadrato immagine
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(Color.White), // Sfondo bianco per l'icona
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Photo,
-                    contentDescription = null,
-                    modifier = Modifier.size(50.dp),
-                    tint = Color.Gray
-                )
-            }
+            // 1. Ruolo (Titolo)
+            Text(
+                text = workOffer.ruolo,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.DarkGray
+            )
 
-            Spacer(Modifier.width(16.dp)) // Spazio tra immagine e testo
+            // 2. Descrizione Breve
+            Text(
+                text = workOffer.descrizioneBreve,
+                fontSize = 14.sp,
+                color = Color.Gray,
+                lineHeight = 18.sp
+            )
 
-            // --- COLONNA DEI TESTI (DESTRA) ---
-            Column(
-                modifier = Modifier.weight(1f), // Prende tutto lo spazio rimanente
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                // 1. Ruolo (Titolo)
-                Text(
-                    text = workOffer.ruolo,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.DarkGray
-                )
+            Spacer(Modifier.height(8.dp))
 
-                // 2. Descrizione Breve
-                Text(
-                    text = workOffer.descrizioneBreve,
-                    fontSize = 14.sp,
-                    color = Color.Gray,
-                    lineHeight = 18.sp
-                )
-
-                Spacer(Modifier.height(4.dp))
-
-                // 3. Info (Città • Contratto • Orario)
-                Text(
-                    text = "${workOffer.citta} • ${workOffer.tipoContratto} • ${workOffer.orario}",
-                    fontSize = 13.sp,
-                    color = Color.Gray,
-                    fontWeight = FontWeight.Light
-                )
-            }
+            // 3. Info (Città • Contratto • Orario)
+            Text(
+                text = "${workOffer.citta} • ${workOffer.tipoContratto.nome} • ${workOffer.orario.nome}",
+                fontSize = 13.sp,
+                color = Color.Gray,
+                fontWeight = FontWeight.Light
+            )
         }
     }
 }

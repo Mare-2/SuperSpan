@@ -310,39 +310,119 @@ class TopOvalShape(private val curveDepth: androidx.compose.ui.unit.Dp) : androi
 }
 
 //-------------------------------WORK OFFERS--------------------------------------------------
+
+// 1. Definizione delle opzioni fisse
+enum class TipoContratto(val nome: String) {
+    DETERMINATO("Determinato"),
+    INDETERMINATO("Indeterminato")
+}
+
+enum class OrarioLavoro(val nome: String) {
+    FULL_TIME("Full-time"),
+    PART_TIME("Part-time")
+}
+
+// 2. Struttura dati
 data class WorkOffer(
     val id: Int,
     val ruolo: String,
     val descrizioneBreve: String,
+    val descrizioneEstesa: String, // Per il corpo della pagina offerta
+    val requisiti: String,
     val citta: String,
-    val tipoContratto: String, // es. "Determinato", "Indeterminato"
-    val orario: String,        // es. "Full-time", "Part-time"
-    val iconaRes: Int? = null  // Per un'eventuale immagine specifica
+    val indirizzo: String,
+    val tipoContratto: TipoContratto, // Scelta limitata
+    val orario: OrarioLavoro,         // Scelta limitata
 )
 
+// 3. Lista di offerte di lavoro disponibili
 val WorkOfferSearchList = listOf(
     WorkOffer(
         id = 1,
         ruolo = "Addetto alle vendite",
         descrizioneBreve = "Cerchiamo personale dinamico per il reparto ortofrutta.",
+        descrizioneEstesa = "Il candidato si occuperà dell'allestimento del banco, della pesatura dei prodotti e dell'assistenza alla clientela nel reparto freschi. È richiesta precisione e puntualità.",
+        requisiti = "Esperienza minima nel settore, orientamento al cliente, flessibilità oraria e possesso di attestato HACCP.",
         citta = "Milano",
-        tipoContratto = "Determinato",
-        orario = "Full-time"
+        indirizzo = "Via Torino, 12",
+        tipoContratto = TipoContratto.DETERMINATO,
+        orario = OrarioLavoro.FULL_TIME
     ),
     WorkOffer(
         id = 2,
         ruolo = "Cassiere/a",
         descrizioneBreve = "Gestione cassa e assistenza clienti nel punto vendita.",
+        descrizioneEstesa = "La figura inserita gestirà le transazioni di pagamento, l'apertura e chiusura cassa e fornirà informazioni sui programmi fedeltà del supermercato.",
+        requisiti = "Diploma di scuola superiore, ottime doti comunicative, dimestichezza con i sistemi informatici di base.",
         citta = "Roma",
-        tipoContratto = "Indeterminato",
-        orario = "Part-time"
+        indirizzo = "Viale Marconi, 45",
+        tipoContratto = TipoContratto.INDETERMINATO,
+        orario = OrarioLavoro.PART_TIME
     ),
     WorkOffer(
         id = 3,
         ruolo = "Magazziniere",
-        descrizioneBreve = "Carico/scarico merci e gestione scorte di magazzino.",
+        descrizioneBreve = "Gestione merci in entrata e uscita.",
+        descrizioneEstesa = "Il lavoro prevede lo scarico dei camion, il controllo delle bolle d'accompagnamento e lo stoccaggio dei prodotti nelle celle frigorifere o negli scaffali del magazzino.",
+        requisiti = "Patentino per il muletto in corso di validità, buona forza fisica, capacità di lavorare in team.",
         citta = "Torino",
-        tipoContratto = "Determinato",
-        orario = "Full-time"
+        indirizzo = "Corso Francia, 120",
+        tipoContratto = TipoContratto.DETERMINATO,
+        orario = OrarioLavoro.FULL_TIME
+    ),
+    WorkOffer(
+        id = 4,
+        ruolo = "Addetto al Banco Gastronomia",
+        descrizioneBreve = "Servizio al cliente e preparazione piatti pronti.",
+        descrizioneEstesa = "La risorsa si occuperà del taglio di salumi e formaggi, della preparazione di panini e piatti pronti e della pulizia delle attrezzature di reparto.",
+        requisiti = "Esperienza nell'uso dell'affettatrice, conoscenza dei prodotti caseari, attestato HACCP obbligatorio.",
+        citta = "Napoli",
+        indirizzo = "Via Toledo, 200",
+        tipoContratto = TipoContratto.INDETERMINATO,
+        orario = OrarioLavoro.PART_TIME
+    ),
+    WorkOffer(
+        id = 5,
+        ruolo = "Responsabile del Punto Vendita",
+        descrizioneBreve = "Coordinamento del team e gestione ordini.",
+        descrizioneEstesa = "Lo Store Manager supervisiona tutte le attività del negozio: gestione dei turni, analisi delle vendite, controllo degli stock e raggiungimento degli obiettivi commerciali.",
+        requisiti = "Pregressa esperienza di almeno 3 anni in ruoli di gestione retail, leadership, ottime capacità analitiche.",
+        citta = "Firenze",
+        indirizzo = "Piazza della Libertà, 5",
+        tipoContratto = TipoContratto.INDETERMINATO,
+        orario = OrarioLavoro.FULL_TIME
+    ),
+    WorkOffer(
+        id = 6,
+        ruolo = "Addetto Reparto Macelleria",
+        descrizioneBreve = "Lavorazione carni e vendita assistita.",
+        descrizioneEstesa = "Il candidato si occuperà del disosso, del taglio delle carni e della preparazione di preparati pronto-cuoci. Gestirà inoltre il rifornimento del banco frigo.",
+        requisiti = "Ottima manualità nel taglio della carne, conoscenza delle norme igienico-sanitarie, cortesia verso il cliente.",
+        citta = "Bologna",
+        indirizzo = "Via dell'Indipendenza, 12",
+        tipoContratto = TipoContratto.DETERMINATO,
+        orario = OrarioLavoro.FULL_TIME
+    ),
+    WorkOffer(
+        id = 7,
+        ruolo = "Addetto Rifornimento Scaffali (Notturno)",
+        descrizioneBreve = "Allestimento corsie durante la chiusura.",
+        descrizioneEstesa = "L'attività prevede il posizionamento dei prodotti negli scaffali, la rotazione delle scadenze e la rimozione degli imballaggi per garantire l'ordine all'apertura del negozio.",
+        requisiti = "Massima serietà, velocità d'esecuzione, disponibilità immediata al turno notturno (22:00 - 06:00).",
+        citta = "Milano",
+        indirizzo = "Viale Monza, 80",
+        tipoContratto = TipoContratto.DETERMINATO,
+        orario = OrarioLavoro.PART_TIME
+    ),
+    WorkOffer(
+        id = 8,
+        ruolo = "Specialista Reparto Pescheria",
+        descrizioneBreve = "Pulizia pesce e servizio al banco.",
+        descrizioneEstesa = "Gestione del banco pesce fresco: pulizia, sfilettatura e consulenza ai clienti sulle tipologie di pescato e metodi di cottura.",
+        requisiti = "Esperienza nella sfilettatura, conoscenza del pescato di stagione, flessibilità nei turni mattutini.",
+        citta = "Genova",
+        indirizzo = "Via XX Settembre, 10",
+        tipoContratto = TipoContratto.INDETERMINATO,
+        orario = OrarioLavoro.FULL_TIME
     )
 )

@@ -72,6 +72,25 @@ fun Navigation(navController: NavHostController, startDestination: Destination, 
                 val product = ListOfProduct.find {product -> product.nome == nameProduct}
                 ProductPage(product, navController, paddingValues)
         }
+
+        composable(
+            // Questa rotta deve corrispondere esattamente a quella usata nel navigate
+            route = "dettaglio_offerta/{offerId}",
+            arguments = listOf(
+                navArgument("offerId") {
+                    type = NavType.IntType // Usiamo Int perché l'ID dell'offerta è un numero
+                }
+            )
+        ) { backStackEntry ->
+            // 1. Recuperiamo l'ID passato durante la navigazione
+            val idOfferta = backStackEntry.arguments?.getInt("offerId")
+
+            // 2. Cerchiamo l'offerta corrispondente nella lista WorkOfferSearchList
+            val offerta = WorkOfferSearchList.find { it.id == idOfferta }
+
+            // 3. Richiamiamo la pagina WorkOfferPage che abbiamo creato
+            WorkOfferPage(offerta, navController, paddingValues)
+        }
     }
 }
 
