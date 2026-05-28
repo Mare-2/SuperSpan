@@ -3,7 +3,7 @@ Cose da fare
 - [] fare il refactor del file User.kt in Utilities.kt
 - [] nel profilo admin mettere le sezioni per gestione offerte e coupon, prodotti (se serve) e candidature 
 - [] aggiustare scorrimento nel profilo
-- [] continuare le pagine per la fase di candidature
+- [] continuare le pagine per le fasi di candidatura
 - [] aggiustare pagine coupon e offerte
 - [] aggiustare pagina prodotto
 - [] decidere se mantenere la parabola o usare solo rettangoli stondati
@@ -12,8 +12,17 @@ Cose da fare
 - [] aggiustare scorrimento nella pagina di ricerca delle offette di lavoro in modo che scorra tutto e non solo le offerte
 - [] aggiustare e fare bene i filtri per le offerte di lavoro
 - [] aggiustare l'ui di quasi tutte le pagine
-- [] fai funzionare il tasto logout nel profilo
+- [] far funzionare il tasto logout nel profilo
 - [] fare le pagine delle sezioni dei profili
 - [] aggiustare le parabole nelle pagine in cui si son sminchiate
-- [] togliere l'header in tutti i posti che non siano la home
-- [] decidere una palette e creare il logo
+- [] togliere l'header in tutti i posti che non siano la home o comunque farne una versione più piccola e con scritte variabili
+- [] decidere una palette e creare il logo (magari due versioni, una orizzontale e una con solo l'immagine)
+- [] mettere la freccia in alto a sinistra per tornare indietro in tutte le pagine secondarie
+- [] mettere icone per distinguere visivamente tra coupon e offerte oppure magari fare una selezione in alto per decidere se guardare gli uni o le altre
+- [] aggiustare la grafica della navbar
+- [] rimpicciolire la barra di ricerca e magari mettere il tasto per i filtri affianco
+- [] gestire i messaggi di errore per aiutare nella compilazione di dati e form
+- [] guardare di aver inserito tutte le feature aggiuntive che abbiamo dedotto con gli scenari
+- [] spararci in faccia (scherzo(forse))
+- [] gestire il caricamento del file per il cv
+- [] gestire la registrazione del video per la candidatura
