@@ -291,7 +291,31 @@ fun filterProduct(prodotti: List<Product>, categorie: List<Category>): List<Prod
 //-------------------------------SHAPES--------------------------------------------------
 
 
+//Parabola header
 class BottomOvalShape(private val curveDepth: androidx.compose.ui.unit.Dp) : androidx.compose.ui.graphics.Shape {
+    override fun createOutline(
+        size: androidx.compose.ui.geometry.Size,
+        layoutDirection: androidx.compose.ui.unit.LayoutDirection,
+        density: androidx.compose.ui.unit.Density
+    ): androidx.compose.ui.graphics.Outline {
+        val depthPx = with(density) { curveDepth.toPx() }
+        val path = androidx.compose.ui.graphics.Path().apply {
+            moveTo(0f, 0f)
+            lineTo(size.width, 0f)
+            // Arriviamo quasi in fondo
+            lineTo(size.width, size.height - depthPx)
+            // Curva più dolce: il punto di controllo (y1) ora è esattamente size.height
+            // invece di size.height + depthPx
+            quadraticBezierTo(
+                x1 = size.width / 2f, y1 = size.height,
+                x2 = 0f, y2 = size.height - depthPx
+            )
+            close()
+        }
+        return androidx.compose.ui.graphics.Outline.Generic(path)
+    }
+}
+/*class BottomOvalShape(private val curveDepth: androidx.compose.ui.unit.Dp) : androidx.compose.ui.graphics.Shape {
     override fun createOutline(size: androidx.compose.ui.geometry.Size, layoutDirection: androidx.compose.ui.unit.LayoutDirection, density: androidx.compose.ui.unit.Density): androidx.compose.ui.graphics.Outline {
         val depthPx = with(density) { curveDepth.toPx() }
         val path = androidx.compose.ui.graphics.Path().apply {
@@ -303,7 +327,7 @@ class BottomOvalShape(private val curveDepth: androidx.compose.ui.unit.Dp) : and
         }
         return androidx.compose.ui.graphics.Outline.Generic(path)
     }
-}
+}*/
 
 /*class TopOvalShape(private val curveDepth: androidx.compose.ui.unit.Dp) : androidx.compose.ui.graphics.Shape {
     override fun createOutline(
@@ -327,6 +351,7 @@ class BottomOvalShape(private val curveDepth: androidx.compose.ui.unit.Dp) : and
     }
 }*/
 
+//Patabola altre pagine
 class TopOvalShape(private val curveDepth: androidx.compose.ui.unit.Dp) : androidx.compose.ui.graphics.Shape {
     override fun createOutline(
         size: androidx.compose.ui.geometry.Size,

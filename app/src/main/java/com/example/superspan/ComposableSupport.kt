@@ -41,6 +41,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.foundation.layout.*
+import androidx.compose.ui.unit.dp
 
 
 
@@ -52,11 +54,45 @@ fun ProfileIcon() {
 
 @Composable
 fun Header(modifier: Modifier = Modifier) {
+    val gradientBrush = androidx.compose.ui.graphics.Brush.verticalGradient(
+        colors = listOf(
+            Color.Gray, // Grigio chiaro in alto
+            Color.LightGray       // Sfumatura verso il bianco
+        )
+    )
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(150.dp) // Altezza simile alla foto
+            .clip(BottomOvalShape(25.dp)) // <--- VALORE RIDOTTO per una curva piatta
+            .background(gradientBrush),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "Logo",
+            fontSize = 45.sp,
+            fontWeight = FontWeight.Light,
+            color = Color(0xFF424242)
+        )
+        Text(
+            text = "Ciao ${actualUser.nome}!",
+            fontSize = 25.sp,
+            fontWeight = FontWeight.Bold, // Nella foto il nome sembra più marcato
+            color = Color(0xFF424242),
+            modifier = Modifier.padding(top = 8.dp)
+        )
+    }
+}
+
+/*@Composable
+fun Header(modifier: Modifier = Modifier) {
     Column(
         modifier
             .clip(BottomOvalShape(30.dp))
             .fillMaxSize()
-            .background(Color.Gray),
+            .background(Color.LightGray),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Bottom
     ) {
@@ -65,7 +101,7 @@ fun Header(modifier: Modifier = Modifier) {
             modifier = Modifier.padding(bottom = 20.dp, top = 15.dp)
         )
     }
-}
+}*/
 
 @Composable
 fun FormPassword(

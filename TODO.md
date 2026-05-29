@@ -26,3 +26,4 @@ Cose da fare
 - [] spararci in faccia (scherzo(forse))
 - [] gestire il caricamento del file per il cv
 - [] gestire la registrazione del video per la candidatura
+- [] ricordare di rendere la navbar sempre visibile
