@@ -43,7 +43,9 @@ enum class Destination (
     REGISTER("register", "Registrazione", null),
     PROFILO("profile", "Profilo", Icons.Default.AccountCircle),
     PRODOTTO("product", "prodotto", null),
-    ADD_COUPON("add_coupon", "Aggiungi Offerta", null)
+    ADD_COUPON("add_coupon", "Aggiungi Offerta", null),
+    PERSONAL_DATA_SUMMARY("data_summary", "Riepilogo Dati", null),
+    PERSONAL_DATA_EDIT("data_edit", "Modifica Dati", null)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,6 +63,8 @@ fun Navigation(navController: NavHostController, startDestination: Destination, 
                     Destination.ADD_COUPON -> AddCoupon(paddingValues, navController)
                     Destination.LAVORO -> WorkSearchPageComplete(paddingValues, navController)
                     Destination.PROFILO -> ProfilePage(user = actualUser, navController = navController, paddingValues = paddingValues)
+                    Destination.PERSONAL_DATA_SUMMARY -> PersonalDataSummaryPage(navController = navController, padding = paddingValues)
+                    Destination.PERSONAL_DATA_EDIT -> PersonalDataEditPage(navController = navController, padding = paddingValues)
                     else -> {}
                 }
             }
@@ -118,6 +122,8 @@ fun MainNavigation() {
                             Destination.REGISTER -> {}
                             Destination.PRODOTTO -> {}
                             Destination.ADD_COUPON -> {}
+                            Destination.PERSONAL_DATA_SUMMARY -> {}
+                            Destination.PERSONAL_DATA_EDIT -> {}
                             else -> {
                                 NavigationBarItem(
                                     selected = currentRoute==destination.route,

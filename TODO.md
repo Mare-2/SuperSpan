@@ -1,7 +1,8 @@
 Cose da fare
 
 - [] fare il refactor del file User.kt in Utilities.kt
-- [] nel profilo admin mettere le sezioni per gestione offerte e coupon, prodotti (se serve) e candidature 
+- [] nel profilo admin mettere le sezioni per gestione []offerte e coupon e [] pagina relativa quando ci schiacci, 
+  [] prodotti (se serve) e [] pagina relativa quando ci schiacci e [] candidature e [] pagina relativa quando ci schiacci
 - [] aggiustare scorrimento nel profilo
 - [] continuare le pagine per le fasi di candidatura
 - [] aggiustare pagine coupon e offerte
@@ -13,7 +14,10 @@ Cose da fare
 - [] aggiustare e fare bene i filtri per le offerte di lavoro
 - [] aggiustare l'ui di quasi tutte le pagine
 - [] far funzionare il tasto logout nel profilo
-- [] fare le pagine delle sezioni dei profili
+- [] fare la pagina dei dati personali con area di modifica del profilo utente
+- [] fare pagina del riepilogo delle candidature nel profilo utente
+- [] fare pagina dati account nel profilo utente con possibile modifica di username(se lo usiamo) e password
+- [] fare pagina dati account nel profilo admin con possibile modifica password
 - [] aggiustare le parabole nelle pagine in cui si son sminchiate
 - [] togliere l'header in tutti i posti che non siano la home o comunque farne una versione più piccola e con scritte variabili
 - [] decidere una palette e creare il logo (magari due versioni, una orizzontale e una con solo l'immagine)
@@ -27,3 +31,4 @@ Cose da fare
 - [] gestire il caricamento del file per il cv
 - [] gestire la registrazione del video per la candidatura
 - [] ricordare di rendere la navbar sempre visibile
+- [] aggiustare grafica di tutto, ma adesso meglio concentrarsi sulle funzionalità 

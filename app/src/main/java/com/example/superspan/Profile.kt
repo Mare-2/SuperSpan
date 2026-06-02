@@ -113,7 +113,12 @@ fun ProfilePage(user: User, navController: NavController?, paddingValues: Paddin
                 } else {
                     // SEZIONE UTENTE (Titolo a sinistra)
                     ProfileSectionTitle("Candidature")
-                    ProfileMenuTile(Icons.Default.Description, "Dati personali", "Contatti e Curriculum Vitae") { }
+                    ProfileMenuTile(
+                        icon = Icons.Default.Description,
+                        title = "Dati personali",
+                        subtitle = "Contatti e Curriculum Vitae",
+                        onClick = { navController?.navigate(Destination.PERSONAL_DATA_SUMMARY.route) } // Assicurati che questa rotta esista
+                    )
                     ProfileMenuTile(Icons.Default.AssignmentTurnedIn, "Candidature in corso", "Stato delle tue domande") { }
                 }
 

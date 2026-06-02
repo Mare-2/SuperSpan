@@ -9,6 +9,60 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
+import android.content.Context
+import android.net.Uri
+import java.io.File
+import java.io.FileOutputStream
+
+//----Serve a scrvere i numeri di telefono con lo spazio
+fun formatPhone(number: String): String {
+    // Rimuove tutto ciò che non è un numero (pulisce spazi vecchi o prefissi con +)
+    val digits = number.filter { it.isDigit() }
+
+    // Se il numero inizia con 39 (prefisso Italia), lo ignoriamo per la formattazione
+    // dei blocchi ma lo teniamo per visualizzarlo, oppure formattiamo solo le ultime 10 cifre.
+    // Per Paolo, assumiamo che vogliamo formattare le ultime 10 cifre:
+
+    val coreNumber = if (digits.startsWith("39") && digits.length > 10) {
+        digits.substring(2)
+    } else {
+        digits
+    }
+
+    val res = StringBuilder()
+    for (i in coreNumber.indices) {
+        res.append(coreNumber[i])
+        if ((i == 2 || i == 5) && i != coreNumber.lastIndex) {
+            res.append(" ")
+        }
+    }
+
+    // Se c'era il 39, lo rimettiamo davanti
+    return if (digits.startsWith("39") && digits.length > 10) "+39 $res" else res.toString()
+}
+
+//----serve a salvare i curriculum vitae nell'applicazione
+fun saveFileToInternalStorage(context: Context, uri: Uri, fileName: String): String? {
+    return try {
+        // Apriamo il file originale tramite l'Uri
+        val inputStream = context.contentResolver.openInputStream(uri)
+        // Creiamo il file di destinazione nella cartella "files" dell'app
+        val file = File(context.filesDir, fileName)
+        val outputStream = FileOutputStream(file)
+
+        // Copiamo i dati
+        inputStream?.use { input ->
+            outputStream.use { output ->
+                input.copyTo(output)
+            }
+        }
+        // Restituiamo il percorso assoluto o il nome del file salvato
+        file.absolutePath
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
+    }
+}
 
 data class User(
     private var _nome: String = "",
@@ -48,8 +102,7 @@ val MapOfUser = mutableMapOf<String, User>(
         _cognome = "Cortellesi",
         _email = "p.cortellesi@gmail.com",
         _password = "password123",
-        _admin = false,
-        _telefono = "333 1234567"
+        _admin = false
     )
 )
 
