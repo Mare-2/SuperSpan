@@ -6,7 +6,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import android.content.Context
@@ -130,6 +129,17 @@ class FilterData() {
     }
 }
 
+class WorkFilterData() {
+    var nome: String by mutableStateOf("")
+    var ordinamento: String by mutableStateOf("Nome")
+    var ordinamentoCrescente: Boolean by mutableStateOf(true)
+    var tipiContratto: MutableList<TipoContratto> = mutableStateListOf<TipoContratto>()
+    var orari: MutableList<OrarioLavoro> = mutableStateListOf<OrarioLavoro>()
+    var ruoli: MutableList<Role> = mutableStateListOf<Role>()
+    var distanzaMax: Float by mutableStateOf(100f)
+}
+
+
 enum class Category(val id: Int, val nome: String, val icon: ImageVector) {
     PANETTERIA(0, "Panetteria", Icons.Default.Image),
     FRUTTA_E_VERDURA(1, "Frutta e verdura", Icons.Default.Image),
@@ -139,6 +149,17 @@ enum class Category(val id: Int, val nome: String, val icon: ImageVector) {
     PULIZIA_CASA(5, "Pulizia casa", Icons.Default.Image),
     IGIENE_PERSONALE(6, "Igiene personale", Icons.Default.Image),
     BEVANDE(7, "Bevande", Icons.Default.Image)
+}
+
+enum class Role(val id: Int, val nome: String, val icon: ImageVector) {
+    ADDETTO_VENDITE(0, "Addetto Vendite", Icons.Default.Image),
+    CASSIERE(1, "Cassiere", Icons.Default.Image),
+    MAGAZZINIERE(2, "Magazziniere", Icons.Default.Image),
+    ADDETTO_BANCO(3, "Banco Gastronomia", Icons.Default.Image),
+    RESPONSABILE(4, "Responsabile", Icons.Default.Image),
+    MACELLERIA(5, "Macelleria", Icons.Default.Image),
+    ADDETTO_SCAFFALI(6, "Rifornimento Scaffali", Icons.Default.Image),
+    PESCHERIA(7, "Pescheria", Icons.Default.Image),
 }
 
 val ListOfProduct = mutableListOf<Product>(
@@ -297,7 +318,7 @@ data class Product(
     private var _nome: String,
     private var _prezzo: Float,
     private var _image: ImageVector?,
-    private var _categoria: Category
+    private var _categoria: Category,
 ) {
     var nome get() = _nome
         set(value) {_nome=value}
@@ -307,10 +328,31 @@ data class Product(
 
     var image get() = _image
         set(value) {_image=value}
-    
+
     var categoria get() = _categoria
         set(value) {_categoria = value}
 }
+
+data class Work(
+    private var _nome: String,
+    private var _stipendio: Float,
+    private var _image: ImageVector?,
+    private var _ruolo: Role,
+) {
+    var nome get() = _nome
+        set(value) {_nome=value}
+
+    var stipendio get() = _stipendio
+        set(value) {_stipendio=value}
+
+    var image get() = _image
+        set(value) {_image=value}
+
+    var categoria get() = _ruolo
+        set(value) {_ruolo = value}
+}
+
+
 
 fun searchProduct(filterData: FilterData): List<Product> {
     var list: List<Product> = ListOfProduct
@@ -339,6 +381,38 @@ fun filterProduct(prodotti: List<Product>, categorie: List<Category>): List<Prod
     return prodotti.filter { product ->
         categorie.contains(product.categoria)
     }
+}
+
+fun searchWorkOffer(filterData: WorkFilterData): List<WorkOffer> {
+    var list: List<WorkOffer> = WorkOfferSearchList
+    // Ricerca per ruolo o città
+    if (filterData.nome.isNotEmpty()) {
+        list = list.filter { offer ->
+            offer.ruolo.contains(filterData.nome, ignoreCase = true) ||
+            offer.citta.contains(filterData.nome, ignoreCase = true)
+        }
+    }
+    // Filtro per ruolo
+    if (filterData.ruoli.isNotEmpty()) {
+        list = list.filter { offer -> filterData.ruoli.contains(offer.ruoloEnum) }
+    }
+    // Filtro per tipo contratto
+    if (filterData.tipiContratto.isNotEmpty()) {
+        list = list.filter { offer -> filterData.tipiContratto.contains(offer.tipoContratto) }
+    }
+    // Filtro per orario
+    if (filterData.orari.isNotEmpty()) {
+        list = list.filter { offer -> filterData.orari.contains(offer.orario) }
+    }
+    // Filtro per distanza
+    list = list.filter { offer -> offer.distanzaKm <= filterData.distanzaMax }
+    // Ordinamento
+    list = when (filterData.ordinamento) {
+        "Città" -> list.sortedBy { it.citta }
+        else    -> list.sortedBy { it.ruolo }
+    }
+    if (!filterData.ordinamentoCrescente) list = list.reversed()
+    return list
 }
 
 //-------------------------------SHAPES--------------------------------------------------
@@ -452,13 +526,15 @@ enum class OrarioLavoro(val nome: String) {
 data class WorkOffer(
     val id: Int,
     val ruolo: String,
+    val ruoloEnum: Role,
     val descrizioneBreve: String,
-    val descrizioneEstesa: String, // Per il corpo della pagina offerta
+    val descrizioneEstesa: String,
     val requisiti: String,
     val citta: String,
     val indirizzo: String,
-    val tipoContratto: TipoContratto, // Scelta limitata
-    val orario: OrarioLavoro,         // Scelta limitata
+    val tipoContratto: TipoContratto,
+    val orario: OrarioLavoro,
+    val distanzaKm: Int = 50
 )
 
 // 3. Lista di offerte di lavoro disponibili
@@ -466,90 +542,106 @@ val WorkOfferSearchList = listOf(
     WorkOffer(
         id = 1,
         ruolo = "Addetto alle vendite",
+        ruoloEnum = Role.ADDETTO_VENDITE,
         descrizioneBreve = "Cerchiamo personale dinamico per il reparto ortofrutta.",
         descrizioneEstesa = "Il candidato si occuperà dell'allestimento del banco, della pesatura dei prodotti e dell'assistenza alla clientela nel reparto freschi. È richiesta precisione e puntualità.",
         requisiti = "Esperienza minima nel settore, orientamento al cliente, flessibilità oraria e possesso di attestato HACCP.",
         citta = "Milano",
         indirizzo = "Via Torino, 12",
         tipoContratto = TipoContratto.DETERMINATO,
-        orario = OrarioLavoro.FULL_TIME
+        orario = OrarioLavoro.FULL_TIME,
+        distanzaKm = 8
     ),
     WorkOffer(
         id = 2,
         ruolo = "Cassiere/a",
+        ruoloEnum = Role.CASSIERE,
         descrizioneBreve = "Gestione cassa e assistenza clienti nel punto vendita.",
         descrizioneEstesa = "La figura inserita gestirà le transazioni di pagamento, l'apertura e chiusura cassa e fornirà informazioni sui programmi fedeltà del supermercato.",
         requisiti = "Diploma di scuola superiore, ottime doti comunicative, dimestichezza con i sistemi informatici di base.",
         citta = "Roma",
         indirizzo = "Viale Marconi, 45",
         tipoContratto = TipoContratto.INDETERMINATO,
-        orario = OrarioLavoro.PART_TIME
+        orario = OrarioLavoro.PART_TIME,
+        distanzaKm = 60
     ),
     WorkOffer(
         id = 3,
         ruolo = "Magazziniere",
+        ruoloEnum = Role.MAGAZZINIERE,
         descrizioneBreve = "Gestione merci in entrata e uscita.",
         descrizioneEstesa = "Il lavoro prevede lo scarico dei camion, il controllo delle bolle d'accompagnamento e lo stoccaggio dei prodotti nelle celle frigorifere o negli scaffali del magazzino.",
         requisiti = "Patentino per il muletto in corso di validità, buona forza fisica, capacità di lavorare in team.",
         citta = "Torino",
         indirizzo = "Corso Francia, 120",
         tipoContratto = TipoContratto.DETERMINATO,
-        orario = OrarioLavoro.FULL_TIME
+        orario = OrarioLavoro.FULL_TIME,
+        distanzaKm = 140
     ),
     WorkOffer(
         id = 4,
         ruolo = "Addetto al Banco Gastronomia",
+        ruoloEnum = Role.ADDETTO_BANCO,
         descrizioneBreve = "Servizio al cliente e preparazione piatti pronti.",
         descrizioneEstesa = "La risorsa si occuperà del taglio di salumi e formaggi, della preparazione di panini e piatti pronti e della pulizia delle attrezzature di reparto.",
         requisiti = "Esperienza nell'uso dell'affettatrice, conoscenza dei prodotti caseari, attestato HACCP obbligatorio.",
         citta = "Napoli",
         indirizzo = "Via Toledo, 200",
         tipoContratto = TipoContratto.INDETERMINATO,
-        orario = OrarioLavoro.PART_TIME
+        orario = OrarioLavoro.PART_TIME,
+        distanzaKm = 720
     ),
     WorkOffer(
         id = 5,
         ruolo = "Responsabile del Punto Vendita",
+        ruoloEnum = Role.RESPONSABILE,
         descrizioneBreve = "Coordinamento del team e gestione ordini.",
         descrizioneEstesa = "Lo Store Manager supervisiona tutte le attività del negozio: gestione dei turni, analisi delle vendite, controllo degli stock e raggiungimento degli obiettivi commerciali.",
         requisiti = "Pregressa esperienza di almeno 3 anni in ruoli di gestione retail, leadership, ottime capacità analitiche.",
         citta = "Firenze",
         indirizzo = "Piazza della Libertà, 5",
         tipoContratto = TipoContratto.INDETERMINATO,
-        orario = OrarioLavoro.FULL_TIME
+        orario = OrarioLavoro.FULL_TIME,
+        distanzaKm = 300
     ),
     WorkOffer(
         id = 6,
         ruolo = "Addetto Reparto Macelleria",
+        ruoloEnum = Role.MACELLERIA,
         descrizioneBreve = "Lavorazione carni e vendita assistita.",
         descrizioneEstesa = "Il candidato si occuperà del disosso, del taglio delle carni e della preparazione di preparati pronto-cuoci. Gestirà inoltre il rifornimento del banco frigo.",
         requisiti = "Ottima manualità nel taglio della carne, conoscenza delle norme igienico-sanitarie, cortesia verso il cliente.",
         citta = "Bologna",
         indirizzo = "Via dell'Indipendenza, 12",
         tipoContratto = TipoContratto.DETERMINATO,
-        orario = OrarioLavoro.FULL_TIME
+        orario = OrarioLavoro.FULL_TIME,
+        distanzaKm = 210
     ),
     WorkOffer(
         id = 7,
         ruolo = "Addetto Rifornimento Scaffali (Notturno)",
+        ruoloEnum = Role.ADDETTO_SCAFFALI,
         descrizioneBreve = "Allestimento corsie durante la chiusura.",
         descrizioneEstesa = "L'attività prevede il posizionamento dei prodotti negli scaffali, la rotazione delle scadenze e la rimozione degli imballaggi per garantire l'ordine all'apertura del negozio.",
         requisiti = "Massima serietà, velocità d'esecuzione, disponibilità immediata al turno notturno (22:00 - 06:00).",
         citta = "Milano",
         indirizzo = "Viale Monza, 80",
         tipoContratto = TipoContratto.DETERMINATO,
-        orario = OrarioLavoro.PART_TIME
+        orario = OrarioLavoro.PART_TIME,
+        distanzaKm = 12
     ),
     WorkOffer(
         id = 8,
         ruolo = "Specialista Reparto Pescheria",
+        ruoloEnum = Role.PESCHERIA,
         descrizioneBreve = "Pulizia pesce e servizio al banco.",
         descrizioneEstesa = "Gestione del banco pesce fresco: pulizia, sfilettatura e consulenza ai clienti sulle tipologie di pescato e metodi di cottura.",
         requisiti = "Esperienza nella sfilettatura, conoscenza del pescato di stagione, flessibilità nei turni mattutini.",
         citta = "Genova",
         indirizzo = "Via XX Settembre, 10",
         tipoContratto = TipoContratto.INDETERMINATO,
-        orario = OrarioLavoro.FULL_TIME
+        orario = OrarioLavoro.FULL_TIME,
+        distanzaKm = 145
     )
 )
 
