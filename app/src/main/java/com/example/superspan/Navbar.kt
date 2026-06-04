@@ -45,7 +45,11 @@ enum class Destination (
     PRODOTTO("product", "prodotto", null),
     ADD_COUPON("add_coupon", "Aggiungi Offerta", null),
     PERSONAL_DATA_SUMMARY("data_summary", "Riepilogo Dati", null),
-    PERSONAL_DATA_EDIT("data_edit", "Modifica Dati", null)
+    PERSONAL_DATA_EDIT("data_edit", "Modifica Dati", null),
+    APPLY_STEP_1("apply_1", "Dati e CV", null),
+    APPLY_STEP_2_INTRO("apply_2_intro", "Istruzioni Video", null),
+    APPLY_STEP_2_RECORD("apply_2_record", "Registra Video", null),
+    APPLY_STEP_3("apply_3", "Riepilogo Finale", null)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -65,6 +69,10 @@ fun Navigation(navController: NavHostController, startDestination: Destination, 
                     Destination.PROFILO -> ProfilePage(user = actualUser, navController = navController, paddingValues = paddingValues)
                     Destination.PERSONAL_DATA_SUMMARY -> PersonalDataSummaryPage(navController = navController, padding = paddingValues)
                     Destination.PERSONAL_DATA_EDIT -> PersonalDataEditPage(navController = navController, padding = paddingValues)
+                    Destination.APPLY_STEP_1 -> ApplyStep1(navController, paddingValues)
+                    Destination.APPLY_STEP_2_INTRO -> ApplyStep2Intro(navController, paddingValues)
+                    Destination.APPLY_STEP_2_RECORD -> ApplyStep2Record(navController, paddingValues)
+                    Destination.APPLY_STEP_3 -> ApplyStep3(navController, paddingValues)
                     else -> {}
                 }
             }
@@ -124,6 +132,10 @@ fun MainNavigation() {
                             Destination.ADD_COUPON -> {}
                             Destination.PERSONAL_DATA_SUMMARY -> {}
                             Destination.PERSONAL_DATA_EDIT -> {}
+                            Destination.APPLY_STEP_1 -> {}
+                            Destination.APPLY_STEP_2_INTRO -> {}
+                            Destination.APPLY_STEP_2_RECORD -> {}
+                            Destination.APPLY_STEP_3 -> {}
                             else -> {
                                 NavigationBarItem(
                                     selected = currentRoute==destination.route,

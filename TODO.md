@@ -1,6 +1,6 @@
 Cose da fare
 
-- [] fare il refactor del file User.kt in Utilities.kt
+- [] fare il refactor del file User.kt in Utilities.kt o qualche altro nome
 - [] nel profilo admin mettere le sezioni per gestione []offerte e coupon e [] pagina relativa quando ci schiacci, 
   [] prodotti (se serve) e [] pagina relativa quando ci schiacci e [] candidature e [] pagina relativa quando ci schiacci
 - [] aggiustare scorrimento nel profilo
@@ -14,7 +14,7 @@ Cose da fare
 - [] aggiustare e fare bene i filtri per le offerte di lavoro
 - [] aggiustare l'ui di quasi tutte le pagine
 - [] far funzionare il tasto logout nel profilo
-- [] fare la pagina dei dati personali con area di modifica del profilo utente
+- [x] fare la pagina dei dati personali con area di modifica del profilo utente
 - [] fare pagina del riepilogo delle candidature nel profilo utente
 - [] fare pagina dati account nel profilo utente con possibile modifica di username(se lo usiamo) e password
 - [] fare pagina dati account nel profilo admin con possibile modifica password
@@ -31,4 +31,6 @@ Cose da fare
 - [] gestire il caricamento del file per il cv
 - [] gestire la registrazione del video per la candidatura
 - [] ricordare di rendere la navbar sempre visibile
-- [] aggiustare grafica di tutto, ma adesso meglio concentrarsi sulle funzionalità 
+- [] aggiustare grafica di tutto, ma adesso meglio concentrarsi sulle funzionalità
+- [] controllare e probabilmente aggiustare la funzione di caricamento del cv
+- [] rendere i luoghi dei supermercati e i km più realistici scegliendo città e paesi vicino a cagliari e in varie vie di cagliari

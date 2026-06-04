@@ -149,7 +149,8 @@ fun WorkOfferPage(offer: WorkOffer?, navController: NavController?, paddingValue
             contentAlignment = Alignment.Center
         ) {
             Button(
-                onClick = { /* Azione */ },
+                onClick = { currentOfferIdApplying = offer?.id ?: 0 // Salviamo l'ID
+                    navController?.navigate(Destination.APPLY_STEP_1.route)},
                 modifier = Modifier
                     .align(Alignment.BottomCenter) // Resta centrato in basso
                     .padding(bottom = 24.dp)      // Distanza fissa dalla navbar

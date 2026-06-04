@@ -259,13 +259,20 @@ fun PersonalDataEditPage(navController: NavController?, padding: PaddingValues) 
     var nome by remember { mutableStateOf(actualUser.nome) }
     var cognome by remember { mutableStateOf(actualUser.cognome) }
     var emailLavoro by remember { mutableStateOf(actualUser.emailLavoro ?: "") }
-    var telefono by remember { mutableStateOf(actualUser.telefono ?: "") }
     var prefisso by remember { mutableStateOf("+39") }
     var cvName by remember { mutableStateOf(actualUser.cvFileName ?: "") }
+    var telefonoDigits by remember {
+        mutableStateOf(
+            actualUser.telefono
+                ?.filter { it.isDigit() } // Prende solo i numeri: 393331234567
+                ?.removePrefix("39")      // Toglie il 39: 3331234567
+                ?: ""
+        )
+    }
 
     // Validazioni per la tranquillità di Paolo
     val isEmailValid = Patterns.EMAIL_ADDRESS.matcher(emailLavoro).matches() || emailLavoro.isEmpty()
-    val isPhoneValid = telefono.all { it.isDigit() } && (telefono.length in 8..11 || telefono.isEmpty())
+    val isPhoneValid = telefonoDigits.all { it.isDigit() } && (telefonoDigits.length in 9..10 || telefonoDigits.isEmpty())
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -330,25 +337,27 @@ fun PersonalDataEditPage(navController: NavController?, padding: PaddingValues) 
             Row(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
                 OutlinedTextField(
                     value = prefisso,
-                    onValueChange = { if (it.length <= 4) prefisso = it },
-                    label = { Text("Prefisso") },
-                    modifier = Modifier.width(90.dp).background(Color(0xFFE8F5E9), RoundedCornerShape(20.dp)),
-                    shape = RoundedCornerShape(20.dp),
-                    singleLine = true
+                    onValueChange = {}, // Lo lasciamo fisso per ora
+                    readOnly = true,
+                    label = { Text("Pre") },
+                    modifier = Modifier.width(80.dp),
+                    shape = RoundedCornerShape(20.dp)
                 )
+
                 Spacer(Modifier.width(8.dp))
+
                 EditTextField(
                     label = "Telefono",
-                    value = telefono,
+                    value = telefonoDigits, // USIAMO SOLO LE CIFRE
                     keyboardType = KeyboardType.Phone,
-                    visualTransformation = PhoneVisualTransformation(), // <--- APPLICA LA TRASFORMAZIONE
+                    visualTransformation = PhoneVisualTransformation(), // Lo spazio è solo un trucco visivo
                     isError = !isPhoneValid,
-                    errorMessage = "Solo numeri",
+                    errorMessage = "Inserisci un numero valido",
                     modifier = Modifier.weight(1f),
-                    onValueChange = {
-                        // Paolo può scrivere solo numeri e massimo 10 cifre
-                        if (it.all { char -> char.isDigit() } && it.length <= 10) {
-                            telefono = it
+                    onValueChange = { input ->
+                        // Accettiamo solo se l'utente scrive numeri e non superiamo i 10
+                        if (input.all { it.isDigit() } && input.length <= 10) {
+                            telefonoDigits = input
                         }
                     }
                 )
@@ -393,11 +402,11 @@ fun PersonalDataEditPage(navController: NavController?, padding: PaddingValues) 
                     actualUser.nome = nome
                     actualUser.cognome = cognome
                     actualUser.emailLavoro = emailLavoro
-                    actualUser.telefono = "$prefisso $telefono"
+                    actualUser.telefono = "$prefisso$telefonoDigits"
                     // cvFileName viene già aggiornato nel launcher
                     navController?.popBackStack()
                 },
-                enabled = nome.isNotEmpty() && cognome.isNotEmpty() && isEmailValid && isPhoneValid,
+                enabled = nome.isNotEmpty() && cognome.isNotEmpty() && isEmailValid && isPhoneValid && telefonoDigits.isNotEmpty(),
                 modifier = Modifier.height(55.dp).width(220.dp),
                 shape = CircleShape,
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF388E3C))

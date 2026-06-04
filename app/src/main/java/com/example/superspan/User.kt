@@ -655,3 +655,24 @@ data class UserProfile(
     val cognome: String,
     val numeroTelefono: String
 )
+
+
+//-------------------------------------Candidature lavoro-------------------------------
+// Inserisci questo dove hai le altre classi dati (User.kt)
+data class Candidacy(
+    val id: Int,
+    val userEmail: String,       // Chi si candida
+    val offerId: Int,            // Per quale lavoro
+    val nome: String,
+    val cognome: String,
+    val emailContatto: String,
+    val cvFileName: String?,
+    val videoSimulatoPath: String = "video_registrato.mp4",
+    val stato: String = "Inviata" // Inviata, In Revisione, Rifiutata, Accettata
+)
+
+// Lista globale accessibile agli Admin
+val AllCandidacies = mutableStateListOf<Candidacy>()
+
+// Variabile temporanea per sapere per quale offerta Paolo sta scrivendo
+var currentOfferIdApplying by mutableStateOf(0)
