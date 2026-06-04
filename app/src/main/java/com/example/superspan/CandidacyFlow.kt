@@ -685,15 +685,73 @@ fun ApplyStep2Record(navController: NavController?, padding: PaddingValues) {
         Box(Modifier.fillMaxWidth().height(120.dp).background(Color.Black), contentAlignment = Alignment.Center) {
             if (isRecording) {
                 Box(Modifier.size(70.dp).clip(CircleShape).background(Color.White).padding(4.dp).clip(CircleShape).background(Color.Red).clickable {
-                    if (seconds < 5) {
-                        errorMsg = "Video troppo corto! Registra almeno 5 secondi."
+                    if (seconds < 15) {
+                        errorMsg = "Video troppo corto! Registra almeno 15 secondi."
                     } else {
                         isRecording = false
                         currentDraft = currentDraft.copy(videoFileName = "Video_Paolo_Presentazione.mp4")
                         if (isReturnToSummary) { isReturnToSummary = false; navController?.popBackStack() }
-                        else { navController?.navigate(Destination.APPLY_STEP_3.route) }
+                        else { navController?.navigate(Destination.APPLY_STEP_2_REVIEW.route) }
                     }
                 })
+            }
+        }
+
+    }
+}
+
+@Composable
+fun ApplyStep2Review(navController: NavController?, padding: PaddingValues) {
+    Column(
+        Modifier.fillMaxSize().padding(padding).background(Color.White),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Header con tasto "Riprova" come nella foto
+        Row(
+            Modifier.fillMaxWidth().padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = { navController?.popBackStack() }) { // Torna a registrare
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
+            }
+            Text("riprova", modifier = Modifier.clickable { navController?.popBackStack() })
+        }
+
+        Spacer(Modifier.height(20.dp))
+
+        // Box Video (Placeholder)
+        Box(
+            Modifier
+                .weight(1f)
+                .fillMaxWidth(0.9f)
+                .clip(RoundedCornerShape(20.dp))
+                .background(Color.LightGray),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("Video", fontSize = 40.sp, color = Color.White, fontWeight = FontWeight.Bold)
+                Icon(Icons.Default.PlayArrow, null, Modifier.size(80.dp), tint = Color.White)
+            }
+        }
+
+        // Tasto Avanti
+        Box(Modifier.fillMaxWidth().padding(30.dp), contentAlignment = Alignment.Center) {
+            Button(
+                onClick = {
+                    if (isReturnToSummary) {
+                        isReturnToSummary = false
+                        navController?.navigate(Destination.APPLY_STEP_3.route) {
+                            popUpTo(Destination.APPLY_STEP_3.route) { inclusive = true }
+                        }
+                    } else {
+                        navController?.navigate(Destination.APPLY_STEP_3.route)
+                    }
+                },
+                modifier = Modifier.height(55.dp).width(180.dp),
+                shape = CircleShape,
+                colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray)
+            ) {
+                Text("Avanti", fontSize = 18.sp)
             }
         }
     }

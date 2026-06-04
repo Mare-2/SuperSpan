@@ -49,6 +49,7 @@ enum class Destination (
     APPLY_STEP_1("apply_1", "Dati e CV", null),
     APPLY_STEP_2_INTRO("apply_2_intro", "Istruzioni Video", null),
     APPLY_STEP_2_RECORD("apply_2_record", "Registra Video", null),
+    APPLY_STEP_2_REVIEW("apply_2_review", "Rivedi Video", null),
     APPLY_STEP_3("apply_3", "Riepilogo Finale", null)
 }
 
@@ -72,6 +73,7 @@ fun Navigation(navController: NavHostController, startDestination: Destination, 
                     Destination.APPLY_STEP_1 -> ApplyStep1(navController, paddingValues)
                     Destination.APPLY_STEP_2_INTRO -> ApplyStep2Intro(navController, paddingValues)
                     Destination.APPLY_STEP_2_RECORD -> ApplyStep2Record(navController, paddingValues)
+                    Destination.APPLY_STEP_2_REVIEW -> ApplyStep2Review(navController, paddingValues)
                     Destination.APPLY_STEP_3 -> ApplyStep3(navController, paddingValues)
                     else -> {}
                 }
@@ -135,6 +137,7 @@ fun MainNavigation() {
                             Destination.APPLY_STEP_1 -> {}
                             Destination.APPLY_STEP_2_INTRO -> {}
                             Destination.APPLY_STEP_2_RECORD -> {}
+                            Destination.APPLY_STEP_2_REVIEW -> {}
                             Destination.APPLY_STEP_3 -> {}
                             else -> {
                                 NavigationBarItem(
