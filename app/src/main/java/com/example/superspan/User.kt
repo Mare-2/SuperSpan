@@ -809,7 +809,7 @@ data class Candidacy(
     val emailContatto: String,
     val cvFileName: String?,
     val videoSimulatoPath: String = "video_registrato.mp4",
-    val stato: String = "Inviata" // Inviata, In Revisione, Rifiutata, Accettata
+    val stato: String = "Inviata" // "Inviata", "In Revisione", "Rifiutata", "Accettata", "Bozza"
 )
 
 // Lista globale accessibile agli Admin

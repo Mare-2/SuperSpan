@@ -3,444 +3,547 @@ package com.example.superspan
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Photo
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.*
-import androidx.navigation.NavController
-import androidx.compose.material.icons.filled.Photo
-import androidx.compose.material3.Button
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.RangeSlider
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import kotlin.math.*
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.*
+import androidx.navigation.NavController
 
+
+// ---------------------------------------------------------------------------
+// ENTRY POINT
+// ---------------------------------------------------------------------------
 
 @Composable
 fun SearchPageComplete(
     padding: PaddingValues,
     navController: NavController?
 ) {
-    var enabled: Boolean by remember { mutableStateOf(false) }
+    var showFilters by remember { mutableStateOf(false) }
     val filterData by remember { mutableStateOf(FilterData()) }
-    Column(
-        Modifier.padding(padding),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        if(!enabled) {
-            Header(Modifier.weight(1f))
-            SearchPage(Modifier.weight(4f), navController, filterData) {
-                enabled = true
-            }
+
+    Box(modifier = Modifier.padding(padding)) {
+        if (!showFilters) {
+            SearchPage(navController, filterData) { showFilters = true }
+        } else {
+            FilterPage(Modifier.fillMaxSize(), filterData) { showFilters = false }
         }
-        else FilterPage(Modifier.fillMaxSize(), filterData) {enabled = false}
     }
 }
+
+// ---------------------------------------------------------------------------
+// PRODUCT CARD
+// ---------------------------------------------------------------------------
 
 @Composable
 fun ProductCompose(product: Product, navController: NavController?) {
-    Box(
-        Modifier
-            .fillMaxSize()
-            .aspectRatio(1f)
-            .clip(RoundedCornerShape(20.dp))
-            .background(Color.LightGray)
-            .clickable(onClick = { navController?.navigate(Destination.PRODOTTO.route + "/${product.nome}") }),
-        contentAlignment = Alignment.TopCenter
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(200.dp)
+            .clickable { navController?.navigate(Destination.PRODOTTO.route + "/${product.nome}") },
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF1F1F1))
     ) {
         Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Icon(
-                Icons.Default.Photo,
-                null,
+            // Immagine prodotto — altezza fissa
+            Box(
                 modifier = Modifier
-                    .weight(1f)
-                    .fillMaxSize()
-            )
-            Column (
-                Modifier
                     .fillMaxWidth()
-                    .weight(0.6f)
+                    .height(110.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color.White),
+                contentAlignment = Alignment.Center
             ) {
-                TestoAdattabile(product.nome, Modifier.padding(end = 25.dp, start = 10.dp), 15.sp)
-                Spacer(Modifier.weight(1f))
-                TestoAdattabile("${product.prezzo} $", Modifier.padding(start = 25.dp, end = 10.dp, bottom = 10.dp),
-                    15.sp,
-                    TextAlign.End
+                Icon(
+                    Icons.Default.Photo,
+                    contentDescription = product.nome,
+                    modifier = Modifier.size(48.dp),
+                    tint = Color.LightGray
+                )
+            }
+            // Nome prodotto — 1 riga, tronca con "..."
+            Text(
+                text = product.nome,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+            // Badge prezzo — sempre in fondo
+            Surface(
+                color = Color(0xFF388E3C).copy(alpha = 0.12f),
+                shape = CircleShape
+            ) {
+                Text(
+                    text = "€ ${"%.2f".format(product.prezzo)}",
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp),
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF2E7D32)
                 )
             }
         }
     }
 }
 
+// ---------------------------------------------------------------------------
+// CATEGORY CHIP (usata nella search page)
+// ---------------------------------------------------------------------------
+
 @Composable
-fun CategoryItem(category: Category, isSelected: Boolean, onclick: ()->Unit) {
-    var color by remember { mutableStateOf(Color.LightGray) }
-    if (isSelected) color = Color.LightGray
-    else color = Color.Unspecified
-    Column(
-        Modifier
-            .background(color),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
+fun CategoryChip(category: Category, isSelected: Boolean, onClick: () -> Unit) {
+    val bgColor = if (isSelected) Color(0xFF388E3C) else Color(0xFFEEEEEE)
+    val textColor = if (isSelected) Color.White else Color.DarkGray
+
+    Surface(
+        modifier = Modifier.clickable { onClick() },
+        shape = RoundedCornerShape(999.dp),
+        color = bgColor
     ) {
-        Box(
-            Modifier
-                .clip(RoundedCornerShape(10.dp))
-                .border(5.dp, Color.Gray)
-                .aspectRatio(1f)
-                .weight(0.7f)
-                .clickable(onClick = {
-                    onclick()
-                }),
-            contentAlignment = Alignment.TopCenter
-        ) {
-            Image(category.icon, null, modifier = Modifier.fillMaxSize())
-        }
-        Text(category.nome, modifier = Modifier.weight(0.3f), fontSize = 12.sp)
+        Text(
+            text = category.nome,
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 7.dp),
+            fontSize = 13.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = textColor
+        )
     }
 }
+
+// ---------------------------------------------------------------------------
+// SEARCH PAGE (lista prodotti + barra ricerca)
+// ---------------------------------------------------------------------------
 
 @Composable
 fun SearchPage(
-    modifier: Modifier,
     navController: NavController?,
     filterData: FilterData,
-    onclick: () -> Unit
+    onOpenFilters: () -> Unit
 ) {
-    val productSearchList: List<Product> by remember {
-        derivedStateOf {
-            searchProduct(filterData)
-        }
+    val productSearchList by remember {
+        derivedStateOf { searchProduct(filterData) }
     }
-    var showSortMenu by remember { mutableStateOf(false) }
-    
-    Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        OutlinedTextField(
-            filterData.nome,
-            {
-                filterData.nome = it
-            },
-            label = { Text("Cerca prodotto") },
-            modifier = Modifier
-                .padding(top = 15.dp, bottom = 10.dp)
-                .weight(0.8f),
-            shape = RoundedCornerShape(30.dp)
-        )
-        Spacer(Modifier.height(5.dp))
-        Row(
-            Modifier
-                .weight(0.5f)
-                .fillMaxWidth()
-                .padding(bottom = 8.dp, end = 10.dp, start = 10.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Box {
-                Button({
-                    showSortMenu = true
-                }) {
-                    Text("Ordina per: ${filterData.ordinamento} ${if(filterData.ordinamentoCrescente) "▲" else "▼"}")
-                }
-                DropdownMenu(
-                    expanded = showSortMenu,
-                    onDismissRequest = { showSortMenu = false }
-                ) {
-                    DropdownMenuItem(
-                        text = { Text("Nome ▲") },
-                        onClick = {
-                            filterData.ordinamento = "Nome"
-                            filterData.ordinamentoCrescente = true
-                            showSortMenu = false
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("Nome ▼") },
-                        onClick = {
-                            filterData.ordinamento = "Nome"
-                            filterData.ordinamentoCrescente = false
-                            showSortMenu = false
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("Prezzo ▲") },
-                        onClick = {
-                            filterData.ordinamento = "Prezzo"
-                            filterData.ordinamentoCrescente = true
-                            showSortMenu = false
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("Prezzo ▼") },
-                        onClick = {
-                            filterData.ordinamento = "Prezzo"
-                            filterData.ordinamentoCrescente = false
-                            showSortMenu = false
-                        }
-                    )
-                }
-            }
-            Button({onclick()}) {
-                Text("Filtri")
+
+    // Direzioni indipendenti per ciascun ordinamento
+    var nomeAscendente by remember { mutableStateOf(true) }
+    var prezzoAscendente by remember { mutableStateOf(true) }
+
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(bottom = 20.dp)
+    ) {
+        // 0. HEADER TITOLO (scorre con la pagina)
+        item {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "I nostri prodotti",
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.ExtraBold
+                )
+                Text(
+                    text = "Trova quello che cerchi",
+                    fontSize = 16.sp,
+                    color = Color.Gray
+                )
             }
         }
-        Spacer(Modifier.height(5.dp))
-        LazyHorizontalGrid(
-            rows = GridCells.Adaptive(200.dp),
-            modifier = Modifier
-                .weight(0.8f)
-                .padding(bottom = 0.dp, start = 10.dp, end = 10.dp),
-            horizontalArrangement = Arrangement.spacedBy(30.dp)
-        ) {
-            items(Category.entries.toList(), key = null) { category ->
-                CategoryItem(category, filterData.categorie.contains(category)) {
-                    if (filterData.categorie.contains(category)) filterData.categorie.remove(category)
-                    else filterData.categorie.add(category)
+
+        // 1. BARRA DI RICERCA + FILTRI
+        item {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                OutlinedTextField(
+                    value = filterData.nome,
+                    onValueChange = { filterData.nome = it },
+                    placeholder = { Text("Cerca prodotto...") },
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(56.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    leadingIcon = { Icon(Icons.Default.Search, null) },
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = Color(0xFFF7F7F7),
+                        unfocusedContainerColor = Color(0xFFF7F7F7)
+                    )
+                )
+
+                Spacer(Modifier.width(8.dp))
+
+                FilledIconButton(
+                    onClick = onOpenFilters,
+                    modifier = Modifier.size(56.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = IconButtonDefaults.filledIconButtonColors(
+                        containerColor = Color(0xFF388E3C)
+                    )
+                ) {
+                    Icon(Icons.Default.Tune, contentDescription = "Filtri", tint = Color.White)
                 }
             }
         }
 
-        LazyVerticalGrid(
-            columns = GridCells.Adaptive(120.dp),
-            modifier = Modifier
-                .weight(2.9f)
-                .fillMaxSize()
-                .padding(horizontal = 20.dp, vertical = 10.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            items(productSearchList, key = { product -> product.nome }) { product ->
-                ProductCompose(product, navController)
+        // 2. ORDINAMENTO: Nome (sinistra) | Prezzo (destra)
+        item {
+            Spacer(Modifier.height(8.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // ── Pulsante NOME (sinistra) ──
+                val nomeAttivo = filterData.ordinamento == "Nome"
+                Button(
+                    onClick = {
+                        if (nomeAttivo) {
+                            // Inverte solo la direzione del nome
+                            nomeAscendente = !nomeAscendente
+                            filterData.ordinamentoCrescente = nomeAscendente
+                        } else {
+                            // Attiva ordinamento nome, ripristina la sua direzione salvata
+                            filterData.ordinamento = "Nome"
+                            filterData.ordinamentoCrescente = nomeAscendente
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (nomeAttivo) Color(0xFF388E3C) else Color(0xFFA5D6A7)
+                    )
+                ) {
+                    Text(
+                        text = if (nomeAscendente) "A - Z" else "Z - A",
+                        fontSize = 13.sp,
+                        color = if (nomeAttivo) Color.White else Color(0xFF1B5E20)
+                    )
+                }
+
+                // ── Pulsante PREZZO (destra) ──
+                val prezzoAttivo = filterData.ordinamento == "Prezzo"
+                Button(
+                    onClick = {
+                        if (prezzoAttivo) {
+                            // Inverte solo la direzione del prezzo
+                            prezzoAscendente = !prezzoAscendente
+                            filterData.ordinamentoCrescente = prezzoAscendente
+                        } else {
+                            // Attiva ordinamento prezzo, ripristina la sua direzione salvata
+                            filterData.ordinamento = "Prezzo"
+                            filterData.ordinamentoCrescente = prezzoAscendente
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (prezzoAttivo) Color(0xFF388E3C) else Color(0xFFA5D6A7)
+                    )
+                ) {
+                    Text(
+                        text = "Prezzo ${if (prezzoAscendente) "▲" else "▼"}",
+                        fontSize = 13.sp,
+                        color = if (prezzoAttivo) Color.White else Color(0xFF1B5E20)
+                    )
+                }
+            }
+            Spacer(Modifier.height(8.dp))
+        }
+
+        // 3. GRIGLIA PRODOTTI (2 colonne fisse per look coerente)
+        item {
+            val columns = 2
+            val chunked = productSearchList.chunked(columns)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                chunked.forEach { row ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        row.forEach { product ->
+                            Box(Modifier.weight(1f)) {
+                                ProductCompose(product, navController)
+                            }
+                        }
+                        // Riempi riga incompleta
+                        if (row.size < columns) {
+                            repeat(columns - row.size) {
+                                Spacer(Modifier.weight(1f))
+                            }
+                        }
+                    }
+                }
             }
         }
     }
 }
 
+// ---------------------------------------------------------------------------
+// FILTER PAGE (stile WorkFilterPage)
+// ---------------------------------------------------------------------------
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FilterPage(modifier: Modifier, filterData: FilterData, onDismiss: ()-> Unit) {
-    var sliderPosition by remember { mutableStateOf(filterData.minPrice.toFloat()..filterData.maxPrice.toFloat()) }
-    var minPrice by remember { mutableStateOf(sliderPosition.start.toString()) }
-    var maxPrice by remember { mutableStateOf(sliderPosition.endInclusive.toString()) }
+fun FilterPage(modifier: Modifier, filterData: FilterData, onDismiss: () -> Unit) {
+    val scrollState = rememberScrollState()
+
+    val absoluteMax = filterData.maxPossiblePrice()
+
+    var sliderPosition by remember {
+        mutableStateOf(
+            filterData.minPrice.toFloat()..filterData.maxPrice.toFloat()
+        )
+    }
+    var minPriceText by remember { mutableStateOf("%.2f".format(sliderPosition.start)) }
+    var maxPriceText by remember { mutableStateOf("%.2f".format(sliderPosition.endInclusive)) }
+
+    // Sincronizza filterData con lo slider
     filterData.minPrice = sliderPosition.start.toDouble()
     filterData.maxPrice = sliderPosition.endInclusive.toDouble()
+
     Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.Bottom
+        modifier = modifier
+            .background(Color(0xFFF8F9FA))
+            .verticalScroll(scrollState)
     ) {
-        Text("Filtri", fontSize = 30.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(20.dp, 16.dp, 20.dp, 8.dp))
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 6.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+        // ── HEADER ──────────────────────────────────────────────────────────
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            color = Color.White,
+            shadowElevation = 2.dp
         ) {
-            Text("Categorie", fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
-            Button(onClick = {
-                filterData.categorie.clear()
-                minPrice = "0.00"
-                maxPrice = filterData.maxPossiblePrice().toString()
-                sliderPosition = 0.0f..filterData.maxPossiblePrice()
-                filterData.ordinamento = "Nome"
-                filterData.ordinamentoCrescente = true
-            }) {
-                Text("Reset filtri")
-            }
-        }
-        Spacer(Modifier.height(8.dp))
-        LazyVerticalGrid(
-            columns = GridCells.Adaptive(120.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = 160.dp, max = 420.dp)
-                .padding(top = 8.dp, bottom = 8.dp, start = 10.dp, end = 10.dp),
-            horizontalArrangement = Arrangement.spacedBy(30.dp)
-        ) {
-            items(Category.entries.toList(), key = null) { category ->
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(filterData.categorie.contains(category), {
-                        if (filterData.categorie.contains(category)) filterData.categorie.remove(category)
-                        else filterData.categorie.add(category) }
-                    )
-                    Text(category.nome, modifier = Modifier.padding(start = 8.dp))
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = onDismiss) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
                 }
-
+                Text(
+                    "Filtri prodotti",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(start = 8.dp)
+                )
+                Spacer(Modifier.weight(1f))
+                TextButton(onClick = {
+                    filterData.categorie.clear()
+                    sliderPosition = 0f..absoluteMax
+                    minPriceText = "0.00"
+                    maxPriceText = "%.2f".format(absoluteMax)
+                    filterData.ordinamento = "Nome"
+                    filterData.ordinamentoCrescente = true
+                }) {
+                    Text("Reset", color = Color.Red, fontWeight = FontWeight.SemiBold)
+                }
             }
         }
-        Spacer(Modifier.height(28.dp))
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 14.dp)) {
-            Text(text = "Seleziona intervallo: ${"%.2f".format(sliderPosition.start)} - ${"%.2f".format(sliderPosition.endInclusive)}")
-            Spacer(Modifier.height(10.dp))
 
-            RangeSlider(
-                value = sliderPosition,
-                onValueChange = {
-                    sliderPosition = it
-                    minPrice = "%.2f".format(sliderPosition.start)
-                    maxPrice = "%.2f".format(sliderPosition.endInclusive)
-                },
-                valueRange = 0.0.toFloat()..filterData.maxPossiblePrice(), // Intervallo totale
-                steps = 0 // Opzionale: aggiunge tacche
-            )
-            Spacer(Modifier.height(10.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                OutlinedTextField(
-                    value = minPrice,
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            // quando l'utente preme "Done" sulla tastiera, rimuovi il focus
-                            if(minPrice.isEmpty() || minPrice.toFloat()<0) {
-                                minPrice = "0.00"
-                                sliderPosition = 0.0f..sliderPosition.endInclusive
-                            }
-                        },
-                        onSend = {
-                            if(minPrice.isEmpty() || minPrice.toFloat()<0) {
-                                minPrice = "0.00"
-                                sliderPosition = 0.0f..sliderPosition.endInclusive
-                            }
-                        }),
-                    onValueChange = {
-                        minPrice = it
-                        if (minPrice.toFloatOrNull()==null) {
-                            minPrice = ""
-                            sliderPosition = sliderPosition.start..filterData.maxPossiblePrice()
-                        }
-                        if (minPrice.isEmpty() || minPrice.toFloat()<0){
-                            sliderPosition = 0.0f..sliderPosition.endInclusive
-                        } else if(minPrice.toFloat()<=sliderPosition.endInclusive) {
-                            sliderPosition = minPrice.toFloat()..sliderPosition.endInclusive
-                        } else {
-                            minPrice = sliderPosition.endInclusive.toString()
-                            sliderPosition = minPrice.toFloat()..sliderPosition.endInclusive
-                        }
-                    },
-                    label = { Text("Prezzo Minimo") },
-                    modifier = Modifier
-                        .padding(top = 0.dp)
-                        .weight(1f)
-                        .padding(end = 5.dp)
-                        .onFocusChanged { focusState ->
-                            // quando perde il focus e il campo è vuoto, impostalo a "0.00"
-                            if (!focusState.isFocused && (minPrice.isEmpty() || minPrice.toFloat()<0)) {
-                                minPrice = "0.00"
-                                // aggiorna anche lo slider di conseguenza
-                                sliderPosition = 0.0f..sliderPosition.endInclusive
-                            }
-                        }
+        Column(Modifier.padding(24.dp)) {
+
+            // ── 1. SEZIONE PREZZO ───────────────────────────────────────────
+            Text("Fascia di prezzo", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Spacer(Modifier.height(16.dp))
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                shape = RoundedCornerShape(20.dp),
+                border = androidx.compose.foundation.BorderStroke(
+                    1.dp,
+                    Color.LightGray.copy(alpha = 0.4f)
                 )
-                OutlinedTextField(
-                    value = maxPrice,
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            // quando l'utente preme "Done" sulla tastiera, rimuovi il focus
-                            if(maxPrice.isEmpty() || maxPrice.toFloat()<0) {
-                                maxPrice = filterData.maxPossiblePrice().toString()
-                                sliderPosition = sliderPosition.start..filterData.maxPossiblePrice()
-                            } else {
-                                maxPrice = sliderPosition.endInclusive.toString()
-                            }
+            ) {
+                Column(Modifier.padding(20.dp)) {
+                    Text(
+                        text = "Da €${"%.2f".format(sliderPosition.start)} a €${"%.2f".format(sliderPosition.endInclusive)}",
+                        color = Color(0xFF388E3C),
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 15.sp
+                    )
+
+                    Spacer(Modifier.height(12.dp))
+
+                    // RANGE SLIDER MODERNO
+                    RangeSlider(
+                        value = sliderPosition,
+                        onValueChange = { newRange ->
+                            sliderPosition = newRange
+                            minPriceText = "%.2f".format(newRange.start)
+                            maxPriceText = "%.2f".format(newRange.endInclusive)
                         },
-                        onSend = {
-                            if(maxPrice.isEmpty() || maxPrice.toFloat()<0) {
-                                maxPrice = filterData.maxPossiblePrice().toString()
-                                sliderPosition = sliderPosition.start..filterData.maxPossiblePrice()
-                            } else {
-                                maxPrice = sliderPosition.endInclusive.toString()
-                            }
-                        }),
-                    onValueChange = {
-                        maxPrice = it
-                        if (maxPrice.toFloatOrNull()==null) {
-                            maxPrice = ""
-                            sliderPosition = sliderPosition.start..filterData.maxPossiblePrice()
-                        }
-                        if (maxPrice.isEmpty() || maxPrice.toFloat()<0){
-                            sliderPosition = sliderPosition.start..filterData.maxPossiblePrice()
-                        } else if(maxPrice.toFloat()>filterData.maxPossiblePrice()) {
-                            maxPrice = filterData.maxPossiblePrice().toString()
-                            sliderPosition = sliderPosition.start..maxPrice.toFloat()
-                        } else if(maxPrice.toFloat()>=sliderPosition.start) {
-                            sliderPosition = sliderPosition.start..maxPrice.toFloat()
-                        } else {
-                            maxPrice = sliderPosition.start.toString()
-                            sliderPosition = sliderPosition.start..maxPrice.toFloat()
-                        }
+                        valueRange = 0f..absoluteMax,
+                        colors = SliderDefaults.colors(
+                            thumbColor = Color(0xFF388E3C),
+                            activeTrackColor = Color(0xFF388E3C),
+                            inactiveTrackColor = Color.LightGray.copy(alpha = 0.3f)
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
 
-                    },
-                    label = { Text("Prezzo Massimo") },
-                    modifier = Modifier
-                        .padding(top = 0.dp)
-                        .weight(1f)
-                        .padding(end = 5.dp)
-                        .onFocusChanged { focusState ->
-                            // quando perde il focus e il campo è vuoto, impostalo a "0.00"
-                            if (!focusState.isFocused && (maxPrice.isEmpty() || maxPrice.toFloat()<0)) {
-                                maxPrice = filterData.maxPrice.toString()
-                                // aggiorna anche lo slider di conseguenza
-                                sliderPosition = sliderPosition.start..filterData.maxPossiblePrice()
-                            }
-                        }
-                )
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text("€ 0,00", fontSize = 12.sp, color = Color.Gray)
+                        Text("€ ${"%.2f".format(absoluteMax)}", fontSize = 12.sp, color = Color.Gray)
+                    }
 
+                    Spacer(Modifier.height(16.dp))
+                    HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray.copy(alpha = 0.5f))
+                    Spacer(Modifier.height(16.dp))
+
+                    // CAMPI TESTO PREZZO MIN / MAX
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        OutlinedTextField(
+                            value = minPriceText,
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                            keyboardActions = KeyboardActions(onDone = {
+                                val v = minPriceText.toFloatOrNull() ?: 0f
+                                val clamped = v.coerceIn(0f, sliderPosition.endInclusive)
+                                sliderPosition = clamped..sliderPosition.endInclusive
+                                minPriceText = "%.2f".format(clamped)
+                            }),
+                            onValueChange = { txt ->
+                                minPriceText = txt
+                                val v = txt.toFloatOrNull()
+                                if (v != null && v >= 0f && v <= sliderPosition.endInclusive) {
+                                    sliderPosition = v..sliderPosition.endInclusive
+                                }
+                            },
+                            label = { Text("Prezzo min") },
+                            modifier = Modifier
+                                .weight(1f)
+                                .onFocusChanged { fs ->
+                                    if (!fs.isFocused) {
+                                        val v = minPriceText.toFloatOrNull() ?: 0f
+                                        val clamped = v.coerceIn(0f, sliderPosition.endInclusive)
+                                        sliderPosition = clamped..sliderPosition.endInclusive
+                                        minPriceText = "%.2f".format(clamped)
+                                    }
+                                },
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                        OutlinedTextField(
+                            value = maxPriceText,
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                            keyboardActions = KeyboardActions(onDone = {
+                                val v = maxPriceText.toFloatOrNull() ?: absoluteMax
+                                val clamped = v.coerceIn(sliderPosition.start, absoluteMax)
+                                sliderPosition = sliderPosition.start..clamped
+                                maxPriceText = "%.2f".format(clamped)
+                            }),
+                            onValueChange = { txt ->
+                                maxPriceText = txt
+                                val v = txt.toFloatOrNull()
+                                if (v != null && v <= absoluteMax && v >= sliderPosition.start) {
+                                    sliderPosition = sliderPosition.start..v
+                                }
+                            },
+                            label = { Text("Prezzo max") },
+                            modifier = Modifier
+                                .weight(1f)
+                                .onFocusChanged { fs ->
+                                    if (!fs.isFocused) {
+                                        val v = maxPriceText.toFloatOrNull() ?: absoluteMax
+                                        val clamped = v.coerceIn(sliderPosition.start, absoluteMax)
+                                        sliderPosition = sliderPosition.start..clamped
+                                        maxPriceText = "%.2f".format(clamped)
+                                    }
+                                },
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                    }
+                }
             }
+
+            Spacer(Modifier.height(32.dp))
+
+            // ── 2. SEZIONE CATEGORIE ────────────────────────────────────────
+            Text("Categorie", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Spacer(Modifier.height(12.dp))
+
+            Category.entries.chunked(2).forEach { pair ->
+                Row(Modifier.fillMaxWidth()) {
+                    pair.forEach { category ->
+                        Row(
+                            Modifier.weight(1f),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            FilterCheckboxRow(
+                                label = category.nome,
+                                isChecked = filterData.categorie.contains(category),
+                                onCheckedChange = { isChecked ->
+                                    if (isChecked) filterData.categorie.add(category)
+                                    else filterData.categorie.remove(category)
+                                }
+                            )
+                        }
+                    }
+                    if (pair.size == 1) Spacer(Modifier.weight(1f))
+                }
+            }
+
+            Spacer(Modifier.height(48.dp))
+
+            // ── 3. TASTO APPLICA ────────────────────────────────────────────
+            Button(
+                onClick = onDismiss,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                shape = CircleShape,
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF388E3C))
+            ) {
+                Text("Applica filtri", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            }
+            Spacer(Modifier.height(32.dp))
         }
-        Spacer(Modifier.height(14.dp))
-        Row (horizontalArrangement = Arrangement.End, modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 14.dp)) {
-            Button(onClick = {onDismiss()}) { Text("Applica") }
-        }
-        Spacer(Modifier.height(5.dp))
     }
 }
 
@@ -450,4 +553,3 @@ fun FilterPage(modifier: Modifier, filterData: FilterData, onDismiss: ()-> Unit)
 fun SearchPreview() {
     SearchPageComplete(PaddingValues(0.dp), null)
 }
-

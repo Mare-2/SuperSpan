@@ -26,12 +26,14 @@
 - [ ] nella fase di candidatura se uno registra un video troppo corto fare in modo che riinizi la registrazione
 - [ ] nell'ultimo step della candidatura fare in modo che se schiacci sul cv ti apra il cv 
 - [ ] nell'ultimo step della candidatura fare in modo che schiacci sul video ti faccia rivedere il video
+- [x] dopo che un utente invia una candidatura riportarlo alla schermata delle offerte di lavoro (non alla home)
 
 ### 🔍 Pagina Ricerca Prodotti e pagina Prodotto
 - [ ] aggiustare pagina prodotto
-- [ ] aggiustare scorrimento nella pagina di ricerca dei prodotti in modo che scorra tutto e non solo i prodotti
-- [ ] rimpicciolire la barra di ricerca e magari mettere il tasto per i filtri affianco
-- [ ] mettere la freccia per tornare indietro nella pagina filtri
+- [x] aggiustare scorrimento nella pagina di ricerca dei prodotti in modo che scorra tutto e non solo i prodotti
+- [x] rimpicciolire la barra di ricerca e mettere il tasto per i filtri affianco
+- [x] mettere la freccia per tornare indietro nella pagina filtri
+- [x] fare la grafica dei filtri prodotti simile alla grafica dei filtri di lavoro
 
 ### Pagina Coupon e Offerte, pagina Coupon e pagina Offerta
 - [ ] aggiustare pagine coupon e offerte
@@ -56,7 +58,7 @@
 - [ ] ricordare di rendere la navbar sempre visibile
 
 ### ⚙️ Logica e Contenuti
-- [ ] capire come aggiustare la home e se lasciarla
+- [x] fare partire l'app dalla home
 - [ ] gestire i messaggi di errore per aiutare nella compilazione di dati e form
 - [ ] guardare di aver inserito tutte le feature aggiuntive che abbiamo dedotto con gli scenari
 - [ ] spararci in faccia (scherzo(forse))

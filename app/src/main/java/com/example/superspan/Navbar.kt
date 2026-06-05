@@ -117,7 +117,7 @@ fun Navigation(navController: NavHostController, startDestination: Destination, 
 @Preview(showBackground = true)
 fun MainNavigation() {
     val navController = rememberNavController()
-    val startDestination: Destination = Destination.OFFERTE
+    val startDestination: Destination = Destination.HOME
     val navBarStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBarStackEntry?.destination?.route ?: Destination.LOGIN.route
     val showBar: Boolean = currentRoute != Destination.LOGIN.route &&
