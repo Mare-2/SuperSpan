@@ -1,4 +1,4 @@
-package com.example.superspan
+/*package com.example.superspan
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -310,4 +310,298 @@ private fun formatPrice(price: Float): String = "€%.2f".format(price)
 @Preview(showBackground = true)
 fun CouponPreview() {
     CouponPageComplete(PaddingValues(0.dp), null)
+}*/
+
+package com.example.superspan
+
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
+import androidx.compose.foundation.lazy.rememberLazyListState
+import java.util.Locale
+
+// Classe per gestire lo stato della scadenza visivamente
+data class ExpirationStatus(val label: String, val color: Color)
+
+
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun CouponPageComplete(paddingValues: PaddingValues, navController: NavController?) {
+    var selectedTab by remember { mutableIntStateOf(0) }
+    var selectedOffer: Coupon? by remember { mutableStateOf(null) }
+
+    // --- GESTIONE RITORNO IN ALTO ---
+    val listState = rememberLazyListState() // Ricorda lo stato della lista
+
+    // Ogni volta che selectedTab cambia, riporta la lista all'item 0 (il titolo)
+    LaunchedEffect(selectedTab) {
+        listState.scrollToItem(0)
+    }
+
+    Box(modifier = Modifier
+        .padding(paddingValues)
+        .fillMaxSize()
+        .background(Color(0xFFF8F9FA))
+    ) {
+        if (selectedOffer == null) {
+            LazyColumn(
+                state = listState, // COLLEGA LO STATO ALLA LISTA
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(bottom = 100.dp)
+            ) {
+                // 1. TITOLO
+                item {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 32.dp, start = 20.dp, end = 20.dp, bottom = 16.dp)
+                    ) {
+                        Text(
+                            text = "Offerte e Coupon",
+                            fontSize = 32.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = Color(0xFF1A1A1A)
+                        )
+                        Text(
+                            text = "Risparmia sulla tua spesa quotidiana",
+                            fontSize = 16.sp,
+                            color = Color.Gray
+                        )
+                    }
+                }
+
+                // 2. STICKY TABS
+                stickyHeader {
+                    Surface(
+                        modifier = Modifier.fillMaxWidth(),
+                        color = Color(0xFFF8F9FA).copy(alpha = 0.95f)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 20.dp, vertical = 12.dp)
+                                .background(Color(0xFFE0E0E0), CircleShape)
+                                .padding(4.dp)
+                        ) {
+                            TabButton("I tuoi Coupon", selectedTab == 0, Modifier.weight(1f)) { selectedTab = 0 }
+                            TabButton("Promozioni", selectedTab == 1, Modifier.weight(1f)) { selectedTab = 1 }
+                        }
+                    }
+                }
+
+                // 3. LISTA FILTRATA
+                val filteredList = if (selectedTab == 0) {
+                    ListOfCoupon.filter { it.products.size == 1 }
+                } else {
+                    ListOfCoupon.filter { it.products.size > 1 }
+                }
+
+                items(filteredList) { item ->
+                    Box(modifier = Modifier.padding(vertical = 6.dp)) {
+                        if (selectedTab == 0) {
+                            CouponTicketCard(item)
+                        } else {
+                            OfferBundleCard(item) { selectedOffer = item }
+                        }
+                    }
+                }
+            }
+        } else {
+            OfferDetailPage(selectedOffer!!) { selectedOffer = null }
+        }
+
+        if (actualUser.admin) {
+            FloatingActionButton(
+                onClick = { navController?.navigate(Destination.ADD_COUPON.route) },
+                containerColor = Color(0xFF388E3C),
+                contentColor = Color.White,
+                modifier = Modifier.align(Alignment.BottomEnd).padding(24.dp)
+            ) {
+                Icon(Icons.Default.Add, "Aggiungi")
+            }
+        }
+    }
+}
+
+// --- FUNZIONI DI SUPPORTO (DATA E CARDS) ---
+
+fun formatDisplayDate(dateString: String): String {
+    return try {
+        val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val outputFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.ITALY)
+        val date = LocalDate.parse(dateString, inputFormatter)
+        date.format(outputFormatter)
+    } catch (e: Exception) {
+        dateString
+    }
+}
+
+@Composable
+fun TabButton(text: String, isSelected: Boolean, modifier: Modifier, onClick: () -> Unit) {
+    Surface(
+        modifier = modifier.clickable { onClick() },
+        color = if (isSelected) Color.White else Color.Transparent,
+        shape = CircleShape,
+        shadowElevation = if (isSelected) 4.dp else 0.dp
+    ) {
+        Box(modifier = Modifier.height(40.dp), contentAlignment = Alignment.Center) {
+            Text(text = text, fontSize = 14.sp, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium, color = if (isSelected) Color.Black else Color.DarkGray)
+        }
+    }
+}
+
+@Composable
+fun CouponTicketCard(coupon: Coupon) {
+    val status = getExpirationStatus(coupon.dateOfExpiration)
+    val product = coupon.products.first()
+
+    Card(
+        modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(2.dp)
+    ) {
+        Row(modifier = Modifier.height(IntrinsicSize.Min)) {
+            Column(modifier = Modifier.weight(1f).padding(16.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Surface(color = status.color.copy(0.1f), shape = CircleShape) {
+                        Text(status.label, modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp), color = status.color, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                    }
+                    Spacer(Modifier.width(8.dp))
+                    Text(text = "Scade: ${formatDisplayDate(coupon.dateOfExpiration)}", fontSize = 11.sp, color = Color.Gray)
+                }
+                Spacer(Modifier.height(8.dp))
+                Text(product.nome, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Text(coupon.description, fontSize = 13.sp, color = Color.Gray)
+                Spacer(Modifier.height(12.dp))
+                Surface(color = Color(0xFFF1F1F1), shape = RoundedCornerShape(8.dp), border = androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray.copy(0.5f))) {
+                    Text(coupon.code, modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp), fontWeight = FontWeight.ExtraBold, letterSpacing = 2.sp, color = Color.DarkGray)
+                }
+            }
+            Box(Modifier.fillMaxHeight().width(1.dp).background(Color.LightGray))
+            Column(
+                modifier = Modifier.fillMaxHeight().width(90.dp).background(status.color.copy(0.05f)),
+                horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center
+            ) {
+                Text("SCONTO", fontSize = 10.sp, color = Color.Gray)
+                Text("-${coupon.discount.toInt()}%", fontSize = 26.sp, fontWeight = FontWeight.Black, color = status.color)
+            }
+        }
+    }
+}
+
+@Composable
+fun OfferBundleCard(coupon: Coupon, onClick: () -> Unit) {
+    Card(
+        modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth().clickable { onClick() },
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(2.dp)
+    ) {
+        Column(Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(Modifier.size(40.dp).background(Color(0xFFE8F5E9), CircleShape), contentAlignment = Alignment.Center) {
+                    Icon(Icons.Default.LocalOffer, null, tint = Color(0xFF388E3C), modifier = Modifier.size(20.dp))
+                }
+                Spacer(Modifier.width(12.dp))
+                Column(Modifier.weight(1f)) {
+                    Text(coupon.description, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    Text(text = "Valida fino al ${formatDisplayDate(coupon.dateOfExpiration)}", fontSize = 12.sp, color = Color(0xFFD32F2F), fontWeight = FontWeight.Medium)
+                }
+                Icon(Icons.Default.ChevronRight, null, tint = Color.LightGray)
+            }
+        }
+    }
+}
+
+@Composable
+fun OfferDetailPage(coupon: Coupon, onBack: () -> Unit) {
+    Column(Modifier.fillMaxSize().background(Color.White)) {
+        Row(Modifier.padding(8.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null) }
+            Text("Torna alla lista", color = Color.Gray)
+        }
+        Column(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp).verticalScroll(rememberScrollState())) {
+            Text(coupon.description, fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, lineHeight = 34.sp)
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 8.dp)) {
+                Icon(Icons.Default.Event, null, tint = Color.Gray, modifier = Modifier.size(16.dp))
+                Spacer(Modifier.width(6.dp))
+                Text("Offerta valida fino al ${formatDisplayDate(coupon.dateOfExpiration)}", color = Color.Gray, fontSize = 14.sp)
+            }
+            Spacer(Modifier.height(24.dp))
+            coupon.products.forEach { product ->
+                ProductDiscountItem(product, coupon)
+                Spacer(Modifier.height(12.dp))
+            }
+            Spacer(Modifier.height(32.dp))
+            Surface(modifier = Modifier.fillMaxWidth(), color = Color(0xFF388E3C).copy(0.1f), shape = RoundedCornerShape(16.dp), border = androidx.compose.foundation.BorderStroke(2.dp, Color(0xFF388E3C))) {
+                Column(modifier = Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("MOSTRA ALLA CASSA", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color(0xFF388E3C))
+                    Spacer(Modifier.height(8.dp))
+                    Text(text = coupon.code, fontSize = 36.sp, fontWeight = FontWeight.Black, letterSpacing = 6.sp, color = Color.Black)
+                }
+            }
+            Spacer(Modifier.height(40.dp))
+        }
+    }
+}
+
+@Composable
+fun ProductDiscountItem(product: Product, coupon: Coupon) {
+    val discountedPrice = coupon.calculateDiscountedPrice(product)
+    Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp), colors = CardDefaults.cardColors(containerColor = Color(0xFFF1F1F1))) {
+        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Text(product.nome, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("€%.2f".format(product.prezzo), textDecoration = TextDecoration.LineThrough, color = Color.Gray, fontSize = 14.sp)
+                    Spacer(Modifier.width(8.dp))
+                    Text("€%.2f".format(discountedPrice), color = Color(0xFF1B5E20), fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
+                }
+            }
+            Text("-${coupon.discount.toInt()}%", fontWeight = FontWeight.Black, color = Color(0xFFD32F2F), fontSize = 20.sp)
+        }
+    }
+}
+
+private fun getExpirationStatus(dateString: String): ExpirationStatus {
+    return try {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val expiry = LocalDate.parse(dateString, formatter)
+        val today = LocalDate.now()
+        val days = ChronoUnit.DAYS.between(today, expiry)
+        when {
+            days < 0 -> ExpirationStatus("SCADUTO", Color.Gray)
+            days == 0L -> ExpirationStatus("SCADE OGGI", Color(0xFFD32F2F))
+            days <= 3 -> ExpirationStatus("SCADE TRA $days GG", Color(0xFFF57C00))
+            else -> ExpirationStatus("ATTIVO", Color(0xFF388E3C))
+        }
+    } catch (e: Exception) { ExpirationStatus("VALIDO", Color.Gray) }
 }

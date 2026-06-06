@@ -816,7 +816,7 @@ fun ApplyStep3(navController: NavController?, padding: PaddingValues) {
                     val nuovaCandidatura = Candidacy(id = AllCandidacies.size + 1, userEmail = actualUser.email, offerId = currentOfferIdApplying, nome = currentDraft.nome, cognome = currentDraft.cognome, emailContatto = currentDraft.emailLavoro, cvFileName = currentDraft.cvFileName)
                     AllCandidacies.add(nuovaCandidatura)
                     currentDraft = CandidacyDraft()
-                    navController?.navigate(Destination.HOME.route) { popUpTo(Destination.HOME.route) { inclusive = true } }
+                    navController?.navigate(Destination.LAVORO.route) { popUpTo(Destination.LAVORO.route) { inclusive = true } }
                 },
                 modifier = Modifier.fillMaxWidth().height(60.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF388E3C)),
