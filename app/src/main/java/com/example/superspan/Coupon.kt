@@ -318,9 +318,11 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource // AGGIUNTO
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -343,13 +345,10 @@ import androidx.navigation.NavController
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
-import androidx.compose.foundation.lazy.rememberLazyListState
 import java.util.Locale
 
 // Classe per gestire lo stato della scadenza visivamente
 data class ExpirationStatus(val label: String, val color: Color)
-
-
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -358,9 +357,8 @@ fun CouponPageComplete(paddingValues: PaddingValues, navController: NavControlle
     var selectedOffer: Coupon? by remember { mutableStateOf(null) }
 
     // --- GESTIONE RITORNO IN ALTO ---
-    val listState = rememberLazyListState() // Ricorda lo stato della lista
+    val listState = rememberLazyListState()
 
-    // Ogni volta che selectedTab cambia, riporta la lista all'item 0 (il titolo)
     LaunchedEffect(selectedTab) {
         listState.scrollToItem(0)
     }
@@ -372,7 +370,7 @@ fun CouponPageComplete(paddingValues: PaddingValues, navController: NavControlle
     ) {
         if (selectedOffer == null) {
             LazyColumn(
-                state = listState, // COLLEGA LO STATO ALLA LISTA
+                state = listState,
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(bottom = 100.dp)
             ) {
@@ -450,7 +448,7 @@ fun CouponPageComplete(paddingValues: PaddingValues, navController: NavControlle
     }
 }
 
-// --- FUNZIONI DI SUPPORTO (DATA E CARDS) ---
+// --- FUNZIONI DI SUPPORTO ---
 
 fun formatDisplayDate(dateString: String): String {
     return try {
@@ -465,14 +463,25 @@ fun formatDisplayDate(dateString: String): String {
 
 @Composable
 fun TabButton(text: String, isSelected: Boolean, modifier: Modifier, onClick: () -> Unit) {
+    // InteractionSource serve a gestire lo stato del clic senza effetti grafici
+    val interactionSource = remember { MutableInteractionSource() }
+
     Surface(
-        modifier = modifier.clickable { onClick() },
+        modifier = modifier.clickable(
+            interactionSource = interactionSource,
+            indication = null // <-- QUESTO RIMUOVE IL RIQUADRO GRIGIO
+        ) { onClick() },
         color = if (isSelected) Color.White else Color.Transparent,
         shape = CircleShape,
         shadowElevation = if (isSelected) 4.dp else 0.dp
     ) {
         Box(modifier = Modifier.height(40.dp), contentAlignment = Alignment.Center) {
-            Text(text = text, fontSize = 14.sp, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium, color = if (isSelected) Color.Black else Color.DarkGray)
+            Text(
+                text = text,
+                fontSize = 14.sp,
+                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                color = if (isSelected) Color.Black else Color.DarkGray
+            )
         }
     }
 }

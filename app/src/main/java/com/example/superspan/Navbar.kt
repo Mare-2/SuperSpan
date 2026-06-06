@@ -26,6 +26,40 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+// Import per i componenti della barra Material 3
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+
+// Import per la gestione dei testi e pesi (Bold/Normal)
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.dp
+
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalConfiguration
+
+// Import per i colori e modificatori
+import androidx.compose.foundation.layout.size
+
+import androidx.compose.material.icons.filled.Face
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.Alignment
+import androidx.compose.foundation.shape.RoundedCornerShape
+
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.navigation.NavGraph.Companion.findStartDestination
+
 //p.cortellesi@gmail.com  d.tinti@superspan.it
 var actualUser by mutableStateOf(MapOfUser["p.cortellesi@gmail.com"]!!)
 //var actualUser: User? = MapOfUser.getValue("p.cortellesi@gmail.com")
@@ -36,7 +70,7 @@ enum class Destination (
     val icon: ImageVector?
 ) {
     HOME("home", "Home", Icons.Default.Home),
-    SEARCH("search", "Search", Icons.Default.Search),
+    SEARCH("search", "Ricerca", Icons.Default.Search),
     OFFERTE("discount", "Offerte", Icons.Default.LocalOffer),
     LAVORO("work", "Lavoro", Icons.Default.Work),
     LOGIN("login", "Login", null),
@@ -112,51 +146,77 @@ fun Navigation(navController: NavHostController, startDestination: Destination, 
     }
 }
 
-//La Navbar è composta solo da placeholder
+/*//La Navbar è composta solo da placeholder
 @Composable
-@Preview(showBackground = true)
 fun MainNavigation() {
     val navController = rememberNavController()
     val startDestination: Destination = Destination.HOME
     val navBarStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBarStackEntry?.destination?.route ?: Destination.LOGIN.route
+
     val showBar: Boolean = currentRoute != Destination.LOGIN.route &&
-                            currentRoute != Destination.REGISTER.route
+            currentRoute != Destination.REGISTER.route &&
+            !currentRoute.startsWith("apply")
+
     Scaffold(
         bottomBar = {
-            if(showBar) {
-                BottomAppBar(containerColor = Color.Unspecified) {
+            if (showBar) {
+                NavigationBar(
+                    containerColor = Color.White,
+                    tonalElevation = 8.dp
+                ) {
                     Destination.entries.forEach { destination ->
-                        when(destination) {
-                            Destination.LOGIN -> {}
-                            Destination.REGISTER -> {}
-                            Destination.PRODOTTO -> {}
-                            Destination.ADD_COUPON -> {}
-                            Destination.PERSONAL_DATA_SUMMARY -> {}
-                            Destination.PERSONAL_DATA_EDIT -> {}
-                            Destination.APPLY_STEP_1 -> {}
-                            Destination.APPLY_STEP_2_INTRO -> {}
-                            Destination.APPLY_STEP_2_RECORD -> {}
-                            Destination.APPLY_STEP_2_REVIEW -> {}
-                            Destination.APPLY_STEP_3 -> {}
+                        // Qui rimettiamo TUTTE le tue eccezioni in modo esplicito
+                        when (destination) {
+                            Destination.LOGIN,
+                            Destination.REGISTER,
+                            Destination.PRODOTTO,
+                            Destination.ADD_COUPON,
+                            Destination.PERSONAL_DATA_SUMMARY,
+                            Destination.PERSONAL_DATA_EDIT,
+                            Destination.APPLY_STEP_1,
+                            Destination.APPLY_STEP_2_INTRO,
+                            Destination.APPLY_STEP_2_RECORD,
+                            Destination.APPLY_STEP_2_REVIEW,
+                            Destination.APPLY_STEP_3 -> {
+                                // Non facciamo nulla: queste pagine NON appaiono nella Navbar
+                            }
                             else -> {
+                                // Tutte le altre (Home, Search, Offerte, Lavoro, Profilo) appaiono
+                                val isSelected = currentRoute == destination.route
+
                                 NavigationBarItem(
-                                    selected = currentRoute==destination.route,
-                                    onClick = {navController.navigate(destination.route)},
+                                    selected = isSelected,
+                                    onClick = {
+                                        if (currentRoute != destination.route) {
+                                            navController.navigate(destination.route) {
+                                                popUpTo(navController.graph.startDestinationId) { saveState = true }
+                                                launchSingleTop = true
+                                                restoreState = true
+                                            }
+                                        }
+                                    },
+                                    label = {
+                                        Text(
+                                            text = destination.label,
+                                            fontSize = 10.sp,
+                                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                                        )
+                                    },
                                     icon = {
-                                        androidx.compose.material3.Icon(
-                                            imageVector = destination.icon?: Icons.Default.Face,
+                                        Icon(
+                                            imageVector = destination.icon ?: Icons.Default.Face,
                                             contentDescription = destination.label,
-                                            tint = if (currentRoute == destination.route) Color.Blue else Color.Green,
-                                            modifier = Modifier.size(40.dp)
+                                            modifier = Modifier.size(26.dp)
                                         )
                                     },
                                     colors = NavigationBarItemDefaults.colors(
-                                        indicatorColor = Color.Transparent, // Rende il contorno invisibile
-                                        selectedIconColor = Color.Blue, // Colore dell'icona quando è selezionata
-                                        unselectedIconColor = Color.Gray // Colore dell'icona quando NON è selezionata
+                                        indicatorColor = Color(0xFFE8F5E9), // Sfondo pillola verde chiaro
+                                        selectedIconColor = Color(0xFF388E3C), // Icona verde scuro
+                                        selectedTextColor = Color(0xFF388E3C),
+                                        unselectedIconColor = Color.Gray,
+                                        unselectedTextColor = Color.Gray
                                     )
-
                                 )
                             }
                         }
@@ -164,7 +224,155 @@ fun MainNavigation() {
                 }
             }
         }
+    ) { contentPadding ->
+        Navigation(navController, startDestination, contentPadding)
+    }
+}
+*/
+
+@Composable
+fun MainNavigation() {
+    val navController = rememberNavController()
+    val navBarStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBarStackEntry?.destination?.route ?: Destination.HOME.route
+
+    val showBar = currentRoute != Destination.LOGIN.route &&
+            currentRoute != Destination.REGISTER.route &&
+            !currentRoute.startsWith("apply")
+
+    Scaffold(
+        bottomBar = {
+            if (showBar) {
+                CustomAnimatedBottomBar(currentRoute) { route ->
+                    // --- NAVIGAZIONE CORRETTA ---
+                    navController.navigate(route) {
+                        // Pulisce tutto lo stack fino alla destinazione iniziale (Home)
+                        // Questo evita l'accumulo di pagine e risolve il tuo bug
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = false // NON salviamo lo stato "sporco"
+                        }
+                        // Evita di creare più copie della stessa pagina
+                        launchSingleTop = true
+                        // NON ripristiniamo il vecchio stato (così torniamo alla Home pulita)
+                        restoreState = false
+                    }
+                }
+            }
+        }
+    ) { contentPadding ->
+        Navigation(navController, Destination.HOME, contentPadding)
+    }
+}
+
+@Composable
+fun CustomAnimatedBottomBar(currentRoute: String, onNavigate: (String) -> Unit) {
+    val items = listOf(
+        Destination.HOME,
+        Destination.SEARCH,
+        Destination.OFFERTE,
+        Destination.LAVORO,
+        Destination.PROFILO
+    )
+
+    // Logica per mantenere la bolla verde sull'icona giusta anche nelle sottopagine
+    val selectedIndex = items.indexOfFirst { it.route == currentRoute }.let { index ->
+        if (index == -1) {
+            // Se siamo in una sottopagina, cerchiamo di capire a quale macro-area appartiene
+            when {
+                currentRoute.contains("apply") || currentRoute.contains("offerta") -> 3 // Icona Lavoro
+                currentRoute.contains("product") -> 1 // Icona Ricerca
+                currentRoute.contains("data") -> 4 // Icona Profilo
+                else -> 0 // Torna a Home se non sa dove andare
+            }
+        } else index
+    }
+
+    val configuration = LocalConfiguration.current
+    val horizontalPadding = 20.dp
+    val screenWidth = configuration.screenWidthDp.dp
+    val barWidth = screenWidth - (horizontalPadding * 2)
+    val tabWidth = barWidth / items.size
+
+    val animatedOffsetX by animateDpAsState(
+        targetValue = tabWidth * selectedIndex,
+        animationSpec = spring(dampingRatio = 0.8f, stiffness = 400f),
+        label = "bubbleMove"
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 24.dp)
+            .padding(horizontal = horizontalPadding),
+        contentAlignment = Alignment.BottomCenter
     ) {
-        contentPadding -> Navigation(navController, startDestination, contentPadding)
+        Surface(
+            modifier = Modifier.fillMaxWidth().height(70.dp),
+            color = Color.White,
+            shape = RoundedCornerShape(35.dp),
+            shadowElevation = 10.dp
+        ) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                // BOLLA ANIMATA
+                Box(
+                    modifier = Modifier
+                        .offset(x = animatedOffsetX)
+                        .width(tabWidth)
+                        .fillMaxHeight()
+                        .padding(5.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(RoundedCornerShape(30.dp))
+                            .background(Color(0xFF388E3C).copy(alpha = 0.12f))
+                    )
+                }
+
+                // ICONE
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    items.forEachIndexed { index, destination ->
+                        val isSelected = selectedIndex == index
+
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight()
+                                .clickable(
+                                    // --- FIX RETTANGOLO GRIGIO ---
+                                    interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
+                                    indication = null // Rimuove il rettangolo di sfondo al clic
+                                ) { onNavigate(destination.route) },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Icon(
+                                    imageVector = destination.icon ?: Icons.Default.Face,
+                                    contentDescription = destination.label,
+                                    tint = if (isSelected) Color(0xFF388E3C) else Color.Gray,
+                                    modifier = Modifier.size(26.dp)
+                                )
+                                if (isSelected) {
+                                    Text(
+                                        text = destination.label,
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        color = Color(0xFF388E3C),
+                                        maxLines = 1
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }

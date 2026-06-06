@@ -108,7 +108,7 @@ val MapOfUser = mutableMapOf<String, User>(
 //var currentUser by mutableStateOf(MapOfUser["p.cortellesi@gmail.com"]!!)
 
 //------------------------------Da sistemare-------------------------------------------
-class FilterData() {
+/*class FilterData() {
     var nome: String by mutableStateOf("")
     var ordinamento: String by mutableStateOf("Nome")
     var ordinamentoCrescente: Boolean by mutableStateOf(true)
@@ -126,6 +126,30 @@ class FilterData() {
         return ListOfProduct.maxOf { product ->
             product.prezzo
         }
+    }
+}*/
+
+class FilterData() {
+    var nome: String by mutableStateOf("")
+
+    // MODIFICA: Inizia con stringa vuota per non avere ordinamenti attivi all'avvio
+    var ordinamento: String by mutableStateOf("")
+
+    var ordinamentoCrescente: Boolean by mutableStateOf(true)
+    var categorie: MutableList<Category> = mutableStateListOf<Category>()
+    var minPrice: Double by mutableDoubleStateOf(0.0)
+    var maxPrice: Double by mutableDoubleStateOf(maxPossiblePrice().toDouble())
+
+    fun minPossiblePrice(): Float {
+        // Aggiunto un controllo di sicurezza se la lista è vuota
+        if (ListOfProduct.isEmpty()) return 0f
+        return ListOfProduct.minOf { product -> product.prezzo }
+    }
+
+    fun maxPossiblePrice(): Float {
+        // Aggiunto un controllo di sicurezza se la lista è vuota
+        if (ListOfProduct.isEmpty()) return 100f
+        return ListOfProduct.maxOf { product -> product.prezzo }
     }
 }
 

@@ -27,6 +27,9 @@
 - [ ] nell'ultimo step della candidatura fare in modo che se schiacci sul cv ti apra il cv 
 - [ ] nell'ultimo step della candidatura fare in modo che schiacci sul video ti faccia rivedere il video
 - [x] dopo che un utente invia una candidatura riportarlo alla schermata delle offerte di lavoro (non alla home)
+- [ ] aggiungere tasto per uscire in quasiasi step e quindi:
+  - [ ] siccome si potranno salvare le bozze se uno tenta di uscire mettere un messaggio con opzioni "elimina tutto", "annulla" e "salva in bozza"
+
 
 ### 🔍 Pagina Ricerca Prodotti e pagina Prodotto
 - [ ] aggiustare pagina prodotto
@@ -34,17 +37,25 @@
 - [x] rimpicciolire la barra di ricerca e mettere il tasto per i filtri affianco
 - [x] mettere la freccia per tornare indietro nella pagina filtri
 - [x] fare la grafica dei filtri prodotti simile alla grafica dei filtri di lavoro
+- [ ] aggiustare il fatto che dopo che usi il tasto per ordinare per prezzo o per nome i prodotti si mettono nell'ordine che pare a loro anche se disattivati i tasti (di solito in base al prezzo)
+- [ ] capire se è necessaria e utile la barra per scorrere massimo e minimo dei prezzi
+- [ ] aggiungere la descrizione del prodotto e tutto ciò che vogliamo nella pagina prodotto nel suo oggetto
+- [ ] aggiungere nuovi prodotti e nuove categorie
+- [ ] la barra di ricerca e il tasto filtri sono giganteschi
 
 ### Pagina Coupon e Offerte, pagina Coupon e pagina Offerta
 - [ ] aggiustare pagine coupon e offerte
-- [ ] mettere icone per distinguere visivamente tra coupon e offerte oppure magari fare una selezione in alto per decidere se guardare gli uni o le altre
+- [x] mettere icone per distinguere visivamente tra coupon e offerte oppure magari fare una selezione in alto per decidere se guardare gli uni o le altre
 - [ ] avrebbe senso aggiungere una barra di ricerca(?), da valutare
+- [ ] cambiare data in coupon e offerte perchè è tutto scaduto)
+- [ ] rebdere più netta la differenza tra roba scaduta, in scadenza e valida che mi sembra non si veda tanto (non sono sicura era tutto scaduto)
 
 
 ### Pagina ricerca Offerte di lavoro e pagina Offerta di lavoro
 - [x] aggiustare scorrimento nella pagina di ricerca delle offette di lavoro in modo che scorra tutto e non solo le offerte
 - [x] aggiustare e fare bene i filtri per le offerte di lavoro
 - [x] rendere i luoghi dei supermercati e i km più realistici scegliendo città e paesi vicino a cagliari e in varie vie di cagliari
+- [ ] la barra di ricerca e il tasto filtri sono giganteschi
 
 ### 🎨 Design e UI/UX Generale
 - [ ] decidere se mantenere la parabola o usare solo rettangoli stondati

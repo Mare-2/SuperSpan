@@ -17,6 +17,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.Photo
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Tune
@@ -33,6 +36,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import androidx.navigation.NavController
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.filled.Abc
+import androidx.compose.material.icons.filled.SortByAlpha
+import androidx.compose.material.icons.filled.Payments
 
 
 // ---------------------------------------------------------------------------
@@ -226,7 +234,7 @@ fun SearchPage(
             }
         }
 
-        // 2. ORDINAMENTO: Nome (sinistra) | Prezzo (destra)
+        /*// 2. ORDINAMENTO: Nome (sinistra) | Prezzo (destra)
         item {
             Spacer(Modifier.height(8.dp))
             Row(
@@ -287,6 +295,107 @@ fun SearchPage(
                 }
             }
             Spacer(Modifier.height(8.dp))
+        }*/
+
+        // 2. ORDINAMENTO: Alfabetico (sinistra) | Prezzo (destra)
+        item {
+            Spacer(Modifier.height(12.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // --- TASTO ALFABETICO (A-Z -> Z-A -> OFF) ---
+                val nomeAttivo = filterData.ordinamento == "Nome"
+
+                Button(
+                    onClick = {
+                        if (!nomeAttivo) {
+                            filterData.ordinamento = "Nome"
+                            filterData.ordinamentoCrescente = true
+                        } else if (filterData.ordinamentoCrescente) {
+                            filterData.ordinamentoCrescente = false
+                        } else {
+                            filterData.ordinamento = ""
+                        }
+                    },
+                    modifier = Modifier
+                        .height(44.dp) // Leggermente più grande (da 40 a 44)
+                        .wrapContentWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (nomeAttivo) Color(0xFF388E3C) else Color.Transparent,
+                        contentColor = if (nomeAttivo) Color.White else Color.DarkGray
+                    ),
+                    border = if (!nomeAttivo) BorderStroke(1.dp, Color.LightGray) else null,
+                    shape = CircleShape,
+                    // Aumentiamo il padding orizzontale per rendere il tasto più "importante"
+                    contentPadding = PaddingValues(horizontal = 20.dp)
+                ) {
+                    // Rimosso Row e Spacer: il testo ora si centra automaticamente
+                    Text(
+                        text = if (nomeAttivo && !filterData.ordinamentoCrescente) "Z-A" else "A-Z",
+                        fontSize = 13.sp, // Leggermente più grande per Paolo
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center
+                    )
+                }
+
+                Spacer(Modifier.width(12.dp))
+
+                // --- TASTO PREZZO (Crescente -> Decrescente -> OFF) ---
+                val prezzoAttivo = filterData.ordinamento == "Prezzo"
+
+                Button(
+                    onClick = {
+                        if (!prezzoAttivo) {
+                            filterData.ordinamento = "Prezzo"
+                            filterData.ordinamentoCrescente = true
+                        } else if (filterData.ordinamentoCrescente) {
+                            filterData.ordinamentoCrescente = false
+                        } else {
+                            filterData.ordinamento = ""
+                        }
+                    },
+                    modifier = Modifier
+                        .height(44.dp) // Stessa altezza dell'altro
+                        .wrapContentWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (prezzoAttivo) Color(0xFF388E3C) else Color.Transparent,
+                        contentColor = if (prezzoAttivo) Color.White else Color.DarkGray
+                    ),
+                    border = if (!prezzoAttivo) BorderStroke(1.dp, Color.LightGray) else null,
+                    shape = CircleShape,
+                    contentPadding = PaddingValues(horizontal = 16.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Payments,
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp) // Icona leggermente più grande
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            text = "Prezzo",
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        if (prezzoAttivo) {
+                            Spacer(Modifier.width(6.dp))
+                            Icon(
+                                imageVector = if (filterData.ordinamentoCrescente) Icons.Default.ArrowUpward else Icons.Default.ArrowDownward,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                    }
+                }
+            }
+            Spacer(Modifier.height(12.dp))
         }
 
         // 3. GRIGLIA PRODOTTI (2 colonne fisse per look coerente)
@@ -326,7 +435,7 @@ fun SearchPage(
 // FILTER PAGE (stile WorkFilterPage)
 // ---------------------------------------------------------------------------
 
-@OptIn(ExperimentalMaterial3Api::class)
+/*@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilterPage(modifier: Modifier, filterData: FilterData, onDismiss: () -> Unit) {
     val scrollState = rememberScrollState()
@@ -545,6 +654,195 @@ fun FilterPage(modifier: Modifier, filterData: FilterData, onDismiss: () -> Unit
             Spacer(Modifier.height(32.dp))
         }
     }
+}*/
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FilterPage(modifier: Modifier, filterData: FilterData, onDismiss: () -> Unit) {
+    val scrollState = rememberScrollState()
+    val absoluteMax = filterData.maxPossiblePrice()
+
+    // Stati locali per lo slider e i testi
+    var sliderPosition by remember {
+        mutableStateOf(filterData.minPrice.toFloat()..filterData.maxPrice.toFloat())
+    }
+    var minPriceText by remember { mutableStateOf("%.2f".format(sliderPosition.start)) }
+    var maxPriceText by remember { mutableStateOf("%.2f".format(sliderPosition.endInclusive)) }
+
+    // Sincronizzazione dati
+    filterData.minPrice = sliderPosition.start.toDouble()
+    filterData.maxPrice = sliderPosition.endInclusive.toDouble()
+
+    Column(
+        modifier = modifier
+            .background(Color(0xFFF8F9FA)) // Sfondo grigio chiarissimo
+            .verticalScroll(scrollState)
+    ) {
+        // --- 1. HEADER FISSO CON OMBRA ---
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            color = Color.White,
+            shadowElevation = 2.dp
+        ) {
+            Row(
+                Modifier.fillMaxWidth().padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = onDismiss) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
+                }
+                Text(
+                    "Filtri prodotti",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(start = 8.dp)
+                )
+                Spacer(Modifier.weight(1f))
+                TextButton(onClick = {
+                    filterData.categorie.clear()
+                    sliderPosition = 0f..absoluteMax
+                    minPriceText = "0.00"
+                    maxPriceText = "%.2f".format(absoluteMax)
+                }) {
+                    Text("Reset", color = Color.Red, fontWeight = FontWeight.SemiBold)
+                }
+            }
+        }
+
+        Column(Modifier.padding(24.dp)) {
+
+            // --- 2. SEZIONE PREZZO (CARD MODERNA) ---
+            Text("Fascia di prezzo", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Spacer(Modifier.height(16.dp))
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                shape = RoundedCornerShape(20.dp),
+                border = BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.4f))
+            ) {
+                Column(Modifier.padding(20.dp)) {
+                    Text(
+                        text = "Da €${"%.2f".format(sliderPosition.start)} a €${"%.2f".format(sliderPosition.endInclusive)}",
+                        color = Color(0xFF388E3C),
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 15.sp
+                    )
+
+                    Spacer(Modifier.height(12.dp))
+
+                    // RANGE SLIDER MODERNO (Due pallini, barra sottile)
+                    RangeSlider(
+                        value = sliderPosition,
+                        onValueChange = { newRange ->
+                            sliderPosition = newRange
+                            minPriceText = "%.2f".format(newRange.start)
+                            maxPriceText = "%.2f".format(newRange.endInclusive)
+                        },
+                        valueRange = 0f..absoluteMax,
+                        // Personalizzazione Pallini (Thumb)
+                        startThumb = {
+                            Box(
+                                modifier = Modifier
+                                    .size(22.dp)
+                                    .background(Color(0xFF388E3C), CircleShape)
+                                    .border(2.dp, Color.White, CircleShape)
+                            )
+                        },
+                        endThumb = {
+                            Box(
+                                modifier = Modifier
+                                    .size(22.dp)
+                                    .background(Color(0xFF388E3C), CircleShape)
+                                    .border(2.dp, Color.White, CircleShape)
+                            )
+                        },
+                        // Personalizzazione Barra (Track)
+                        track = { rangeSliderState ->
+                            SliderDefaults.Track(
+                                modifier = Modifier.height(4.dp),
+                                rangeSliderState = rangeSliderState,
+                                colors = SliderDefaults.colors(
+                                    activeTrackColor = Color(0xFF388E3C),
+                                    inactiveTrackColor = Color.LightGray.copy(alpha = 0.3f)
+                                )
+                            )
+                        }
+                    )
+
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text("€ 0,00", fontSize = 12.sp, color = Color.Gray)
+                        Text("€ ${"%.2f".format(absoluteMax)}", fontSize = 12.sp, color = Color.Gray)
+                    }
+
+                    Spacer(Modifier.height(16.dp))
+                    HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray.copy(alpha = 0.5f))
+                    Spacer(Modifier.height(16.dp))
+
+                    // Campi di testo per inserimento manuale
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        OutlinedTextField(
+                            value = minPriceText,
+                            onValueChange = { minPriceText = it },
+                            label = { Text("Min") },
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(12.dp),
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
+                        )
+                        OutlinedTextField(
+                            value = maxPriceText,
+                            onValueChange = { maxPriceText = it },
+                            label = { Text("Max") },
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(12.dp),
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
+                        )
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(32.dp))
+
+            // --- 3. SEZIONE CATEGORIE ---
+            Text("Categorie prodotti", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Spacer(Modifier.height(16.dp))
+
+            Category.entries.chunked(2).forEach { pair ->
+                Row(Modifier.fillMaxWidth()) {
+                    pair.forEach { category ->
+                        Row(Modifier.weight(1f)) {
+                            FilterCheckboxRow(
+                                label = category.nome,
+                                isChecked = filterData.categorie.contains(category),
+                                onCheckedChange = { isChecked ->
+                                    if (isChecked) filterData.categorie.add(category)
+                                    else filterData.categorie.remove(category)
+                                }
+                            )
+                        }
+                    }
+                    if (pair.size == 1) Spacer(Modifier.weight(1f))
+                }
+            }
+
+            Spacer(Modifier.height(48.dp))
+
+            // --- 4. TASTO APPLICA (STILE PILLOLA VERDE) ---
+            Button(
+                onClick = onDismiss,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                shape = CircleShape,
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF388E3C))
+            ) {
+                Text("Applica filtri", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            }
+            Spacer(Modifier.height(32.dp))
+        }
+    }
 }
 
 
@@ -553,3 +851,4 @@ fun FilterPage(modifier: Modifier, filterData: FilterData, onDismiss: () -> Unit
 fun SearchPreview() {
     SearchPageComplete(PaddingValues(0.dp), null)
 }
+
