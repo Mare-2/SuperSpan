@@ -339,6 +339,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -613,4 +614,10 @@ private fun getExpirationStatus(dateString: String): ExpirationStatus {
             else -> ExpirationStatus("ATTIVO", Color(0xFF388E3C))
         }
     } catch (e: Exception) { ExpirationStatus("VALIDO", Color.Gray) }
+}
+
+@Composable
+@Preview(showBackground = true)
+fun CouponPreview() {
+    CouponPageComplete(PaddingValues(0.dp), null)
 }

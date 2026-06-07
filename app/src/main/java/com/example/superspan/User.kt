@@ -10,6 +10,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import android.content.Context
 import android.net.Uri
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import java.io.File
 import java.io.FileOutputStream
 
@@ -72,12 +74,15 @@ data class User(
     // Campi aggiuntivi per dati personali/lavoro
     private var _telefono: String? = null,
     private var _emailLavoro: String? = null,
-    private var _cvFileName: String? = null // Nome del file PDF caricato
+    private var _cvFileName: String? = null, // Nome del file PDF caricato
+    private var _draftWorksByOfferId: MutableMap<Int, DraftWork> = mutableStateMapOf()
+    
 ) {
     // ... getter e setter ...
     var telefono get() = _telefono; set(v) { _telefono = v }
     var emailLavoro get() = _emailLavoro; set(v) { _emailLavoro = v }
     var cvFileName get() = _cvFileName; set(v) { _cvFileName = v }
+    var draftWorksByOfferId get() = _draftWorksByOfferId; set(v) { _draftWorksByOfferId = v }
     var nome get() = _nome; set(v) { _nome = v }
     var cognome get() = _cognome; set(v) { _cognome = v }
     var email get() = _email; set(v) { _email = v }
@@ -840,4 +845,4 @@ data class Candidacy(
 val AllCandidacies = mutableStateListOf<Candidacy>()
 
 // Variabile temporanea per sapere per quale offerta Paolo sta scrivendo
-var currentOfferIdApplying by mutableStateOf(0)
+var currentOfferIdApplying by mutableIntStateOf(0)

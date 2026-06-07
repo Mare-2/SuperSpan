@@ -80,6 +80,7 @@ enum class Destination (
     ADD_COUPON("add_coupon", "Aggiungi Offerta", null),
     PERSONAL_DATA_SUMMARY("data_summary", "Riepilogo Dati", null),
     PERSONAL_DATA_EDIT("data_edit", "Modifica Dati", null),
+    DRAFTS("drafts", "Bozze", Icons.Default.Description),
     APPLY_STEP_1("apply_1", "Dati e CV", null),
     APPLY_STEP_2_INTRO("apply_2_intro", "Istruzioni Video", null),
     APPLY_STEP_2_RECORD("apply_2_record", "Registra Video", null),
@@ -104,6 +105,7 @@ fun Navigation(navController: NavHostController, startDestination: Destination, 
                     Destination.PROFILO -> ProfilePage(user = actualUser, navController = navController, paddingValues = paddingValues)
                     Destination.PERSONAL_DATA_SUMMARY -> PersonalDataSummaryPage(navController = navController, padding = paddingValues)
                     Destination.PERSONAL_DATA_EDIT -> PersonalDataEditPage(navController = navController, padding = paddingValues)
+                    Destination.DRAFTS -> DraftsPage(navController = navController, padding = paddingValues)
                     Destination.APPLY_STEP_1 -> ApplyStep1(navController, paddingValues)
                     Destination.APPLY_STEP_2_INTRO -> ApplyStep2Intro(navController, paddingValues)
                     Destination.APPLY_STEP_2_RECORD -> ApplyStep2Record(navController, paddingValues)

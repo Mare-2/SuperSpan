@@ -35,6 +35,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,10 +53,34 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.WorkOutline
+import androidx.compose.material3.AlertDialog
+
 
 @Composable
 fun WorkOfferPage(offer: WorkOffer?, navController: NavController?, paddingValues: PaddingValues) {
     val scrollState = rememberScrollState()
+    var showSaveDialog by remember { mutableStateOf(false) }
+    
+    // Stato per la bozza candidatura
+    var draftWorkName by remember { mutableStateOf("") }
+    var draftWorkCognome by remember { mutableStateOf("") }
+    var draftWorkEmail by remember { mutableStateOf("") }
+    var draftWorkTelefono by remember { mutableStateOf("") }
+    var draftWorkCvFileName by remember { mutableStateOf<String?>(null) }
+
+    // Carica la bozza precedente se esiste
+    LaunchedEffect(offer?.id) {
+        if (offer != null) {
+            val savedDraft = getDraftWorkForOffer(actualUser, offer.id)
+            if (savedDraft != null) {
+                draftWorkName = savedDraft.nome
+                draftWorkCognome = savedDraft.cognome
+                draftWorkEmail = savedDraft.email
+                draftWorkTelefono = savedDraft.telefono
+                draftWorkCvFileName = savedDraft.cvFileName
+            }
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -133,10 +159,49 @@ fun WorkOfferPage(offer: WorkOffer?, navController: NavController?, paddingValue
 
         // --- TASTO INDIETRO ---
         IconButton(
-            onClick = { navController?.popBackStack() },
+            onClick = { showSaveDialog = true },
             modifier = Modifier.padding(12.dp).size(48.dp)
         ) {
             Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = Color.Black)
+        }
+
+        // --- DIALOGO SALVA BOZZA ---
+        if (showSaveDialog) {
+            AlertDialog(
+                onDismissRequest = { showSaveDialog = false },
+                title = { Text("Salva candidatura?", fontWeight = FontWeight.Bold) },
+                text = { Text("Vuoi salvare questa candidatura come bozza prima di uscire?") },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            // Salva la bozza
+                            val draft = DraftWork(
+                                nome = draftWorkName,
+                                cognome = draftWorkCognome,
+                                email = draftWorkEmail,
+                                telefono = draftWorkTelefono,
+                                cvFileName = draftWorkCvFileName
+                            )
+                            saveDraftWorkForOffer(actualUser, offer?.id ?: 0, draft)
+                            showSaveDialog = false
+                            navController?.popBackStack()
+                        }
+                    ) {
+                        Text("Salva")
+                    }
+                },
+                dismissButton = {
+                    Button(
+                        onClick = {
+                            // Non salva, semplicemente torna indietro
+                            showSaveDialog = false
+                            navController?.popBackStack()
+                        }
+                    ) {
+                        Text("Scarta")
+                    }
+                }
+            )
         }
 
         // --- TASTO CANDIDATI (Fisso con ombra) ---

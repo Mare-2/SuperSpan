@@ -119,7 +119,7 @@ fun ProfilePage(user: User, navController: NavController?, paddingValues: Paddin
                         subtitle = "Contatti e Curriculum Vitae",
                         onClick = { navController?.navigate(Destination.PERSONAL_DATA_SUMMARY.route) } // Assicurati che questa rotta esista
                     )
-                    ProfileMenuTile(Icons.Default.AssignmentTurnedIn, "Candidature in corso", "Stato delle tue domande") { }
+                    ProfileMenuTile(Icons.Default.AssignmentTurnedIn, "Candidature in corso", "Stato delle tue domande") { navController?.navigate(Destination.DRAFTS.route) }
                 }
 
                 Spacer(modifier = Modifier.height(32.dp))

@@ -420,6 +420,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
 
+
 @Composable
 fun WorkSearchPageComplete(
     padding: PaddingValues,
