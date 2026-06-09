@@ -127,7 +127,11 @@ fun ProfilePage(user: User, navController: NavController?, paddingValues: Paddin
                 // --- 3. TASTO ESCI (Stile pillola centrato, larghezza testo) ---
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                     Button(
-                        onClick = { /* Logout */ },
+                        onClick = {
+                            navController?.navigate(Destination.LOGIN.route) {
+                                popUpTo(0) // Pulisce tutta la back stack per evitare di tornare indietro dopo il logout
+                            } // Resettiamo l'utente attuale
+                        },
                         modifier = Modifier.height(56.dp),
                         shape = CircleShape,
                         contentPadding = PaddingValues(horizontal = 32.dp),

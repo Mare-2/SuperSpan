@@ -452,9 +452,12 @@ fun ApplyHeader(step: String, title: String, onBack: () -> Unit) {
         Modifier.fillMaxWidth().background(Color.White),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp)) {
+        Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
+            }
+            IconButton(onClick = onBack) {
+                Icon(Icons.Default.Close, null, tint = Color.Red)
             }
         }
         Box(

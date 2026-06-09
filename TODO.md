@@ -15,7 +15,7 @@
 - [ ] fare pagina dati account nel profilo admin con possibile modifica password
 
 ### Profilo Generico
-- [ ] far funzionare il tasto logout nel profilo
+- [x] far funzionare il tasto logout nel profilo
 - [ ] aggiustare scorrimento nel profilo
 
 ### 📝 Flusso Candidatura (Lavora con noi)
