@@ -70,18 +70,18 @@ fun Header(modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(
-            text = "Logo",
-            fontSize = 45.sp,
-            fontWeight = FontWeight.Light,
-            color = Color(0xFF424242)
+        androidx.compose.foundation.Image(
+            painter = androidx.compose.ui.res.painterResource(id = R.drawable.logo_superspan),
+            contentDescription = "Logo SuperSpan",
+            modifier = Modifier.height(80.dp),
+            contentScale = androidx.compose.ui.layout.ContentScale.Fit
         )
         Text(
             text = "Ciao ${actualUser.nome}!",
             fontSize = 25.sp,
             fontWeight = FontWeight.Bold, // Nella foto il nome sembra più marcato
             color = Color(0xFF424242),
-            modifier = Modifier.padding(top = 8.dp)
+            modifier = Modifier.padding(top = 5.dp)
         )
     }
 }

@@ -94,12 +94,23 @@ fun ProductCompose(product: Product, navController: NavController?) {
                     .background(Color.White),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    Icons.Default.Photo,
-                    contentDescription = product.nome,
-                    modifier = Modifier.size(48.dp),
-                    tint = Color.LightGray
-                )
+                if (product.image != null) {
+                    val needsShrink = product.nome == "Pane Fresco" || product.nome == "Parmigiano Reggiano 200g" || product.nome == "Detersivo Piatti"
+                    val imagePadding = if (needsShrink) 16.dp else 0.dp
+                    Image(
+                        painter = androidx.compose.ui.res.painterResource(id = product.image!!),
+                        contentDescription = product.nome,
+                        modifier = Modifier.fillMaxSize().padding(imagePadding),
+                        contentScale = androidx.compose.ui.layout.ContentScale.Fit
+                    )
+                } else {
+                    Icon(
+                        Icons.Default.Photo,
+                        contentDescription = product.nome,
+                        modifier = Modifier.size(48.dp),
+                        tint = Color.LightGray
+                    )
+                }
             }
             // Nome prodotto — 1 riga, tronca con "..."
             Text(
