@@ -13,73 +13,87 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import kotlinx.coroutines.delay
+            LaunchedEffect(Unit) {
+        while (countdown > 0) {
+            delay(1000)
+            countdown--
+        }
+        isRecording = true
+    }
 
-// --- HEADER COMUNE (Più compatto per lasciare spazio alla navbar) ---
-@Composable
-fun ApplyHeader(step: String, title: String, onBack: () -> Unit) {
-    Column(
-        Modifier.fillMaxWidth().background(Color.White),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp)) {
-            IconButton(onClick = onBack) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
+    LaunchedEffect(isRecording) {
+        while (isRecording && seconds < 30) {
+            delay(1000)
+            seconds++
+        }
+        if (seconds >= 30) {
+            isRecording = false
+            currentDraft = currentDraft.copy(videoFileName = "Video_Paolo_Presentazione.mp4")
+            navController?.navigate(Destination.APPLY_STEP_3.route)
+        }
+    }
+
+    Column(Modifier.fillMaxSize().padding(padding).background(Color.Black)) {
+        ApplyHeader("2", "Registrazione", onBack = { navController?.popBackStack() }, onClose = { showExitDialog = true })
+
+        ExitDraftDialog(
+            visible = showExitDialog,
+            onDismiss = { showExitDialog = false },
+            onSave = {
+                val draft = DraftWork(
+                    nome = currentDraft.nome,
+                    cognome = currentDraft.cognome,
+                    email = currentDraft.emailLavoro,
+                    telefono = currentDraft.telefono,
+                    cvFileName = currentDraft.cvFileName.ifEmpty { null }
+                )
+                saveDraftWorkForOffer(actualUser, currentOfferIdApplying, draft)
+                showExitDialog = false
+                goToOfferPresentation(navController)
+            },
+            onDiscard = {
+                showExitDialog = false
+                goToOfferPresentation(navController)
+            }
+        )
+
+        Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
+            if (countdown > 0) {
+                Text(countdown.toString(), fontSize = 120.sp, color = Color.White, fontWeight = FontWeight.ExtraBold)
+            } else {
+                Column(Modifier.fillMaxSize()) {
+                    LinearProgressIndicator(progress = { seconds / 30f }, modifier = Modifier.fillMaxWidth().height(8.dp), color = Color.Red, trackColor = Color.White.copy(0.2f))
+                    Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Surface(Modifier.size(12.dp), shape = CircleShape, color = Color.Red) {}
+                        Spacer(Modifier.width(8.dp))
+                        Text("REC 00:${seconds.toString().padStart(2, '0')} / 00:30", color = Color.White, fontWeight = FontWeight.Bold)
+                    }
+                    if (errorMsg.isNotEmpty()) {
+                        Text(errorMsg, color = Color.Yellow, modifier = Modifier.padding(16.dp).background(Color.Black.copy(0.6f)))
+                    }
+                }
             }
         }
-        Box(
-            Modifier.fillMaxWidth().height(80.dp).clip(TopOvalShape(20.dp)).background(Color.LightGray),
-            contentAlignment = Alignment.Center
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("Candidatura: Step $step di 3", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color(0xFF388E3C))
-                Text(title, fontSize = 20.sp, fontWeight = FontWeight.ExtraBold)
+
+        Box(Modifier.fillMaxWidth().height(120.dp).background(Color.Black), contentAlignment = Alignment.Center) {
+            if (isRecording) {
+                Box(Modifier.size(70.dp).clip(CircleShape).background(Color.White).padding(4.dp).clip(CircleShape).background(Color.Red).clickable {
+                    if (seconds < 5) {
+                        errorMsg = "Video troppo corto! Registra almeno 5 secondi."
+                    } else {
+                        isRecording = false
+                        if (isReturnToSummary) {
+                            isReturnToSummary = false
+                            navController?.popBackStack()
+                        } else {
+                            navController?.navigate(Destination.APPLY_STEP_3.route)
+                        }
+                    }
+                })
             }
         }
     }
 }
-
-// --- STATO TEMPORANEO PER LA CANDIDATURA (Per non sporcare actualUser) ---
-data class CandidacyDraft(
-    var nome: String = "",
-    var cognome: String = "",
-    var emailLavoro: String = "",
-    var telefono: String = "",
-    var cvFileName: String = ""
-)
-
-var currentDraft by mutableStateOf(CandidacyDraft())
-var isReturnToSummary by mutableStateOf(false)
-
-// --- STEP 1: DATI E CV ---
-@Composable
-fun ApplyStep1(navController: NavController?, padding: PaddingValues) {
-    // Inizializziamo i campi con i dati del profilo SOLO la prima volta
-    var nome by remember { mutableStateOf(currentDraft.nome.ifEmpty { actualUser.nome }) }
-    var cognome by remember { mutableStateOf(currentDraft.cognome.ifEmpty { actualUser.cognome }) }
-    var emailLavoro by remember { mutableStateOf(currentDraft.emailLavoro.ifEmpty { actualUser.emailLavoro ?: "" }) }
-    var telefonoCompleto = currentDraft.telefono.ifEmpty { actualUser.telefono ?: "" }
-    var telefonoInput by remember {
-        mutableStateOf(
-            if (currentDraft.telefono.isEmpty())
-                formatPhone(actualUser.telefono?.replace("+39 ", "") ?: "")
-            else
-                currentDraft.telefono.replace("+39 ", "")
         )
     }
 
@@ -97,6 +111,8 @@ fun ApplyStep1(navController: NavController?, padding: PaddingValues) {
         uri?.let { cvName = "CV_Selezionato.pdf" }
     }
 
+    var showExitDialog by remember { mutableStateOf(false) }
+
     if (showResetDialog) {
         AlertDialog(
             onDismissRequest = { showResetDialog = false },
@@ -113,7 +129,28 @@ fun ApplyStep1(navController: NavController?, padding: PaddingValues) {
     }
 
     Column(Modifier.fillMaxSize().padding(padding).background(Color.White)) {
-        ApplyHeader("1", "I tuoi dati e CV") { navController?.popBackStack() }
+        ApplyHeader("1", "I tuoi dati e CV", onBack = { navController?.popBackStack() }, onClose = { showExitDialog = true })
+
+        ExitDraftDialog(
+            visible = showExitDialog,
+            onDismiss = { showExitDialog = false },
+            onSave = {
+                val draft = DraftWork(
+                    nome = nome,
+                    cognome = cognome,
+                    email = emailLavoro,
+                    telefono = "$prefisso ${formatPhone(telefonoDigits)}",
+                    cvFileName = cvName.ifEmpty { null }
+                )
+                saveDraftWorkForOffer(actualUser, currentOfferIdApplying, draft)
+                showExitDialog = false
+                goToOfferPresentation(navController)
+            },
+            onDiscard = {
+                showExitDialog = false
+                goToOfferPresentation(navController)
+            }
+        )
 
         Column(Modifier.padding(horizontal = 24.dp).verticalScroll(rememberScrollState())) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
@@ -204,8 +241,31 @@ fun ApplyStep1(navController: NavController?, padding: PaddingValues) {
 // --- STEP 2a: ISTRUZIONI VIDEO ---
 @Composable
 fun ApplyStep2Intro(navController: NavController?, padding: PaddingValues) {
+    var showExitDialog by remember { mutableStateOf(false) }
+
     Column(Modifier.fillMaxSize().padding(padding).background(Color.White)) {
-        ApplyHeader("2", "Preparati al Video") { navController?.popBackStack() }
+        ApplyHeader("2", "Preparati al Video", onBack = { navController?.popBackStack() }, onClose = { showExitDialog = true })
+
+        ExitDraftDialog(
+            visible = showExitDialog,
+            onDismiss = { showExitDialog = false },
+            onSave = {
+                val draft = DraftWork(
+                    nome = currentDraft.nome,
+                    cognome = currentDraft.cognome,
+                    email = currentDraft.emailLavoro,
+                    telefono = currentDraft.telefono,
+                    cvFileName = currentDraft.cvFileName.ifEmpty { null }
+                )
+                saveDraftWorkForOffer(actualUser, currentOfferIdApplying, draft)
+                showExitDialog = false
+                goToOfferPresentation(navController)
+            },
+            onDiscard = {
+                showExitDialog = false
+                goToOfferPresentation(navController)
+            }
+        )
 
         Column(Modifier.padding(30.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(Color(0xFFF5F5F5)).padding(24.dp)) {
@@ -241,6 +301,9 @@ fun ApplyStep2Record(navController: NavController?, padding: PaddingValues) {
     var seconds by remember { mutableStateOf(0) }
     var isRecording by remember { mutableStateOf(false) }
     var errorMsg by remember { mutableStateOf("") }
+    var showExitDialog by remember { mutableStateOf(false) }
+    var showExitDialog by remember { mutableStateOf(false) }
+    var showExitDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         while (countdown > 0) { delay(1000); countdown-- }
@@ -290,7 +353,28 @@ fun ApplyStep2Record(navController: NavController?, padding: PaddingValues) {
                     }
                 })
             }
-        }
+                                        ApplyHeader("2", "Registrazione", onBack = { navController?.popBackStack() }, onClose = { showExitDialog = true })
+
+                                        ExitDraftDialog(
+                                            visible = showExitDialog,
+                                            onDismiss = { showExitDialog = false },
+                                            onSave = {
+                                                val draft = DraftWork(
+                                                    nome = currentDraft.nome,
+                                                    cognome = currentDraft.cognome,
+                                                    email = currentDraft.emailLavoro,
+                                                    telefono = currentDraft.telefono,
+                                                    cvFileName = currentDraft.cvFileName.ifEmpty { null }
+                                                )
+                                                saveDraftWorkForOffer(actualUser, currentOfferIdApplying, draft)
+                                                showExitDialog = false
+                                                goToOfferPresentation(navController)
+                                            },
+                                            onDiscard = {
+                                                showExitDialog = false
+                                                goToOfferPresentation(navController)
+                                            }
+                                        )
     }
 }
 
@@ -298,6 +382,7 @@ fun ApplyStep2Record(navController: NavController?, padding: PaddingValues) {
 @Composable
 fun ApplyStep3(navController: NavController?, padding: PaddingValues) {
     var showEditConfirm by remember { mutableStateOf<String?>(null) }
+    var showExitDialog by remember { mutableStateOf(false) }
 
     if (showEditConfirm != null) {
         AlertDialog(
@@ -317,7 +402,28 @@ fun ApplyStep3(navController: NavController?, padding: PaddingValues) {
     }
 
     Column(Modifier.fillMaxSize().padding(padding).background(Color.White)) {
-        ApplyHeader("3", "Riepilogo e Invio") { navController?.popBackStack() }
+        ApplyHeader("3", "Riepilogo e Invio", onBack = { navController?.popBackStack() }, onClose = { showExitDialog = true })
+
+        ExitDraftDialog(
+            visible = showExitDialog,
+            onDismiss = { showExitDialog = false },
+            onSave = {
+                val draft = DraftWork(
+                    nome = currentDraft.nome,
+                    cognome = currentDraft.cognome,
+                    email = currentDraft.emailLavoro,
+                    telefono = currentDraft.telefono,
+                    cvFileName = currentDraft.cvFileName.ifEmpty { null }
+                )
+                saveDraftWorkForOffer(actualUser, currentOfferIdApplying, draft)
+                showExitDialog = false
+                goToOfferPresentation(navController)
+            },
+            onDiscard = {
+                showExitDialog = false
+                goToOfferPresentation(navController)
+            }
+        )
 
         Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Text("Controlla i dati per questa candidatura:", color = Color.Gray, fontSize = 14.sp)
@@ -445,9 +551,39 @@ data class CandidacyDraft(
 var currentDraft by mutableStateOf(CandidacyDraft())
 var isReturnToSummary by mutableStateOf(false)
 
+fun goToOfferPresentation(navController: NavController?) {
+    navController?.navigate("dettaglio_offerta/$currentOfferIdApplying") {
+    popUpTo(Destination.APPLY_STEP_1.route) { inclusive = true }
+        launchSingleTop = true
+    }
+}
+
+@Composable
+fun ExitDraftDialog(
+    visible: Boolean,
+    onDismiss: () -> Unit,
+    onSave: () -> Unit,
+    onDiscard: () -> Unit
+) {
+    if (visible) {
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            title = { Text("Esci dalla candidatura") },
+            text = { Text("Vuoi salvare la candidatura tra le bozze prima di uscire?") },
+            confirmButton = { TextButton(onClick = onSave) { Text("Salva") } },
+            dismissButton = {
+                Row {
+                    TextButton(onClick = onDiscard) { Text("Scarta", color = Color.Red) }
+                    TextButton(onClick = onDismiss) { Text("Annulla") }
+                }
+            }
+        )
+    }
+}
+
 // --- HEADER ---
 @Composable
-fun ApplyHeader(step: String, title: String, onBack: () -> Unit) {
+fun ApplyHeader(step: String, title: String, onBack: () -> Unit, onClose: () -> Unit) {
     Column(
         Modifier.fillMaxWidth().background(Color.White),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -456,7 +592,7 @@ fun ApplyHeader(step: String, title: String, onBack: () -> Unit) {
             IconButton(onClick = onBack) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
             }
-            IconButton(onClick = onBack) {
+            IconButton(onClick = onClose) {
                 Icon(Icons.Default.Close, null, tint = Color.Red)
             }
         }
@@ -478,6 +614,7 @@ fun ApplyStep1(navController: NavController?, padding: PaddingValues) {
     var nome by remember { mutableStateOf(currentDraft.nome.ifEmpty { actualUser.nome }) }
     var cognome by remember { mutableStateOf(currentDraft.cognome.ifEmpty { actualUser.cognome }) }
     var emailLavoro by remember { mutableStateOf(currentDraft.emailLavoro.ifEmpty { actualUser.emailLavoro ?: "" }) }
+    var showExitDialog by remember { mutableStateOf(false) }
 
     val telefonoDiPartenza = if (currentDraft.telefono.isNotEmpty()) {
         currentDraft.telefono
@@ -508,8 +645,6 @@ fun ApplyStep1(navController: NavController?, padding: PaddingValues) {
         uri?.let { cvName = "CV_Selezionato.pdf" }
     }
 
-    var showExitDialog by remember { mutableStateOf(false) }
-
     if (showResetDialog) {
         AlertDialog(
             onDismissRequest = { showResetDialog = false },
@@ -526,35 +661,28 @@ fun ApplyStep1(navController: NavController?, padding: PaddingValues) {
     }
 
     Column(Modifier.fillMaxSize().padding(padding).background(Color.White)) {
-        ApplyHeader("1", "I tuoi dati e CV") { showExitDialog = true }
+        ApplyHeader("1", "I tuoi dati e CV", onBack = { navController?.popBackStack() }, onClose = { showExitDialog = true })
 
-        if (showExitDialog) {
-            AlertDialog(
-                onDismissRequest = { showExitDialog = false },
-                title = { Text("Esci dalla candidatura") },
-                text = { Text("Vuoi salvare la candidatura tra le bozze prima di uscire?") },
-                confirmButton = {
-                    TextButton(onClick = {
-                        // Salva la bozza usando i valori correnti del form
-                        val telefonoFormattato = "$prefisso ${formatPhone(telefonoDigits)}"
-                        val draft = DraftWork(nome = nome, cognome = cognome, email = emailLavoro, telefono = telefonoFormattato, cvFileName = cvName.ifEmpty { null })
-                        saveDraftWorkForOffer(actualUser, currentOfferIdApplying, draft)
-                        showExitDialog = false
-                        navController?.popBackStack()
-                    }) { Text("Salva") }
-                },
-                dismissButton = {
-                    Row {
-                        TextButton(onClick = {
-                            // Scarta e torna indietro
-                            showExitDialog = false
-                            navController?.popBackStack()
-                        }) { Text("Scarta", color = Color.Red) }
-                        TextButton(onClick = { showExitDialog = false }) { Text("Annulla") }
-                    }
-                }
-            )
-        }
+        ExitDraftDialog(
+            visible = showExitDialog,
+            onDismiss = { showExitDialog = false },
+            onSave = {
+                val draft = DraftWork(
+                    nome = nome,
+                    cognome = cognome,
+                    email = emailLavoro,
+                    telefono = "$prefisso ${formatPhone(telefonoDigits)}",
+                    cvFileName = cvName.ifEmpty { null }
+                )
+                saveDraftWorkForOffer(actualUser, currentOfferIdApplying, draft)
+                showExitDialog = false
+                goToOfferPresentation(navController)
+            },
+            onDiscard = {
+                showExitDialog = false
+                goToOfferPresentation(navController)
+            }
+        )
 
         Column(Modifier.padding(horizontal = 24.dp).verticalScroll(rememberScrollState())) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
@@ -647,32 +775,28 @@ fun ApplyStep2Intro(navController: NavController?, padding: PaddingValues) {
     var showExitDialog by remember { mutableStateOf(false) }
 
     Column(Modifier.fillMaxSize().padding(padding).background(Color.White)) {
-        ApplyHeader("2", "Preparati al Video") { showExitDialog = true }
+        ApplyHeader("2", "Preparati al Video", onBack = { navController?.popBackStack() }, onClose = { showExitDialog = true })
 
-        if (showExitDialog) {
-            AlertDialog(
-                onDismissRequest = { showExitDialog = false },
-                title = { Text("Esci dalla candidatura") },
-                text = { Text("Vuoi salvare la candidatura tra le bozze prima di uscire?") },
-                confirmButton = {
-                    TextButton(onClick = {
-                        val draft = DraftWork(nome = currentDraft.nome, cognome = currentDraft.cognome, email = currentDraft.emailLavoro, telefono = currentDraft.telefono, cvFileName = currentDraft.cvFileName.ifEmpty { null })
-                        saveDraftWorkForOffer(actualUser, currentOfferIdApplying, draft)
-                        showExitDialog = false
-                        navController?.popBackStack()
-                    }) { Text("Salva") }
-                },
-                dismissButton = {
-                    Row {
-                        TextButton(onClick = {
-                            showExitDialog = false
-                            navController?.popBackStack()
-                        }) { Text("Scarta", color = Color.Red) }
-                        TextButton(onClick = { showExitDialog = false }) { Text("Annulla") }
-                    }
-                }
-            )
-        }
+        ExitDraftDialog(
+            visible = showExitDialog,
+            onDismiss = { showExitDialog = false },
+            onSave = {
+                val draft = DraftWork(
+                    nome = currentDraft.nome,
+                    cognome = currentDraft.cognome,
+                    email = currentDraft.emailLavoro,
+                    telefono = currentDraft.telefono,
+                    cvFileName = currentDraft.cvFileName.ifEmpty { null }
+                )
+                saveDraftWorkForOffer(actualUser, currentOfferIdApplying, draft)
+                showExitDialog = false
+                goToOfferPresentation(navController)
+            },
+            onDiscard = {
+                showExitDialog = false
+                goToOfferPresentation(navController)
+            }
+        )
 
         Column(Modifier.padding(30.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(Color(0xFFF5F5F5)).padding(24.dp)) {
@@ -708,6 +832,7 @@ fun ApplyStep2Record(navController: NavController?, padding: PaddingValues) {
     var seconds by remember { mutableStateOf(0) }
     var isRecording by remember { mutableStateOf(false) }
     var errorMsg by remember { mutableStateOf("") }
+    var showExitDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         while (countdown > 0) { delay(1000); countdown-- }
@@ -723,35 +848,29 @@ fun ApplyStep2Record(navController: NavController?, padding: PaddingValues) {
         }
     }
 
-    var showExitDialog by remember { mutableStateOf(false) }
-
     Column(Modifier.fillMaxSize().padding(padding).background(Color.Black)) {
-        ApplyHeader("2", "Registrazione") { showExitDialog = true }
+        ApplyHeader("2", "Registrazione", onBack = { navController?.popBackStack() }, onClose = { showExitDialog = true })
 
-        if (showExitDialog) {
-            AlertDialog(
-                onDismissRequest = { showExitDialog = false },
-                title = { Text("Esci dalla candidatura") },
-                text = { Text("Vuoi salvare la candidatura tra le bozze prima di uscire?") },
-                confirmButton = {
-                    TextButton(onClick = {
-                        val draft = DraftWork(nome = currentDraft.nome, cognome = currentDraft.cognome, email = currentDraft.emailLavoro, telefono = currentDraft.telefono, cvFileName = currentDraft.cvFileName.ifEmpty { null })
-                        saveDraftWorkForOffer(actualUser, currentOfferIdApplying, draft)
-                        showExitDialog = false
-                        navController?.popBackStack()
-                    }) { Text("Salva") }
-                },
-                dismissButton = {
-                    Row {
-                        TextButton(onClick = {
-                            showExitDialog = false
-                            navController?.popBackStack()
-                        }) { Text("Scarta", color = Color.Red) }
-                        TextButton(onClick = { showExitDialog = false }) { Text("Annulla") }
-                    }
-                }
-            )
-        }
+        ExitDraftDialog(
+            visible = showExitDialog,
+            onDismiss = { showExitDialog = false },
+            onSave = {
+                val draft = DraftWork(
+                    nome = currentDraft.nome,
+                    cognome = currentDraft.cognome,
+                    email = currentDraft.emailLavoro,
+                    telefono = currentDraft.telefono,
+                    cvFileName = currentDraft.cvFileName.ifEmpty { null }
+                )
+                saveDraftWorkForOffer(actualUser, currentOfferIdApplying, draft)
+                showExitDialog = false
+                goToOfferPresentation(navController)
+            },
+            onDiscard = {
+                showExitDialog = false
+                goToOfferPresentation(navController)
+            }
+        )
 
         Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
             if (countdown > 0) {
@@ -791,46 +910,19 @@ fun ApplyStep2Record(navController: NavController?, padding: PaddingValues) {
 
 @Composable
 fun ApplyStep2Review(navController: NavController?, padding: PaddingValues) {
-    var showExitDialog by remember { mutableStateOf(false) }
-
     Column(
         Modifier.fillMaxSize().padding(padding).background(Color.White),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Header con tasto "Riprova" come nella foto
+        // Freccia per tornare semplicemente indietro, senza conferma
         Row(
             Modifier.fillMaxWidth().padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = { showExitDialog = true }) { // Torna a registrare -> mostra dialog
+            IconButton(onClick = { navController?.popBackStack() }) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
             }
-            Text("riprova", modifier = Modifier.clickable { showExitDialog = true })
-        }
-
-        if (showExitDialog) {
-            AlertDialog(
-                onDismissRequest = { showExitDialog = false },
-                title = { Text("Esci dalla candidatura") },
-                text = { Text("Vuoi salvare la candidatura tra le bozze prima di uscire?") },
-                confirmButton = {
-                    TextButton(onClick = {
-                        val draft = DraftWork(nome = currentDraft.nome, cognome = currentDraft.cognome, email = currentDraft.emailLavoro, telefono = currentDraft.telefono, cvFileName = currentDraft.cvFileName.ifEmpty { null })
-                        saveDraftWorkForOffer(actualUser, currentOfferIdApplying, draft)
-                        showExitDialog = false
-                        navController?.popBackStack()
-                    }) { Text("Salva") }
-                },
-                dismissButton = {
-                    Row {
-                        TextButton(onClick = {
-                            showExitDialog = false
-                            navController?.popBackStack()
-                        }) { Text("Scarta", color = Color.Red) }
-                        TextButton(onClick = { showExitDialog = false }) { Text("Annulla") }
-                    }
-                }
-            )
+            Text("riprova", modifier = Modifier.clickable { navController?.popBackStack() })
         }
 
         Spacer(Modifier.height(20.dp))
@@ -900,32 +992,28 @@ fun ApplyStep3(navController: NavController?, padding: PaddingValues) {
     // [Dialog Anteprima uguale a prima...]
 
     Column(Modifier.fillMaxSize().padding(padding).background(Color.White)) {
-        ApplyHeader("3", "Riepilogo e Invio") { showExitDialog = true }
+        ApplyHeader("3", "Riepilogo e Invio", onBack = { navController?.popBackStack() }, onClose = { showExitDialog = true })
 
-        if (showExitDialog) {
-            AlertDialog(
-                onDismissRequest = { showExitDialog = false },
-                title = { Text("Esci dalla candidatura") },
-                text = { Text("Vuoi salvare la candidatura tra le bozze prima di uscire?") },
-                confirmButton = {
-                    TextButton(onClick = {
-                        val draft = DraftWork(nome = currentDraft.nome, cognome = currentDraft.cognome, email = currentDraft.emailLavoro, telefono = currentDraft.telefono, cvFileName = currentDraft.cvFileName.ifEmpty { null })
-                        saveDraftWorkForOffer(actualUser, currentOfferIdApplying, draft)
-                        showExitDialog = false
-                        navController?.popBackStack()
-                    }) { Text("Salva") }
-                },
-                dismissButton = {
-                    Row {
-                        TextButton(onClick = {
-                            showExitDialog = false
-                            navController?.popBackStack()
-                        }) { Text("Scarta", color = Color.Red) }
-                        TextButton(onClick = { showExitDialog = false }) { Text("Annulla") }
-                    }
-                }
-            )
-        }
+        ExitDraftDialog(
+            visible = showExitDialog,
+            onDismiss = { showExitDialog = false },
+            onSave = {
+                val draft = DraftWork(
+                    nome = currentDraft.nome,
+                    cognome = currentDraft.cognome,
+                    email = currentDraft.emailLavoro,
+                    telefono = currentDraft.telefono,
+                    cvFileName = currentDraft.cvFileName.ifEmpty { null }
+                )
+                saveDraftWorkForOffer(actualUser, currentOfferIdApplying, draft)
+                showExitDialog = false
+                goToOfferPresentation(navController)
+            },
+            onDiscard = {
+                showExitDialog = false
+                goToOfferPresentation(navController)
+            }
+        )
 
         Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text("Paolo, controlla un'ultima volta i dati:", color = Color.Gray, fontSize = 13.sp)

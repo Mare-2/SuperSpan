@@ -10,6 +10,7 @@ data class DraftWork(
 
 fun saveDraftWorkForOffer(user: User, offerId: Int, draft: DraftWork) {
     // Salviamo una copia per evitare modifiche involontarie condivise tra schermate.
+    clearDraftWorkForOffer(user, offerId)
     user.draftWorksByOfferId[offerId] = draft.copy()
 }
 
