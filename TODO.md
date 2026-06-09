@@ -29,9 +29,10 @@
 - [x] dopo che un utente invia una candidatura riportarlo alla schermata delle offerte di lavoro (non alla home)
 - [ ] aggiungere tasto per uscire in quasiasi step e quindi:
   - [ ] siccome si potranno salvare le bozze se uno tenta di uscire mettere un messaggio con opzioni "elimina tutto", "annulla" e "salva in bozza"
+- [ ] le candidature arrivate a Daniela devono essere filtrabili per posizione e sede
 
 
-### 🔍 Pagina Ricerca Prodotti e pagina Prodotto
+### 🔍 Pagina Ricerca P[Register.kt](app/src/main/java/com/example/superspan/Register.kt)rodotti e pagina Prodotto
 - [ ] aggiustare pagina prodotto
 - [x] aggiustare scorrimento nella pagina di ricerca dei prodotti in modo che scorra tutto e non solo i prodotti
 - [x] rimpicciolire la barra di ricerca e mettere il tasto per i filtri affianco
@@ -49,6 +50,8 @@
 - [ ] avrebbe senso aggiungere una barra di ricerca(?), da valutare
 - [ ] cambiare data in coupon e offerte perchè è tutto scaduto)
 - [ ] rendere più netta la differenza tra roba scaduta, in scadenza e valida che mi sembra non si veda tanto (non sono sicura era tutto scaduto)
+- [ ] messaggio di conferma quando viene caricato un coupon o un'offerta
+- [ ] capire esattamente cosa sono i coupon e in caso mettere codice a barre
 
 
 ### Pagina ricerca Offerte di lavoro e pagina Offerta di lavoro
@@ -56,6 +59,8 @@
 - [x] aggiustare e fare bene i filtri per le offerte di lavoro
 - [x] rendere i luoghi dei supermercati e i km più realistici scegliendo città e paesi vicino a cagliari e in varie vie di cagliari
 - [ ] la barra di ricerca e il tasto filtri sono giganteschi
+- [ ] quando Daniela inserisce un'offerta di lavoro mettere un messaggio di conferma che è stata caricata
+
 
 ### 🎨 Design e UI/UX Generale
 - [ ] decidere se mantenere la parabola o usare solo rettangoli stondati
