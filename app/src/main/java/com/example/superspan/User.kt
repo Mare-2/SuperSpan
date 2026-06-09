@@ -71,24 +71,25 @@ data class User(
     private var _email: String = "",
     private var _password: String = "",
     private var _admin: Boolean = false,
-    // Campi aggiuntivi per dati personali/lavoro
     private var _telefono: String? = null,
     private var _emailLavoro: String? = null,
-    private var _cvFileName: String? = null, // Nome del file PDF caricato
-    private var _draftWorksByOfferId: MutableMap<Int, DraftWork> = mutableStateMapOf()
-    
+    private var _cvFileName: String? = null,
+    private var _cvPath: String? = null,
+    // Mappa delle bozze: ID Offerta -> Bozza
+    private var _candidacyDraftsByOfferId: MutableMap<Int, CandidacyDraft> = mutableStateMapOf()
 ) {
-    // ... getter e setter ...
-    var telefono get() = _telefono; set(v) { _telefono = v }
-    var emailLavoro get() = _emailLavoro; set(v) { _emailLavoro = v }
-    var cvFileName get() = _cvFileName; set(v) { _cvFileName = v }
-    var draftWorksByOfferId get() = _draftWorksByOfferId; set(v) { _draftWorksByOfferId = v }
     var nome get() = _nome; set(v) { _nome = v }
     var cognome get() = _cognome; set(v) { _cognome = v }
     var email get() = _email; set(v) { _email = v }
     var password get() = _password; set(v) { _password = v }
     var admin get() = _admin; set(v) { _admin = v }
+    var telefono get() = _telefono; set(v) { _telefono = v }
+    var emailLavoro get() = _emailLavoro; set(v) { _emailLavoro = v }
+    var cvFileName get() = _cvFileName; set(v) { _cvFileName = v }
+    var cvPath get() = _cvPath; set(v) { _cvPath = v }
+    var candidacyDraftsByOfferId get() = _candidacyDraftsByOfferId; set(v) { _candidacyDraftsByOfferId = v }
 }
+
 val MapOfUser = mutableMapOf<String, User>(
     // DANIELA TINTI (Admin)
     "d.tinti@superspan.it" to User(
@@ -831,18 +832,18 @@ data class UserProfile(
 // Inserisci questo dove hai le altre classi dati (User.kt)
 data class Candidacy(
     val id: Int,
-    val userEmail: String,       // Chi si candida
-    val offerId: Int,            // Per quale lavoro
+    val userEmail: String,
+    val offerId: Int,
     val nome: String,
     val cognome: String,
     val emailContatto: String,
-    val cvFileName: String?,
-    val videoSimulatoPath: String = "video_registrato.mp4",
-    val stato: String = "Inviata" // "Inviata", "In Revisione", "Rifiutata", "Accettata", "Bozza"
+    val telefono: String,
+    val cvPath: String?,
+    val videoPath: String?,
+    val dataInvio: String = java.time.LocalDate.now().toString(),
+    val stato: String = "Inviata"
 )
 
-// Lista globale accessibile agli Admin
+// --- 4. STATI GLOBALI ---
 val AllCandidacies = mutableStateListOf<Candidacy>()
-
-// Variabile temporanea per sapere per quale offerta Paolo sta scrivendo
 var currentOfferIdApplying by mutableIntStateOf(0)

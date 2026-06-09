@@ -1,27 +1,37 @@
 package com.example.superspan
 
-data class DraftWork(
+data class CandidacyDraft(
     var nome: String = "",
     var cognome: String = "",
-    var email: String = "",
+    var emailLavoro: String = "",
     var telefono: String = "",
-    var cvFileName: String? = null
+    var cvFileName: String = "", // Qui puoi tenere il nome semplice per la UI
+    var cvPath: String = "",     // Qui il percorso reale per il salvataggio
+    var videoPath: String = ""   // Il percorso del video appena registrato
 )
 
-fun saveDraftWorkForOffer(user: User, offerId: Int, draft: DraftWork) {
+/*fun saveCandidacyDraftForOffer(user: User, offerId: Int, draft: CandidacyDraft) {
     // Salviamo una copia per evitare modifiche involontarie condivise tra schermate.
-    clearDraftWorkForOffer(user, offerId)
-    user.draftWorksByOfferId[offerId] = draft.copy()
+    clearCandidacyDraftForOffer(user, offerId)
+    user.candidacyDraftsByOfferId[offerId] = draft.copy()
 }
 
-fun getDraftWorkForOffer(user: User, offerId: Int): DraftWork? {
+fun getCandidacyDraftForOffer(user: User, offerId: Int): CandidacyDraft? {
     // Restituisce la bozza per una determinata offerta, o null se non esiste.
-    return user.draftWorksByOfferId[offerId]
+    return user.candidacyDraftsByOfferId[offerId]
+}*/
+
+fun saveCandidacyDraftForOffer(user: User, offerId: Int, draft: CandidacyDraft) {
+    user.candidacyDraftsByOfferId[offerId] = draft.copy()
 }
 
-fun clearDraftWorkForOffer(user: User, offerId: Int) {
+fun getCandidacyDraftForOffer(user: User, offerId: Int): CandidacyDraft? {
+    return user.candidacyDraftsByOfferId[offerId]
+}
+
+fun clearCandidacyDraftForOffer(user: User, offerId: Int) {
     // Rimuove la bozza per una determinata offerta.
-    user.draftWorksByOfferId.remove(offerId)
+    user.candidacyDraftsByOfferId.remove(offerId)
 }
 
 

@@ -48,7 +48,7 @@
 - [x] mettere icone per distinguere visivamente tra coupon e offerte oppure magari fare una selezione in alto per decidere se guardare gli uni o le altre
 - [ ] avrebbe senso aggiungere una barra di ricerca(?), da valutare
 - [ ] cambiare data in coupon e offerte perchè è tutto scaduto)
-- [ ] rebdere più netta la differenza tra roba scaduta, in scadenza e valida che mi sembra non si veda tanto (non sono sicura era tutto scaduto)
+- [ ] rendere più netta la differenza tra roba scaduta, in scadenza e valida che mi sembra non si veda tanto (non sono sicura era tutto scaduto)
 
 
 ### Pagina ricerca Offerte di lavoro e pagina Offerta di lavoro

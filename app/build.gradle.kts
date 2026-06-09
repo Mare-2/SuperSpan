@@ -58,4 +58,22 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     implementation("androidx.compose.material:material-icons-extended")
+
+    // CameraX - Versioni stabili aggiornate
+    val camerax_version = "1.3.3"
+    implementation("androidx.camera:camera-core:$camerax_version")
+    implementation("androidx.camera:camera-camera2:$camerax_version")
+    implementation("androidx.camera:camera-lifecycle:$camerax_version")
+    implementation("androidx.camera:camera-video:$camerax_version")
+    implementation("androidx.camera:camera-view:$camerax_version")
+
+    // Per gestire il ciclo di vita in Compose
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
+
+    val media3_version = "1.3.1" // Versione stabile attuale
+    implementation("androidx.media3:media3-exoplayer:$media3_version")
+    implementation("androidx.media3:media3-ui:$media3_version")
+    implementation("androidx.media3:media3-common:$media3_version")
+
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.1")
 }

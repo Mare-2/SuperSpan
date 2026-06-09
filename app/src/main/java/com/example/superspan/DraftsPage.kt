@@ -27,7 +27,7 @@ fun DraftsPage(navController: NavController?, padding: PaddingValues) {
     val scrollState = rememberScrollState()
 
     // Lista di coppie (offerId -> DraftWork)
-    val draftsList by remember { derivedStateOf { actualUser.draftWorksByOfferId.entries.toList() } }
+    val draftsList by remember { derivedStateOf { actualUser.candidacyDraftsByOfferId.entries.toList() } }
 
     var showDeleteConfirmFor by remember { mutableStateOf<Int?>(null) }
 
@@ -73,7 +73,7 @@ fun DraftsPage(navController: NavController?, padding: PaddingValues) {
                                 Text(offer?.citta ?: "-", color = Color.Gray, fontSize = 13.sp)
                                 Spacer(Modifier.height(8.dp))
                                 Text("Nome: ${draft.nome} ${draft.cognome}", fontSize = 14.sp)
-                                Text("Email: ${draft.email}", fontSize = 14.sp)
+                                Text("Email: ${draft.emailLavoro}", fontSize = 14.sp)
                                 Text("Telefono: ${draft.telefono}", fontSize = 14.sp)
 
                                 Spacer(Modifier.height(12.dp))
@@ -83,7 +83,7 @@ fun DraftsPage(navController: NavController?, padding: PaddingValues) {
                                         currentDraft = currentDraft.copy(
                                             nome = draft.nome,
                                             cognome = draft.cognome,
-                                            emailLavoro = draft.email,
+                                            emailLavoro = draft.emailLavoro,
                                             telefono = draft.telefono,
                                             cvFileName = draft.cvFileName ?: ""
                                         )
@@ -118,7 +118,7 @@ fun DraftsPage(navController: NavController?, padding: PaddingValues) {
                 text = { Text("Sei sicuro di eliminare la bozza per l'offerta #$idToDelete ?") },
                 confirmButton = {
                     TextButton(onClick = {
-                        clearDraftWorkForOffer(actualUser, idToDelete)
+                        clearCandidacyDraftForOffer(actualUser, idToDelete)
                         showDeleteConfirmFor = null
                     }) { Text("Elimina", color = Color.Red) }
                 },
