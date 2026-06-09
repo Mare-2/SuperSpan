@@ -78,10 +78,11 @@ fun ProductCompose(product: Product, navController: NavController?) {
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFFF1F1F1))
     ) {
+        val bestDiscount = ListOfCoupon.filter { it.products.contains(product) }.maxOfOrNull { it.discount }
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(12.dp),
+                .padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
@@ -111,6 +112,16 @@ fun ProductCompose(product: Product, navController: NavController?) {
                         tint = Color.LightGray
                     )
                 }
+                if (bestDiscount != null && bestDiscount > 0) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .background(Color.Red, RoundedCornerShape(bottomEnd = 8.dp))
+                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                    ) {
+                        Text("-${bestDiscount.toInt()}%", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                    }
+                }
             }
             // Nome prodotto — 1 riga, tronca con "..."
             Text(
@@ -123,17 +134,36 @@ fun ProductCompose(product: Product, navController: NavController?) {
                 modifier = Modifier.fillMaxWidth()
             )
             // Badge prezzo — sempre in fondo
-            Surface(
-                color = Color(0xFF388E3C).copy(alpha = 0.12f),
-                shape = CircleShape
-            ) {
-                Text(
-                    text = "€ ${"%.2f".format(product.prezzo)}",
-                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp),
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF2E7D32)
-                )
+            if (bestDiscount != null && bestDiscount > 0) {
+                val discountedPrice = product.prezzo * (1 - bestDiscount / 100)
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = "€ ${"%.2f".format(product.prezzo)}",
+                        fontSize = 11.sp,
+                        color = Color.Gray,
+                        textDecoration = androidx.compose.ui.text.style.TextDecoration.LineThrough
+                    )
+                    Surface(color = Color(0xFFD32F2F).copy(alpha = 0.12f), shape = CircleShape) {
+                        Text(
+                            text = "€ ${"%.2f".format(discountedPrice)}",
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 2.dp),
+                            fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color(0xFFD32F2F)
+                        )
+                    }
+                }
+            } else {
+                Surface(
+                    color = Color(0xFF388E3C).copy(alpha = 0.12f),
+                    shape = CircleShape
+                ) {
+                    Text(
+                        text = "€ ${"%.2f".format(product.prezzo)}",
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF2E7D32)
+                    )
+                }
             }
         }
     }

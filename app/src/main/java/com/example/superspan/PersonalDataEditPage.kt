@@ -428,6 +428,7 @@ fun EditTextField(
     errorMessage: String = "",
     visualTransformation: VisualTransformation = VisualTransformation.None,
     modifier: Modifier = Modifier,
+    trailingIcon: @Composable (() -> Unit)? = null,
     onValueChange: (String) -> Unit
 ) {
     // Logica colori per Paolo:
@@ -456,6 +457,7 @@ fun EditTextField(
             shape = RoundedCornerShape(20.dp),
             singleLine = true,
             isError = isError,
+            trailingIcon = trailingIcon,
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
             colors = OutlinedTextFieldDefaults.colors(
                 unfocusedBorderColor = borderColor,

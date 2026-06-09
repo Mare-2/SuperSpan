@@ -61,7 +61,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.navigation.NavGraph.Companion.findStartDestination
 
 //p.cortellesi@gmail.com  d.tinti@superspan.it
-var actualUser by mutableStateOf(MapOfUser["d.tinti@superspan.it"]!!)
+var actualUser by mutableStateOf(MapOfUser["p.cortellesi@gmail.com"]!!)
 //var actualUser: User? = MapOfUser.getValue("p.cortellesi@gmail.com")
 
 enum class Destination (
@@ -88,7 +88,9 @@ enum class Destination (
     APPLY_STEP_3("apply_3", "Riepilogo Finale", null),
     EDIT_COUPON("edit_coupon", "Modifica Offerta", null),
     ADD_WORK_OFFER("add_work_offer", "Aggiungi Lavoro", null),
-    EDIT_WORK_OFFER("edit_work_offer", "Modifica Lavoro", null)
+    EDIT_WORK_OFFER("edit_work_offer", "Modifica Lavoro", null),
+    ACCOUNT_SUMMARY("account_summary", "Il mio account", null),
+    ACCOUNT_EDIT("account_edit", "Modifica Account", null)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -117,6 +119,8 @@ fun Navigation(navController: NavHostController, startDestination: Destination, 
                     Destination.EDIT_COUPON -> AdminCouponEditPage(navController, paddingValues)
                     Destination.ADD_WORK_OFFER -> AdminWorkOfferEditPage(null, navController, paddingValues)
                     Destination.EDIT_WORK_OFFER -> AdminWorkOfferEditPage(null, navController, paddingValues) // Will be handled by ID route
+                    Destination.ACCOUNT_SUMMARY -> AccountSummaryPage(actualUser, navController, paddingValues)
+                    Destination.ACCOUNT_EDIT -> AccountSettingsPage(actualUser, navController, paddingValues)
                     else -> {}
                 }
             }

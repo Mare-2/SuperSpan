@@ -8,6 +8,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -91,11 +92,45 @@ fun AdminCouponEditPage(
                 modifier = Modifier.fillMaxWidth()
             )
 
+            var showDatePicker by remember { mutableStateOf(false) }
+            val datePickerState = rememberDatePickerState()
+
+            if (showDatePicker) {
+                DatePickerDialog(
+                    onDismissRequest = { showDatePicker = false },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            datePickerState.selectedDateMillis?.let { millis ->
+                                val formatter = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+                                formatter.timeZone = java.util.TimeZone.getTimeZone("UTC")
+                                dateOfExpiration = formatter.format(java.util.Date(millis))
+                            }
+                            showDatePicker = false
+                        }) {
+                            Text("OK")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showDatePicker = false }) {
+                            Text("Annulla")
+                        }
+                    }
+                ) {
+                    DatePicker(state = datePickerState)
+                }
+            }
+
             OutlinedTextField(
                 value = dateOfExpiration,
-                onValueChange = { dateOfExpiration = it },
-                label = { Text("Data Scadenza (yyyy-MM-dd)") },
-                modifier = Modifier.fillMaxWidth()
+                onValueChange = { },
+                label = { Text("Data Scadenza") },
+                modifier = Modifier.fillMaxWidth(),
+                readOnly = true,
+                trailingIcon = {
+                    IconButton(onClick = { showDatePicker = true }) {
+                        Icon(androidx.compose.material.icons.Icons.Default.DateRange, contentDescription = "Seleziona Data")
+                    }
+                }
             )
 
             Text("Seleziona Prodotti", fontWeight = FontWeight.Bold, fontSize = 18.sp)

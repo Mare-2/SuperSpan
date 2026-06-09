@@ -1200,6 +1200,7 @@ import androidx.camera.core.CameraSelector
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.video.*
 import androidx.camera.view.PreviewView
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -1218,6 +1219,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
@@ -1400,6 +1402,18 @@ fun ApplyStep1(navController: NavController?, padding: PaddingValues) {
 @Composable
 fun ApplyStep2Intro(navController: NavController?, padding: PaddingValues) {
     var showExitDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val videoPickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let { selectedUri ->
+            val destinationName = "video_galleria_${actualUser.nome.lowercase()}_${currentOfferIdApplying}.mp4"
+            val savedPath = saveFileToInternalStorage(context, selectedUri, destinationName)
+            if (savedPath != null) {
+                currentDraft = currentDraft.copy(videoPath = savedPath)
+                navController?.navigate(Destination.APPLY_STEP_2_REVIEW.route)
+            }
+        }
+    }
+
     Column(Modifier.fillMaxSize().padding(padding).background(Color.White)) {
         ApplyHeader("2", "Preparati al Video", { navController?.popBackStack() }, { showExitDialog = true })
         ExitDraftDialog(showExitDialog, { showExitDialog = false }, {
@@ -1421,8 +1435,12 @@ fun ApplyStep2Intro(navController: NavController?, padding: PaddingValues) {
                 }
             }
             Spacer(Modifier.weight(1f))
-            Button(onClick = { navController?.navigate(Destination.APPLY_STEP_2_RECORD.route) }, Modifier.height(60.dp).fillMaxWidth(0.7f), colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray), shape = CircleShape) {
+            Button(onClick = { navController?.navigate(Destination.APPLY_STEP_2_RECORD.route) }, Modifier.height(60.dp).fillMaxWidth(0.8f), colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray), shape = CircleShape) {
                 Icon(Icons.Default.Videocam, null); Spacer(Modifier.width(8.dp)); Text("Inizia Registrazione")
+            }
+            Spacer(Modifier.height(16.dp))
+            OutlinedButton(onClick = { videoPickerLauncher.launch("video/*") }, Modifier.height(60.dp).fillMaxWidth(0.8f), shape = CircleShape) {
+                Icon(Icons.Default.PhotoLibrary, null, tint = Color.DarkGray); Spacer(Modifier.width(8.dp)); Text("Carica da Galleria", color = Color.DarkGray)
             }
         }
     }
@@ -1581,7 +1599,18 @@ fun ApplyStep2Review(navController: NavController?, padding: PaddingValues) {
 fun ApplyStep3(navController: NavController?, padding: PaddingValues) {
     var showEditConfirm by remember { mutableStateOf<String?>(null) }
     var previewContent by remember { mutableStateOf<String?>(null) }
+    var showPreviewVideo by remember { mutableStateOf(false) }
+    var showPreviewCV by remember { mutableStateOf(false) }
     var showExitDialog by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
+    val exoPlayer = remember {
+        androidx.media3.exoplayer.ExoPlayer.Builder(context).build()
+    }
+
+    DisposableEffect(Unit) {
+        onDispose { exoPlayer.release() }
+    }
 
     if (showEditConfirm != null) {
         AlertDialog(onDismissRequest = { showEditConfirm = null }, title = { Text("Modifica?") }, text = { Text("Tornerai allo step di $showEditConfirm.") },
@@ -1589,10 +1618,110 @@ fun ApplyStep3(navController: NavController?, padding: PaddingValues) {
             dismissButton = { TextButton(onClick = { showEditConfirm = null }) { Text("No") } })
     }
 
-    if (previewContent != null) {
-        AlertDialog(onDismissRequest = { previewContent = null }, title = { Text("Anteprima") },
-            text = { Text(previewContent!!) },
-            confirmButton = { Button(onClick = { previewContent = null }) { Text("Chiudi") } })
+    var pdfBitmap by remember { mutableStateOf<android.graphics.Bitmap?>(null) }
+
+    LaunchedEffect(currentDraft.cvPath) {
+        if (currentDraft.cvPath.isNotEmpty()) {
+            pdfBitmap = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                try {
+                    val file = java.io.File(currentDraft.cvPath)
+                    if (file.exists() && currentDraft.cvPath.endsWith(".pdf", ignoreCase = true)) {
+                        val pfd = android.os.ParcelFileDescriptor.open(file, android.os.ParcelFileDescriptor.MODE_READ_ONLY)
+                        val renderer = android.graphics.pdf.PdfRenderer(pfd)
+                        var bitmap: android.graphics.Bitmap? = null
+                        if (renderer.pageCount > 0) {
+                            val page = renderer.openPage(0)
+                            val width = 800
+                            val height = (width.toFloat() / page.width * page.height).toInt()
+                            bitmap = android.graphics.Bitmap.createBitmap(width, height, android.graphics.Bitmap.Config.ARGB_8888)
+                            val canvas = android.graphics.Canvas(bitmap)
+                            canvas.drawColor(android.graphics.Color.WHITE)
+                            page.render(bitmap, null, null, android.graphics.pdf.PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+                            page.close()
+                        }
+                        renderer.close()
+                        pfd.close()
+                        bitmap
+                    } else null
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    null
+                }
+            }
+        }
+    }
+
+    if (showPreviewCV) {
+        AlertDialog(
+            onDismissRequest = { showPreviewCV = false },
+            title = { Text("Anteprima Curriculum", fontWeight = FontWeight.Bold) },
+            text = {
+                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                    if (pdfBitmap != null) {
+                        androidx.compose.foundation.Image(
+                            bitmap = pdfBitmap!!.asImageBitmap(),
+                            contentDescription = "Anteprima PDF",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(350.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .border(1.dp, Color.LightGray, RoundedCornerShape(8.dp)),
+                            contentScale = androidx.compose.ui.layout.ContentScale.Fit
+                        )
+                        Spacer(Modifier.height(16.dp))
+                        Text(currentDraft.cvFileName, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                    } else {
+                        Icon(Icons.Default.Description, null, modifier = Modifier.size(64.dp), tint = Color(0xFFD32F2F))
+                        Spacer(Modifier.height(16.dp))
+                        Text(currentDraft.cvFileName.ifEmpty { "Nessun file selezionato" }, fontWeight = FontWeight.Bold)
+                        Spacer(Modifier.height(8.dp))
+                        Text("Il file PDF è stato allegato correttamente ed è pronto per essere inviato con la tua candidatura.", textAlign = TextAlign.Center)
+                    }
+                }
+            },
+            confirmButton = { Button(onClick = { showPreviewCV = false }) { Text("Chiudi") } }
+        )
+    }
+
+    if (showPreviewVideo) {
+        LaunchedEffect(currentDraft.videoPath) {
+            if (currentDraft.videoPath != null) {
+                val mediaItem = androidx.media3.common.MediaItem.fromUri(android.net.Uri.fromFile(java.io.File(currentDraft.videoPath!!)))
+                exoPlayer.setMediaItem(mediaItem)
+                exoPlayer.prepare()
+                exoPlayer.play()
+            }
+        }
+        AlertDialog(
+            onDismissRequest = { 
+                showPreviewVideo = false
+                exoPlayer.stop() 
+            },
+            title = { Text("Anteprima Video", fontWeight = FontWeight.Bold) },
+            text = {
+                if (currentDraft.videoPath != null) {
+                    Box(modifier = Modifier.fillMaxWidth().height(300.dp)) {
+                        androidx.compose.ui.viewinterop.AndroidView(
+                            factory = { ctx ->
+                                androidx.media3.ui.PlayerView(ctx).apply {
+                                    player = exoPlayer
+                                    useController = true
+                                }
+                            },
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                } else {
+                    Text("Nessun video registrato.", Modifier.padding(16.dp))
+                }
+            },
+            confirmButton = { 
+                Button(onClick = { 
+                    showPreviewVideo = false
+                    exoPlayer.stop() 
+                }) { Text("Chiudi") } 
+            }
+        )
     }
 
     Column(Modifier.fillMaxSize().padding(padding).background(Color.White)) {
@@ -1612,8 +1741,8 @@ fun ApplyStep3(navController: NavController?, padding: PaddingValues) {
             SummaryInteractiveRow(Icons.Default.Person, "Candidato", "${currentDraft.nome} ${currentDraft.cognome}", { showEditConfirm = "Dati" }) { previewContent = "Nome: ${currentDraft.nome}\nCognome: ${currentDraft.cognome}" }
             SummaryInteractiveRow(Icons.Default.Email, "Email", currentDraft.emailLavoro, { showEditConfirm = "Dati" }) { previewContent = "Email: ${currentDraft.emailLavoro}" }
             SummaryInteractiveRow(Icons.Default.Phone, "Telefono", currentDraft.telefono, { showEditConfirm = "Dati" }) { previewContent = "Telefono: ${currentDraft.telefono}" }
-            SummaryInteractiveRow(Icons.Default.Description, "CV", currentDraft.cvFileName.ifEmpty { "Nessun file" }, { showEditConfirm = "Dati" }) { previewContent = "File: ${currentDraft.cvFileName}\nPercorso: ${currentDraft.cvPath}" }
-            SummaryInteractiveRow(Icons.Default.Videocam, "Video", "Registrato correttamente", { showEditConfirm = "Video" }) { previewContent = "Percorso: ${currentDraft.videoPath}" }
+            SummaryInteractiveRow(Icons.Default.Description, "CV", currentDraft.cvFileName.ifEmpty { "Nessun file" }, { showEditConfirm = "Dati" }) { showPreviewCV = true }
+            SummaryInteractiveRow(Icons.Default.Videocam, "Video", if (currentDraft.videoPath != null) "Registrato correttamente" else "Nessun video", { showEditConfirm = "Video" }) { showPreviewVideo = true }
 
             Spacer(Modifier.weight(1f))
             Button(onClick = {

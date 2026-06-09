@@ -22,17 +22,17 @@
 - [x] continuare le pagine per le fasi di candidatura
 - [ ] gestire il caricamento del file per il cv
 - [ ] controllare e probabilmente aggiustare la funzione di caricamento del cv
-- [ ] gestire la registrazione del video per la candidatura (per ora è finta)
+- [x] gestire la registrazione del video per la candidatura (per ora è finta)
 - [ ] nella fase di candidatura se uno registra un video troppo corto fare in modo che riinizi la registrazione
-- [ ] nell'ultimo step della candidatura fare in modo che se schiacci sul cv ti apra il cv 
-- [ ] nell'ultimo step della candidatura fare in modo che schiacci sul video ti faccia rivedere il video
+- [] nell'ultimo step della candidatura fare in modo che se schiacci sul cv ti apra il cv 
+- [x] nell'ultimo step della candidatura fare in modo che schiacci sul video ti faccia rivedere il video
 - [x] dopo che un utente invia una candidatura riportarlo alla schermata delle offerte di lavoro (non alla home)
-- [ ] aggiungere tasto per uscire in quasiasi step e quindi:
-  - [ ] siccome si potranno salvare le bozze se uno tenta di uscire mettere un messaggio con opzioni "elimina tutto", "annulla" e "salva in bozza"
+- [x] aggiungere tasto per uscire in quasiasi step e quindi:
+  - [x] siccome si potranno salvare le bozze se uno tenta di uscire mettere un messaggio con opzioni "elimina tutto", "annulla" e "salva in bozza"
 
 
 ### 🔍 Pagina Ricerca Prodotti e pagina Prodotto
-- [ ] aggiustare pagina prodotto
+- [x] aggiustare pagina prodotto
 - [x] aggiustare scorrimento nella pagina di ricerca dei prodotti in modo che scorra tutto e non solo i prodotti
 - [x] rimpicciolire la barra di ricerca e mettere il tasto per i filtri affianco
 - [x] mettere la freccia per tornare indietro nella pagina filtri
@@ -47,7 +47,7 @@
 - [ ] aggiustare pagine coupon e offerte
 - [x] mettere icone per distinguere visivamente tra coupon e offerte oppure magari fare una selezione in alto per decidere se guardare gli uni o le altre
 - [ ] avrebbe senso aggiungere una barra di ricerca(?), da valutare
-- [ ] cambiare data in coupon e offerte perchè è tutto scaduto)
+- [x] cambiare data in coupon e offerte perchè è tutto scaduto
 - [ ] rendere più netta la differenza tra roba scaduta, in scadenza e valida che mi sembra non si veda tanto (non sono sicura era tutto scaduto)
 
 

@@ -15,6 +15,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -120,6 +121,7 @@ fun AddCoupon(paddingValues: PaddingValues, navController: NavController?) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CouponForm(
     onSave: (Coupon) -> Unit
@@ -167,12 +169,45 @@ private fun CouponForm(
             minLines = 2
         )
 
+        var showDatePicker by remember { mutableStateOf(false) }
+        val datePickerState = androidx.compose.material3.rememberDatePickerState()
+
+        if (showDatePicker) {
+            androidx.compose.material3.DatePickerDialog(
+                onDismissRequest = { showDatePicker = false },
+                confirmButton = {
+                    androidx.compose.material3.TextButton(onClick = {
+                        datePickerState.selectedDateMillis?.let { millis ->
+                            val formatter = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+                            formatter.timeZone = java.util.TimeZone.getTimeZone("UTC")
+                            expirationDate = formatter.format(java.util.Date(millis))
+                        }
+                        showDatePicker = false
+                    }) {
+                        Text("OK")
+                    }
+                },
+                dismissButton = {
+                    androidx.compose.material3.TextButton(onClick = { showDatePicker = false }) {
+                        Text("Annulla")
+                    }
+                }
+            ) {
+                androidx.compose.material3.DatePicker(state = datePickerState)
+            }
+        }
+
         OutlinedTextField(
             value = expirationDate,
-            onValueChange = { expirationDate = it },
-            label = { Text("Scadenza (yyyy-MM-dd)") },
+            onValueChange = { },
+            label = { Text("Scadenza") },
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            readOnly = true,
+            trailingIcon = {
+                IconButton(onClick = { showDatePicker = true }) {
+                    Icon(androidx.compose.material.icons.Icons.Default.DateRange, contentDescription = "Seleziona Data")
+                }
+            }
         )
 
         SimpleSearchBar(

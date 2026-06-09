@@ -34,6 +34,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -145,13 +146,42 @@ fun ProductPage(product: Product?, navController: NavController?, paddingValues:
                         color = Color.Black,
                         modifier = Modifier.weight(1f)
                     )
-                    Text(
-                        text = "€ ${"%.2f".format(product?.prezzo ?: 0.0f)}",
-                        fontSize = 26.sp,
-                        color = Color(0xFF2E7D32), // Verde scuro premium
-                        fontWeight = androidx.compose.ui.text.font.FontWeight.ExtraBold,
-                        modifier = Modifier.padding(start = 16.dp)
-                    )
+                    val bestDiscount = product?.let { p -> ListOfCoupon.filter { it.products.contains(p) }.maxOfOrNull { it.discount } }
+                    if (bestDiscount != null && bestDiscount > 0) {
+                        val discountedPrice = (product?.prezzo ?: 0f) * (1 - bestDiscount / 100)
+                        Column(horizontalAlignment = Alignment.End, modifier = Modifier.padding(start = 16.dp)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Surface(
+                                    color = Color.Red,
+                                    shape = RoundedCornerShape(8.dp),
+                                    modifier = Modifier.padding(end = 8.dp)
+                                ) {
+                                    Text("-${bestDiscount.toInt()}%", color = Color.White, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold, fontSize = 12.sp, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp))
+                                }
+                                Text(
+                                    text = "€ ${"%.2f".format(product?.prezzo ?: 0.0f)}",
+                                    fontSize = 16.sp,
+                                    color = Color.Gray,
+                                    textDecoration = androidx.compose.ui.text.style.TextDecoration.LineThrough,
+                                    fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold
+                                )
+                            }
+                            Text(
+                                text = "€ ${"%.2f".format(discountedPrice)}",
+                                fontSize = 28.sp,
+                                color = Color(0xFFD32F2F),
+                                fontWeight = androidx.compose.ui.text.font.FontWeight.ExtraBold
+                            )
+                        }
+                    } else {
+                        Text(
+                            text = "€ ${"%.2f".format(product?.prezzo ?: 0.0f)}",
+                            fontSize = 26.sp,
+                            color = Color(0xFF2E7D32),
+                            fontWeight = androidx.compose.ui.text.font.FontWeight.ExtraBold,
+                            modifier = Modifier.padding(start = 16.dp)
+                        )
+                    }
                 }
 
                 Spacer(Modifier.height(24.dp))

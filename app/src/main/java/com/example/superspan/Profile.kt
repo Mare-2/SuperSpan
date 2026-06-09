@@ -101,7 +101,7 @@ fun ProfilePage(user: User, navController: NavController?, paddingValues: Paddin
                     icon = Icons.Default.AccountCircle,
                     title = "Il mio account",
                     subtitle = "Username, email e password",
-                    onClick = { /* TODO */ }
+                    onClick = { navController?.navigate(Destination.ACCOUNT_SUMMARY.route) }
                 )
 
                 if (user.admin) { //TODO: Decisamente da rivedere quelle admin
