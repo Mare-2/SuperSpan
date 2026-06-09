@@ -178,7 +178,10 @@ enum class Category(val id: Int, val nome: String, val icon: ImageVector) {
     COLAZIONE(4, "Colazione", Icons.Default.Image),
     PULIZIA_CASA(5, "Pulizia casa", Icons.Default.Image),
     IGIENE_PERSONALE(6, "Igiene personale", Icons.Default.Image),
-    BEVANDE(7, "Bevande", Icons.Default.Image)
+    BEVANDE(7, "Bevande", Icons.Default.Image),
+    CARNE(8, "Carne", Icons.Default.Image),
+    SALUMI(9, "Salumi", Icons.Default.Image),
+    PESCE(10, "Pescheria", Icons.Default.Image)
 }
 
 enum class Role(val id: Int, val nome: String, val icon: ImageVector) {
@@ -193,28 +196,33 @@ enum class Role(val id: Int, val nome: String, val icon: ImageVector) {
 }
 
 val ListOfProduct = mutableListOf<Product>(
-    Product("Pane Fresco", 1.20f, null, Category.PANETTERIA),
-    Product("Latte Intero 1L", 1.50f, null, Category.LATTICINI),
-    Product("Pasta Barilla 500g", 0.99f, null, Category.DISPENSA),
-    Product("Salsa di Pomodoro", 1.10f, null, Category.DISPENSA),
-    Product("Mele (sacchetto 1kg)", 2.30f, null, Category.FRUTTA_E_VERDURA),
-    Product("Uova (confezione da 6)", 1.80f, null, Category.LATTICINI),
-    Product("Parmigiano Reggiano 200g", 5.50f, null, Category.LATTICINI),
-    Product("Biscotti al Cioccolato", 2.99f, null, Category.COLAZIONE),
-    Product("Detersivo Piatti", 1.45f, null, Category.PULIZIA_CASA),
-    Product("Carta Igienica (4 rotoli)", 2.20f, null, Category.IGIENE_PERSONALE),
-    Product("Acqua Naturale 1.5L", 0.40f, null, Category.BEVANDE),
-    Product("Caffè Macinato 250g", 3.50f, null, Category.DISPENSA),
-    Product("Pane Integrale 500g", 1.80f, null, Category.PANETTERIA),
-    Product("Banane (al kg)", 1.20f, null, Category.FRUTTA_E_VERDURA),
-    Product("Yogurt Naturale 125g", 0.85f, null, Category.LATTICINI),
-    Product("Riso Arborio 1kg", 2.40f, null, Category.DISPENSA),
-    Product("Olio d'Oliva Extra Vergine 500ml", 7.99f, null, Category.DISPENSA),
-    Product("Cereali Muesli", 3.20f, null, Category.COLAZIONE),
-    Product("Shampoo Neutro 250ml", 2.75f, null, Category.IGIENE_PERSONALE),
-    Product("Succo d'Arancia 1L", 1.30f, null, Category.BEVANDE),
-    Product("Pollo Intero 1kg", 6.50f, null, Category.FRUTTA_E_VERDURA),
-    Product("Spazzolino da Denti", 1.99f, null, Category.IGIENE_PERSONALE)
+    Product("Pane Fresco", 1.20f, R.drawable.pane_fresco, Category.PANETTERIA, "Prodotto da forno preparato quotidianamente dai nostri mastri fornai. Crosta dorata e croccante con una mollica soffice, ideale per la tavola di tutti i giorni. Da conservare in luogo fresco e asciutto.", "Farina di grano tenero tipo '0', acqua, lievito madre, sale, malto d'orzo."),
+    Product("Latte Intero 1L", 1.50f, R.drawable.latte_intero, Category.LATTICINI, "Latte bovino intero pastorizzato, proveniente al 100% da allevamenti italiani selezionati. Un alimento completo e genuino, perfetto per la colazione di tutta la famiglia.", null),
+    Product("Pasta Barilla 500g", 0.99f, R.drawable.pasta, Category.DISPENSA, "Le Penne Rigate Barilla sono tra i formati di pasta corta più amati dagli italiani. Grazie alla loro rigatura esterna trattengono al meglio ogni sugo, garantendo una tenuta in cottura sempre perfetta.", "Semola di grano duro, acqua. Può contenere tracce di soia e senape."),
+    Product("Salsa di Pomodoro", 1.10f, R.drawable.salsa_pomodoro, Category.DISPENSA, "Passata di pomodoro classica, realizzata esclusivamente con pomodori freschi italiani maturati al sole e lavorati in giornata. La base ideale per sughi genuini e saporiti.", "Pomodoro fresco (99%), sale, correttore di acidità: acido citrico."),
+    Product("Mele (sacchetto 1kg)", 2.30f, R.drawable.mele, Category.FRUTTA_E_VERDURA, "Mele fresche di prima categoria, calibro 70/80mm. Polpa croccante e succosa con un perfetto equilibrio tra dolcezza e acidità. Origine: Italia. Ideali per il consumo fresco o in pasticceria.", null),
+    Product("Uova (confezione da 6)", 1.80f, R.drawable.uova, Category.LATTICINI, "Uova fresche categoria A, calibro grande. Provenienti da galline allevate a terra in fattorie italiane controllate. Ottime per ogni preparazione culinaria dolce o salata.", null),
+    Product("Parmigiano Reggiano 200g", 5.50f, R.drawable.parmigiano, Category.LATTICINI, "Formaggio a pasta dura DOP, stagionato minimo 24 mesi. Prodotto artigianale dal sapore ricco, complesso e inconfondibile. Naturalmente privo di lattosio. Confezionato sottovuoto.", "Latte, sale, caglio."),
+    Product("Biscotti al Cioccolato", 2.99f, R.drawable.biscotti, Category.COLAZIONE, "Frollini friabili e golosi arricchiti con vere gocce di cioccolato fondente. Perfetti per iniziare la giornata con la giusta carica di energia o per una pausa sfiziosa.", "Farina di frumento, zucchero, olio di semi di girasole, gocce di cioccolato fondente (15%) (zucchero, pasta di cacao, burro di cacao, emulsionante: lecitina di soia), uova fresche, agenti lievitanti, aromi."),
+    Product("Detersivo Piatti", 1.45f, R.drawable.sapone_piatti, Category.PULIZIA_CASA, "Detergente liquido per stoviglie a mano. Azione ultra sgrassante al profumo di limone, efficace contro lo sporco difficile anche in acqua fredda. Rispetta il pH della pelle.", null),
+    Product("Carta Igienica (4 rotoli)", 2.20f, R.drawable.carta_ig, Category.IGIENE_PERSONALE, "Carta igienica in pura ovatta di cellulosa, a tre veli. Straordinaria morbidezza e resistenza garantita. Prodotto testato dermatologicamente, ideale anche per pelli sensibili.", null),
+    Product("Acqua Naturale 1.5L", 0.40f, R.drawable.acqua, Category.BEVANDE, "Acqua oligominerale naturale, pura e leggera. Nasce in alta quota in un ambiente incontaminato. Indicata per le diete povere di sodio e adatta all'alimentazione dei neonati.", null),
+    Product("Caffè Macinato 250g", 3.50f, R.drawable.caffe, Category.DISPENSA, "Miscela di caffè tostato e macinato di qualità superiore (Arabica e Robusta). Tostatura lenta per un aroma intenso, crema vellutata e gusto corposo. Ideale per moka e macchine espresso casa.", "100% miscela di caffè tostato e macinato."),
+    Product("Pane Integrale 500g", 1.80f, R.drawable.pane_integrale, Category.PANETTERIA, "Prodotto da forno a fette con farina integrale e arricchito con un mix di semi (girasole, lino, sesamo). Elevato apporto di fibre, consistenza morbida. Perfetto per sandwich bilanciati.", "Farina integrale di grano tenero (50%), acqua, lievito, olio di semi di girasole, semi di girasole, semi di lino, semi di sesamo, sale, farina di cereali maltati."),
+    Product("Banane (al kg)", 1.20f, R.drawable.banane, Category.FRUTTA_E_VERDURA, "Banane Cavendish di prima qualità, importate e maturate accuratamente. Ricche di potassio e vitamine. Ottime a colazione, come snack sportivo o per preparare frullati.", null),
+    Product("Yogurt Naturale 125g", 0.85f, R.drawable.yogurt, Category.LATTICINI, "Yogurt intero bianco, consistenza cremosa e sapore delicatamente acidulo. Preparato solo con latte fresco di alta qualità. Senza conservanti né zuccheri aggiunti.", "Latte intero pastorizzato, fermenti lattici vivi (Streptococcus thermophilus, Lactobacillus bulgaricus)."),
+    Product("Riso Arborio 1kg", 2.40f, R.drawable.riso, Category.DISPENSA, "Riso dai chicchi grandi e perlati, tipico della tradizione culinaria italiana. Grazie all'alto contenuto di amido, garantisce una mantecatura eccezionale. Il compagno perfetto per risotti.", null),
+    Product("Olio d'Oliva Extra Vergine 500ml", 7.99f, R.drawable.olio, Category.DISPENSA, "Olio Extra Vergine di Oliva ottenuto a freddo da olive raccolte al giusto grado di maturazione. Sapore fruttato, leggermente piccante nel finale. Ideale a crudo su insalate, verdure e zuppe.", null),
+    Product("Cereali Muesli", 3.20f, R.drawable.cereali, Category.COLAZIONE, "Mix croccante per la colazione a base di cereali integrali, frutta essiccata e nocciole tostate. Ottima fonte di fibre ed energia per cominciare la giornata con vitalità.", "Fiocchi d'avena integrali (45%), uvetta sultanina (15%), fiocchi di frumento, zucchero di canna, nocciole tostate (5%), miele, olio di semi di girasole."),
+    Product("Shampoo Neutro 250ml", 2.75f, R.drawable.schampoo, Category.IGIENE_PERSONALE, "Shampoo delicato per lavaggi frequenti. Deterge a fondo rispettando il film idrolipidico di cute e capelli. Lascia i capelli morbidi, luminosi e facili da pettinare. Formula senza parabeni.", null),
+    Product("Succo d'Arancia 1L", 1.30f, R.drawable.succo_arancia, Category.BEVANDE, "Succo 100% arancia bionda da concentrato. Naturalmente ricco di Vitamina C. Gusto dolce e rinfrescante, dissetante e ideale per la colazione di tutta la famiglia.", "Succo d'arancia da concentrato, antiossidante (acido ascorbico)."),
+    Product("Pollo Intero 1kg", 6.50f, R.drawable.pollo, Category.CARNE, "Pollo intero classe A, eviscerato. Allevato a terra in Italia senza l'uso di antibiotici. Carni tenere, delicate e versatili, perfette per arrosti domenicali o cotture in umido.", null),
+    Product("Spazzolino da Denti", 1.99f, R.drawable.spazzolino, Category.IGIENE_PERSONALE, "Spazzolino manuale per adulti con testina compatta e setole a durezza media. Manico ergonomico antiscivolo. Rimuove efficacemente la placca raggiungendo le zone difficili.", null),
+    Product("Burro Arborea", 2.50f, R.drawable.burro, Category.LATTICINI, "Burro tradizionale ottenuto mediante la zangolatura della panna fresca del latte. Dal profumo delicato e sapore inconfondibile, è l'ingrediente principe per pasticceria e pietanze salate.", "Crema di latte (panna), fermenti lattici."),
+    Product("Macinato di carne", 4.50f, R.drawable.macinato, Category.CARNE, "Preparato di carne bovina macinata fresca. Taglio magro e saporito, rigorosamente da allevamenti italiani. Ottimo per ragù alla bolognese, polpette morbidissime e profumati hamburger.", null),
+    Product("Pan Bauletto", 1.50f, R.drawable.pan_bauletto, Category.PANETTERIA, "Pane a fette tipo bauletto. Consistenza estremamente soffice ed elastica, crosta quasi assente. La base perfetta per sfiziosi toast farciti, sandwich o tramezzini.", "Farina di grano tenero tipo '0', acqua, olio extra vergine di oliva, lievito, zucchero, sale, farina di malto di frumento."),
+    Product("Prosciutto Cotto 100g", 2.50f, R.drawable.prosciutto_cotto, Category.SALUMI, "Prosciutto cotto di Alta Qualità affettato fresco. Coscia di suino selezionata, cotta lentamente a vapore per esaltarne la dolcezza e la morbidezza. Senza glutine.", "Coscia di suino (85%), acqua, sale, destrosio, aromi, antiossidante: ascorbato di sodio, conservante: nitrito di sodio."),
+    Product("Trancio di Salmone 250g", 5.90f, R.drawable.salmone, Category.PESCE, "Trancio di Salmone fresco (Salmo salar) allevato responsabilmente nei mari della Norvegia. Carni sode e ricche di Omega-3. Pulito, pronto per essere cotto al vapore, al forno o in padella.", null)
 )
 
 class Coupon(
@@ -250,92 +258,92 @@ class Coupon(
 
 val ListOfCoupon = mutableStateListOf<Coupon>(
     // Offerte (2-3 prodotti)
-    Coupon("Sconto10", 10f, "10% di sconto su Pane Fresco e Latte Intero", "2026-05-20",
+    Coupon("Sconto10", 10f, "10% di sconto su Pane Fresco e Latte Intero", "2026-06-30",
         ListOfProduct.find { it.nome == "Pane Fresco" }!!,
         ListOfProduct.find { it.nome == "Latte Intero 1L" }!!
     ),
-    Coupon("Sconto20", 20f, "20% di sconto su Pasta Barilla e Salsa di Pomodoro", "2026-05-12",
+    Coupon("Sconto20", 20f, "20% di sconto su Pasta Barilla e Salsa di Pomodoro", "2026-07-15",
         ListOfProduct.find { it.nome == "Pasta Barilla 500g" }!!,
         ListOfProduct.find { it.nome == "Salsa di Pomodoro" }!!
     ),
-    Coupon("Sconto15", 15f, "15% di sconto su Mele e Banane", "2026-05-02",
+    Coupon("Sconto15", 15f, "15% di sconto su Mele e Banane", "2026-07-05",
         ListOfProduct.find { it.nome == "Mele (sacchetto 1kg)" }!!,
         ListOfProduct.find { it.nome == "Banane (al kg)" }!!
     ),
-    Coupon("FRESCO25", 25f, "25% di sconto su Pane Integrale e Uova", "2026-05-14",
+    Coupon("FRESCO25", 25f, "25% di sconto su Pane Integrale e Uova", "2026-07-20",
         ListOfProduct.find { it.nome == "Pane Integrale 500g" }!!,
         ListOfProduct.find { it.nome == "Uova (confezione da 6)" }!!
     ),
-    Coupon("LATTICINI30", 30f, "30% di sconto su Parmigiano Reggiano, Latte e Yogurt", "2026-06-10",
+    Coupon("LATTICINI30", 30f, "30% di sconto su Parmigiano Reggiano, Latte e Yogurt", "2026-08-10",
         ListOfProduct.find { it.nome == "Parmigiano Reggiano 200g" }!!,
         ListOfProduct.find { it.nome == "Latte Intero 1L" }!!,
         ListOfProduct.find { it.nome == "Yogurt Naturale 125g" }!!
     ),
-    Coupon("CUCINA18", 18f, "18% di sconto su Riso Arborio e Olio d'Oliva", "2026-05-13",
+    Coupon("CUCINA18", 18f, "18% di sconto su Riso Arborio e Olio d'Oliva", "2026-07-25",
         ListOfProduct.find { it.nome == "Riso Arborio 1kg" }!!,
         ListOfProduct.find { it.nome == "Olio d'Oliva Extra Vergine 500ml" }!!
     ),
-    Coupon("BREAKFAST12", 12f, "12% di sconto su Cereali Muesli e Caffè Macinato", "2026-06-01",
+    Coupon("BREAKFAST12", 12f, "12% di sconto su Cereali Muesli e Caffè Macinato", "2026-08-01",
         ListOfProduct.find { it.nome == "Cereali Muesli" }!!,
         ListOfProduct.find { it.nome == "Caffè Macinato 250g" }!!
     ),
-    Coupon("CASA22", 22f, "22% di sconto su Detersivo e Carta Igienica", "2026-04-30",
+    Coupon("CASA22", 22f, "22% di sconto su Detersivo e Carta Igienica", "2026-07-10",
         ListOfProduct.find { it.nome == "Detersivo Piatti" }!!,
         ListOfProduct.find { it.nome == "Carta Igienica (4 rotoli)" }!!
     ),
-    Coupon("IGIENE28", 28f, "28% di sconto su Shampoo Neutro e Spazzolino", "2026-07-15",
+    Coupon("IGIENE28", 28f, "28% di sconto su Shampoo Neutro e Spazzolino", "2026-08-15",
         ListOfProduct.find { it.nome == "Shampoo Neutro 250ml" }!!,
         ListOfProduct.find { it.nome == "Spazzolino da Denti" }!!
     ),
-    Coupon("BEVANDE16", 16f, "16% di sconto su Acqua Naturale e Succo d'Arancia", "2026-05-25",
+    Coupon("BEVANDE16", 16f, "16% di sconto su Acqua Naturale e Succo d'Arancia", "2026-07-28",
         ListOfProduct.find { it.nome == "Acqua Naturale 1.5L" }!!,
         ListOfProduct.find { it.nome == "Succo d'Arancia 1L" }!!
     ),
-    Coupon("VERDURA20", 20f, "20% di sconto su Pollo Intero e Mele", "2026-05-19",
+    Coupon("VERDURA20", 20f, "20% di sconto su Pollo Intero e Mele", "2026-07-18",
         ListOfProduct.find { it.nome == "Pollo Intero 1kg" }!!,
         ListOfProduct.find { it.nome == "Mele (sacchetto 1kg)" }!!
     ),
     // Coupon (1 solo prodotto)
-    Coupon("PANE5", 5f, "Sconto 5% su Pane Fresco", "2026-05-22",
+    Coupon("PANE5", 5f, "Sconto 5% su Pane Fresco", "2026-06-25",
         ListOfProduct.find { it.nome == "Pane Fresco" }!!
     ),
-    Coupon("LATTE8", 8f, "Sconto 8% su Latte Intero 1L", "2026-05-13",
+    Coupon("LATTE8", 8f, "Sconto 8% su Latte Intero 1L", "2026-07-12",
         ListOfProduct.find { it.nome == "Latte Intero 1L" }!!
     ),
-    Coupon("PASTA10", 10f, "Sconto 10% su Pasta Barilla", "2026-05-07",
+    Coupon("PASTA10", 10f, "Sconto 10% su Pasta Barilla", "2026-07-08",
         ListOfProduct.find { it.nome == "Pasta Barilla 500g" }!!
     ),
-    Coupon("POMODORO7", 7f, "Sconto 7% su Salsa di Pomodoro", "2026-05-14",
+    Coupon("POMODORO7", 7f, "Sconto 7% su Salsa di Pomodoro", "2026-07-22",
         ListOfProduct.find { it.nome == "Salsa di Pomodoro" }!!
     ),
-    Coupon("UOVA12", 12f, "Sconto 12% su Uova confezione da 6", "2026-06-05",
+    Coupon("UOVA12", 12f, "Sconto 12% su Uova confezione da 6", "2026-07-05",
         ListOfProduct.find { it.nome == "Uova (confezione da 6)" }!!
     ),
-    Coupon("PARMIGIANO15", 15f, "Sconto 15% su Parmigiano Reggiano", "2026-05-18",
+    Coupon("PARMIGIANO15", 15f, "Sconto 15% su Parmigiano Reggiano", "2026-08-05",
         ListOfProduct.find { it.nome == "Parmigiano Reggiano 200g" }!!
     ),
-    Coupon("BISCOTTI9", 9f, "Sconto 9% su Biscotti al Cioccolato", "2026-04-25",
+    Coupon("BISCOTTI9", 9f, "Sconto 9% su Biscotti al Cioccolato", "2026-06-30",
         ListOfProduct.find { it.nome == "Biscotti al Cioccolato" }!!
     ),
-    Coupon("YOUGURT6", 6f, "Sconto 6% su Yogurt Naturale", "2026-05-30",
+    Coupon("YOUGURT6", 6f, "Sconto 6% su Yogurt Naturale", "2026-07-15",
         ListOfProduct.find { it.nome == "Yogurt Naturale 125g" }!!
     ),
-    Coupon("RISO11", 11f, "Sconto 11% su Riso Arborio", "2026-05-17",
+    Coupon("RISO11", 11f, "Sconto 11% su Riso Arborio", "2026-07-27",
         ListOfProduct.find { it.nome == "Riso Arborio 1kg" }!!
     ),
-    Coupon("OLIO14", 14f, "Sconto 14% su Olio d'Oliva Extra Vergine", "2026-05-01",
+    Coupon("OLIO14", 14f, "Sconto 14% su Olio d'Oliva Extra Vergine", "2026-08-20",
         ListOfProduct.find { it.nome == "Olio d'Oliva Extra Vergine 500ml" }!!
     ),
-    Coupon("CAFFE13", 13f, "Sconto 13% su Caffè Macinato", "2026-06-20",
+    Coupon("CAFFE13", 13f, "Sconto 13% su Caffè Macinato", "2026-07-31",
         ListOfProduct.find { it.nome == "Caffè Macinato 250g" }!!
     ),
-    Coupon("ACQUA4", 4f, "Sconto 4% su Acqua Naturale", "2026-05-28",
+    Coupon("ACQUA4", 4f, "Sconto 4% su Acqua Naturale", "2026-06-28",
         ListOfProduct.find { it.nome == "Acqua Naturale 1.5L" }!!
     ),
-    Coupon("POLLO19", 19f, "Sconto 19% su Pollo Intero", "2026-04-15",
+    Coupon("POLLO19", 19f, "Sconto 19% su Pollo Intero", "2026-07-15",
         ListOfProduct.find { it.nome == "Pollo Intero 1kg" }!!
     ),
-    Coupon("BANANE8", 8f, "Sconto 8% su Banane", "2026-05-27",
+    Coupon("BANANE8", 8f, "Sconto 8% su Banane", "2026-07-10",
         ListOfProduct.find { it.nome == "Banane (al kg)" }!!
     )
 )
@@ -347,8 +355,10 @@ val ListOfCoupon = mutableStateListOf<Coupon>(
 data class Product(
     private var _nome: String,
     private var _prezzo: Float,
-    private var _image: ImageVector?,
+    private var _image: Int?,
     private var _categoria: Category,
+    private var _descrizione: String = "",
+    private var _ingredienti: String? = null
 ) {
     var nome get() = _nome
         set(value) {_nome=value}
@@ -361,6 +371,12 @@ data class Product(
 
     var categoria get() = _categoria
         set(value) {_categoria = value}
+
+    var descrizione get() = _descrizione
+        set(value) {_descrizione = value}
+
+    var ingredienti get() = _ingredienti
+        set(value) {_ingredienti = value}
 }
 
 data class Work(
