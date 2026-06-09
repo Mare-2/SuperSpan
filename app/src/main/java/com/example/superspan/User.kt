@@ -247,7 +247,7 @@ class Coupon(
     }
 }
 
-val ListOfCoupon = mutableListOf<Coupon>(
+val ListOfCoupon = mutableStateListOf<Coupon>(
     // Offerte (2-3 prodotti)
     Coupon("Sconto10", 10f, "10% di sconto su Pane Fresco e Latte Intero", "2026-05-20",
         ListOfProduct.find { it.nome == "Pane Fresco" }!!,
@@ -567,7 +567,7 @@ data class WorkOffer(
 )
 
 // 3. Lista di offerte di lavoro disponibili
-val WorkOfferSearchList = listOf(
+val WorkOfferSearchList = mutableStateListOf(
     // --- CAGLIARI (6 SEDI) ---
     WorkOffer(
         id = 9,

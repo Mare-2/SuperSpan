@@ -439,7 +439,7 @@ fun WorkSearchPageComplete(
         })
     }
 
-    Box(modifier = Modifier.padding(padding)) {
+    Box(modifier = Modifier.padding(padding).fillMaxSize()) {
         if (!enabled) {
             WorkSearchPage(navController, filterData) {
                 enabled = true
@@ -447,6 +447,17 @@ fun WorkSearchPageComplete(
         } else {
             WorkFilterPage(Modifier.fillMaxSize(), filterData) {
                 enabled = false
+            }
+        }
+
+        if (actualUser.admin && !enabled) {
+            FloatingActionButton(
+                onClick = { navController?.navigate(Destination.ADD_WORK_OFFER.route) },
+                containerColor = Color(0xFF388E3C),
+                contentColor = Color.White,
+                modifier = Modifier.align(Alignment.BottomEnd).padding(24.dp)
+            ) {
+                Icon(Icons.Default.Add, "Aggiungi")
             }
         }
     }

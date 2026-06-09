@@ -119,6 +119,11 @@ fun CouponCard(coupon: Coupon) {
 
                 // sconto a destra
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    if (actualUser.admin) {
+                        IconButton(onClick = { navController?.navigate("${Destination.EDIT_COUPON.route}/${coupon.code}") }) {
+                            Icon(Icons.Default.Edit, contentDescription = "Modifica", tint = Color.Gray, modifier = Modifier.size(20.dp))
+                        }
+                    }
                     Text("-${coupon.discount.toInt()}%", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.ExtraBold)
                 }
             }
@@ -159,6 +164,13 @@ fun OfferCard(coupon: Coupon, onClick: (Coupon) -> Unit) {
                 Spacer(modifier = Modifier.width(12.dp))
 
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    if (actualUser.admin) {
+                        IconButton(onClick = { /* Navigazione gestita dall'onClick della card se preferito, ma aggiungiamo un tasto esplicito */
+                            // navController?.navigate("${Destination.EDIT_COUPON.route}/${coupon.code}")
+                        }) {
+                            Icon(Icons.Default.Edit, contentDescription = "Modifica", tint = Color.Gray, modifier = Modifier.size(20.dp))
+                        }
+                    }
                     Text("-${coupon.discount.toInt()}%", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.ExtraBold)
                 }
             }
@@ -425,7 +437,7 @@ fun CouponPageComplete(paddingValues: PaddingValues, navController: NavControlle
                 items(filteredList) { item ->
                     Box(modifier = Modifier.padding(vertical = 6.dp)) {
                         if (selectedTab == 0) {
-                            CouponTicketCard(item)
+                            CouponTicketCard(item, navController)
                         } else {
                             OfferBundleCard(item) { selectedOffer = item }
                         }
@@ -433,7 +445,7 @@ fun CouponPageComplete(paddingValues: PaddingValues, navController: NavControlle
                 }
             }
         } else {
-            OfferDetailPage(selectedOffer!!) { selectedOffer = null }
+            OfferDetailPage(selectedOffer!!, navController) { selectedOffer = null }
         }
 
         if (actualUser.admin) {
@@ -488,7 +500,7 @@ fun TabButton(text: String, isSelected: Boolean, modifier: Modifier, onClick: ()
 }
 
 @Composable
-fun CouponTicketCard(coupon: Coupon) {
+fun CouponTicketCard(coupon: Coupon, navController: NavController? = null) {
     val status = getExpirationStatus(coupon.dateOfExpiration)
     val product = coupon.products.first()
 
@@ -520,6 +532,12 @@ fun CouponTicketCard(coupon: Coupon) {
                 modifier = Modifier.fillMaxHeight().width(90.dp).background(status.color.copy(0.05f)),
                 horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center
             ) {
+                if (actualUser.admin) {
+                    IconButton(onClick = { navController?.navigate("${Destination.EDIT_COUPON.route}/${coupon.code}") }) {
+                        Icon(Icons.Default.Edit, contentDescription = "Modifica", tint = status.color)
+                    }
+                    Spacer(Modifier.height(4.dp))
+                }
                 Text("SCONTO", fontSize = 10.sp, color = Color.Gray)
                 Text("-${coupon.discount.toInt()}%", fontSize = 26.sp, fontWeight = FontWeight.Black, color = status.color)
             }
@@ -552,14 +570,21 @@ fun OfferBundleCard(coupon: Coupon, onClick: () -> Unit) {
 }
 
 @Composable
-fun OfferDetailPage(coupon: Coupon, onBack: () -> Unit) {
+fun OfferDetailPage(coupon: Coupon, navController: NavController? = null, onBack: () -> Unit) {
     Column(Modifier.fillMaxSize().background(Color.White)) {
         Row(Modifier.padding(8.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null) }
             Text("Torna alla lista", color = Color.Gray)
         }
         Column(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp).verticalScroll(rememberScrollState())) {
-            Text(coupon.description, fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, lineHeight = 34.sp)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(coupon.description, fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, lineHeight = 34.sp, modifier = Modifier.weight(1f))
+                if (actualUser.admin) {
+                    IconButton(onClick = { navController?.navigate("${Destination.EDIT_COUPON.route}/${coupon.code}") }) {
+                        Icon(Icons.Default.Edit, contentDescription = "Modifica", tint = Color.Gray)
+                    }
+                }
+            }
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 8.dp)) {
                 Icon(Icons.Default.Event, null, tint = Color.Gray, modifier = Modifier.size(16.dp))
                 Spacer(Modifier.width(6.dp))

@@ -61,7 +61,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.navigation.NavGraph.Companion.findStartDestination
 
 //p.cortellesi@gmail.com  d.tinti@superspan.it
-var actualUser by mutableStateOf(MapOfUser["p.cortellesi@gmail.com"]!!)
+var actualUser by mutableStateOf(MapOfUser["d.tinti@superspan.it"]!!)
 //var actualUser: User? = MapOfUser.getValue("p.cortellesi@gmail.com")
 
 enum class Destination (
@@ -85,7 +85,10 @@ enum class Destination (
     APPLY_STEP_2_INTRO("apply_2_intro", "Istruzioni Video", null),
     APPLY_STEP_2_RECORD("apply_2_record", "Registra Video", null),
     APPLY_STEP_2_REVIEW("apply_2_review", "Rivedi Video", null),
-    APPLY_STEP_3("apply_3", "Riepilogo Finale", null)
+    APPLY_STEP_3("apply_3", "Riepilogo Finale", null),
+    EDIT_COUPON("edit_coupon", "Modifica Offerta", null),
+    ADD_WORK_OFFER("add_work_offer", "Aggiungi Lavoro", null),
+    EDIT_WORK_OFFER("edit_work_offer", "Modifica Lavoro", null)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -111,10 +114,29 @@ fun Navigation(navController: NavHostController, startDestination: Destination, 
                     Destination.APPLY_STEP_2_RECORD -> ApplyStep2Record(navController, paddingValues)
                     Destination.APPLY_STEP_2_REVIEW -> ApplyStep2Review(navController, paddingValues)
                     Destination.APPLY_STEP_3 -> ApplyStep3(navController, paddingValues)
+                    Destination.EDIT_COUPON -> AdminCouponEditPage(navController, paddingValues)
+                    Destination.ADD_WORK_OFFER -> AdminWorkOfferEditPage(null, navController, paddingValues)
+                    Destination.EDIT_WORK_OFFER -> AdminWorkOfferEditPage(null, navController, paddingValues) // Will be handled by ID route
                     else -> {}
                 }
             }
         }
+        composable(Destination.EDIT_COUPON.route+"/{couponCode}", arguments = listOf(
+            navArgument("couponCode") { type = NavType.StringType }
+        )) { backStackEntry ->
+            val code = backStackEntry.arguments?.getString("couponCode")
+            val coupon = ListOfCoupon.find { it.code == code }
+            AdminCouponEditPage(navController, paddingValues, coupon)
+        }
+
+        composable(Destination.EDIT_WORK_OFFER.route+"/{offerId}", arguments = listOf(
+            navArgument("offerId") { type = NavType.IntType }
+        )) { backStackEntry ->
+            val id = backStackEntry.arguments?.getInt("offerId")
+            val offer = WorkOfferSearchList.find { it.id == id }
+            AdminWorkOfferEditPage(offer, navController, paddingValues)
+        }
+
         composable(Destination.PRODOTTO.route+"/{prod}", arguments = listOf(
             navArgument("prod") {
                 type = NavType.StringType

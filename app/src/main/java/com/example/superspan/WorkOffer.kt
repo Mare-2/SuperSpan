@@ -50,6 +50,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.WorkOutline
@@ -134,12 +135,27 @@ fun WorkOfferPage(offer: WorkOffer?, navController: NavController?, paddingValue
             Spacer(modifier = Modifier.height(120.dp)) // Spazio per il tasto
         }
 
-        // --- TASTO INDIETRO ---
-        IconButton(
-            onClick = { navController?.popBackStack() },
-            modifier = Modifier.padding(12.dp).size(48.dp)
+        // --- TASTO INDIETRO E MODIFICA ---
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = Color.Black)
+            IconButton(
+                onClick = { navController?.popBackStack() },
+                modifier = Modifier.size(48.dp)
+            ) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = Color.Black)
+            }
+
+            if (actualUser.admin && offer != null) {
+                IconButton(
+                    onClick = { navController?.navigate("${Destination.EDIT_WORK_OFFER.route}/${offer.id}") },
+                    modifier = Modifier.size(48.dp)
+                ) {
+                    Icon(Icons.Default.Edit, contentDescription = "Modifica", tint = Color.Black)
+                }
+            }
         }
 
 
