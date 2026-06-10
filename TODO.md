@@ -4,42 +4,47 @@
 
 ### 👤 Profilo Utente
 - [x] fare la pagina dei dati personali con area di modifica del profilo utente
-- [ ] fare pagina del riepilogo delle candidature nel profilo utente
-- [ ] fare pagina dati account nel profilo utente con possibile modifica di username(se lo usiamo) e password
+- [ ] fare pagina del riepilogo delle candidature nel profilo utente con storico 
+- [ ] fare pagina dati account nel profilo utente con possibile modifica di email e password (da controllare se mail cambiata funziona )
+- [ ] nella pagina candidature far vedere se la candidatura viene scartata o mandata all'hr/ responsabile 
+
 
 ### 👨‍💼 Profilo Admin (Gestione)
-- [ ] nel profilo admin mettere le sezioni per gestione 
-  - [ ] offerte e coupon e pagina relativa quando ci schiacci, 
-  - [ ] prodotti (se serve) e pagina relativa quando ci schiacci 
-  - [ ] candidature e pagina relativa quando ci schiacci
-- [ ] fare pagina dati account nel profilo admin con possibile modifica password
+- [x] nel profilo admin mettere le sezioni per gestione 
+  - [x] offerte e coupon e pagina relativa quando ci schiacci, 
+  - [x] candidature e pagina relativa quando ci schiacci
+- [ ] fare pagina dati account nel profilo admin con possibile modifica password (da verificare)
+- [ ] togliere username dalla card mio account nel profilo
 
 ### Profilo Generico
 - [x] far funzionare il tasto logout nel profilo
 - [ ] aggiustare scorrimento nel profilo
+- [ ] togliere freccia in alto a sinistra 
 
 ### 📝 Flusso Candidatura (Lavora con noi)
 - [x] continuare le pagine per le fasi di candidatura
-- [ ] gestire il caricamento del file per il cv
-- [ ] controllare e probabilmente aggiustare la funzione di caricamento del cv
+- [x] gestire il caricamento del file per il cv
+- [x] controllare e probabilmente aggiustare la funzione di caricamento del cv
 - [x] gestire la registrazione del video per la candidatura (per ora è finta)
 - [ ] nella fase di candidatura se uno registra un video troppo corto fare in modo che riinizi la registrazione
-- [] nell'ultimo step della candidatura fare in modo che se schiacci sul cv ti apra il cv 
+- [x] nell'ultimo step della candidatura fare in modo che se schiacci sul cv ti apra il cv 
 - [x] nell'ultimo step della candidatura fare in modo che schiacci sul video ti faccia rivedere il video
 - [x] dopo che un utente invia una candidatura riportarlo alla schermata delle offerte di lavoro (non alla home)
-- [ ] aggiungere tasto per uscire in quasiasi step e quindi:
-  - [ ] siccome si potranno salvare le bozze se uno tenta di uscire mettere un messaggio con opzioni "elimina tutto", "annulla" e "salva in bozza"
+- [x] aggiungere tasto per uscire in quasiasi step e quindi:
+  - [x] siccome si potranno salvare le bozze se uno tenta di uscire mettere un messaggio con opzioni "elimina tutto", "annulla" e "salva in bozza"
+- [ ] mostrare un feedback visivo chiaro e il nome del file caricato per rassicurare l'utente che il CV è stato acquisito (pop-up)
+- [ ] aggiungere istruzioni chiare sulla durata del video (circa 30 secondi) e un messaggio di conferma al termine della registrazione
 
 
 ### 🔍 Pagina Ricerca Prodotti e pagina Prodotto
-- [ ] aggiustare pagina prodotto
+- [x] aggiustare pagina prodotto
 - [x] aggiustare scorrimento nella pagina di ricerca dei prodotti in modo che scorra tutto e non solo i prodotti
 - [x] rimpicciolire la barra di ricerca e mettere il tasto per i filtri affianco
 - [x] mettere la freccia per tornare indietro nella pagina filtri
 - [x] fare la grafica dei filtri prodotti simile alla grafica dei filtri di lavoro
-- [ ] aggiustare il fatto che dopo che usi il tasto per ordinare per prezzo o per nome i prodotti si mettono nell'ordine che pare a loro anche se disattivati i tasti (di solito in base al prezzo)
-- [ ] capire se è necessaria e utile la barra per scorrere massimo e minimo dei prezzi
-- [ ] aggiungere la descrizione del prodotto e tutto ciò che vogliamo nella pagina prodotto nel suo oggetto
+- [x] aggiustare il fatto che dopo che usi il tasto per ordinare per prezzo o per nome i prodotti si mettono nell'ordine che pare a loro anche se disattivati i tasti (di solito in base al prezzo)
+- [x] capire se è necessaria e utile la barra per scorrere massimo e minimo dei prezzi
+- [x] aggiungere la descrizione del prodotto e tutto ciò che vogliamo nella pagina prodotto nel suo oggetto
 - [ ] aggiungere nuovi prodotti e nuove categorie
 - [ ] la barra di ricerca e il tasto filtri sono giganteschi
 
@@ -49,8 +54,9 @@
 - [ ] avrebbe senso aggiungere una barra di ricerca(?), da valutare
 - [x] cambiare data in coupon e offerte perchè è tutto scaduto
 - [ ] rendere più netta la differenza tra roba scaduta, in scadenza e valida che mi sembra non si veda tanto (non sono sicura era tutto scaduto)
-- [ ] messaggio di conferma quando viene caricato un coupon o un'offerta
-- [ ] capire esattamente cosa sono i coupon e in caso mettere codice a barre
+- [ ] messaggio di conferma visibile non solo quando viene caricato, ma anche quando viene eliminato o modificato un coupon o un'offerta
+- [ ] capire esattamente cosa sono i coupon e implementare la logica: Daniela deve poter definire un coupon selezionando esattamente 3 prodotti per la campagna promozionale
+- [ ] vedere se mettere il codice a barre 
 
 
 ### Pagina ricerca Offerte di lavoro e pagina Offerta di lavoro
@@ -58,8 +64,8 @@
 - [x] aggiustare e fare bene i filtri per le offerte di lavoro
 - [x] rendere i luoghi dei supermercati e i km più realistici scegliendo città e paesi vicino a cagliari e in varie vie di cagliari
 - [ ] la barra di ricerca e il tasto filtri sono giganteschi
-- [ ] quando Daniela inserisce un'offerta di lavoro mettere un messaggio di conferma che è stata caricata
-- [ ] quando guarda le candidature daniela deve poter filtrare per ruolo sede e data 
+- [ ] messaggi di conferma visibili non solo quando Daniela inserisce un'offerta di lavoro, ma anche quando la modifica o la elimina
+- [x] quando guarda le candidature daniela deve poter filtrare per ruolo sede e data 
 
 
 ### 🎨 Design e UI/UX Generale
@@ -75,6 +81,11 @@
 
 ### ⚙️ Logica e Contenuti
 - [x] fare partire l'app dalla home
+- [ ] far partire dal login
 - [ ] gestire i messaggi di errore per aiutare nella compilazione di dati e form
 - [ ] guardare di aver inserito tutte le feature aggiuntive che abbiamo dedotto con gli scenari
 - [ ] spararci in faccia (scherzo(forse))
+
+
+
+- [ ] metti popup di errore o di conferma uguali a quelli dell'invio candidature da daniela 

@@ -423,14 +423,12 @@ fun SearchPage(
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Bold
                         )
-                        if (prezzoAttivo) {
-                            Spacer(Modifier.width(6.dp))
-                            Icon(
-                                imageVector = if (filterData.ordinamentoPrezzoCrescente == true) Icons.Default.ArrowUpward else Icons.Default.ArrowDownward,
-                                contentDescription = null,
-                                modifier = Modifier.size(16.dp)
-                            )
-                        }
+                        Spacer(Modifier.width(6.dp))
+                        Icon(
+                            imageVector = if (filterData.ordinamentoPrezzoCrescente == true) Icons.Default.ArrowUpward else Icons.Default.ArrowDownward,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp)
+                        )
                     }
                 }
             }

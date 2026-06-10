@@ -23,6 +23,8 @@ import android.net.Uri
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.FileProvider
 import java.io.File
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.text.style.TextAlign
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -35,13 +37,17 @@ fun AdminCandidaciesPage(navController: NavController?, paddingValues: PaddingVa
     var dateDescending by remember { mutableStateOf(true) }
 
     // Dati filtrati
-    val filteredCandidacies = remember(AllCandidacies, selectedRole, selectedSupermarket, dateDescending) {
-        AllCandidacies.filter { candidacy ->
-            val offer = WorkOfferSearchList.find { it.id == candidacy.offerId }
-            val roleMatch = selectedRole == null || offer?.ruoloEnum == selectedRole
-            val superMatch = selectedSupermarket == null || offer?.supermarket?.id == selectedSupermarket?.id
-            roleMatch && superMatch
-        }.sortedWith { a, b ->
+    val filteredCandidacies = AllCandidacies.filter { candidacy ->
+        val offer = WorkOfferSearchList.find { it.id == candidacy.offerId }
+        val roleMatch = selectedRole == null || offer?.ruoloEnum == selectedRole
+        val superMatch = selectedSupermarket == null || offer?.supermarket?.id == selectedSupermarket?.id
+        roleMatch && superMatch
+    }.sortedWith { a, b ->
+        val aInoltrata = a.stato != "Inviata"
+        val bInoltrata = b.stato != "Inviata"
+        if (aInoltrata != bInoltrata) {
+            if (aInoltrata) 1 else -1
+        } else {
             if (dateDescending) b.dataInvio.compareTo(a.dataInvio)
             else a.dataInvio.compareTo(b.dataInvio)
         }
@@ -167,27 +173,56 @@ fun AdminCandidaciesPage(navController: NavController?, paddingValues: PaddingVa
 @Composable
 fun CandidacyAdminCard(candidacy: Candidacy) {
     val offer = WorkOfferSearchList.find { it.id == candidacy.offerId }
+    val isForwarded = candidacy.stato != "Inviata"
+    val context = LocalContext.current
+    var showDiscardDialog by remember { mutableStateOf(false) }
+
+    if (showDiscardDialog) {
+        AlertDialog(
+            onDismissRequest = { showDiscardDialog = false },
+            title = { Text("Scartare candidatura?") },
+            text = { Text("Sei sicuro di voler scartare la candidatura di ${candidacy.nome} ${candidacy.cognome}?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showDiscardDialog = false
+                    val index = AllCandidacies.indexOfFirst { it.id == candidacy.id }
+                    if (index != -1) {
+                        AllCandidacies[index] = candidacy.copy(stato = "Scartata")
+                    }
+                    android.widget.Toast.makeText(context, "Candidatura scartata", android.widget.Toast.LENGTH_SHORT).show()
+                }) {
+                    Text("Sì, scarta", color = Color.Red)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDiscardDialog = false }) {
+                    Text("Annulla")
+                }
+            }
+        )
+    }
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(2.dp),
+        modifier = if (isForwarded) Modifier.fillMaxWidth().alpha(0.6f) else Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = if (isForwarded) Color(0xFFF5F5F5) else Color.White),
+        elevation = CardDefaults.cardElevation(if (isForwarded) 0.dp else 2.dp),
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(Modifier.padding(16.dp)) {
-            // Header: Ruolo e Data
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            // Header: Ruolo e Delete
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Top) {
                 Text(
                     text = offer?.titolo ?: "Offerta rimossa",
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
-                    color = Color(0xFF1565C0)
+                    color = Color(0xFF1565C0),
+                    modifier = Modifier.weight(1f)
                 )
-                Text(
-                    text = candidacy.dataInvio,
-                    fontSize = 12.sp,
-                    color = Color.Gray
-                )
+                if (!isForwarded) {
+                    IconButton(onClick = { showDiscardDialog = true }, modifier = Modifier.size(24.dp)) {
+                        Icon(Icons.Default.Delete, contentDescription = "Scarta", tint = Color.Red, modifier = Modifier.size(20.dp))
+                    }
+                }
             }
             
             // Sede
@@ -195,6 +230,13 @@ fun CandidacyAdminCard(candidacy: Candidacy) {
                 Icon(Icons.Default.LocationOn, null, tint = Color.Gray, modifier = Modifier.size(16.dp))
                 Spacer(Modifier.width(4.dp))
                 Text(offer?.supermarket?.nome ?: "Sede non specificata", fontSize = 14.sp, color = Color.DarkGray)
+            }
+
+            // Data Inviata
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 4.dp)) {
+                Icon(Icons.Default.DateRange, null, tint = Color.Gray, modifier = Modifier.size(16.dp))
+                Spacer(Modifier.width(4.dp))
+                Text("Inviata il: ${candidacy.dataInvio}", fontSize = 14.sp, color = Color.Gray)
             }
 
             Spacer(Modifier.height(12.dp))
@@ -225,7 +267,6 @@ fun CandidacyAdminCard(candidacy: Candidacy) {
             Spacer(Modifier.height(16.dp))
 
             // Bottoni Download
-            val context = LocalContext.current
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (candidacy.cvPath != null) {
                     Button(
@@ -304,6 +345,46 @@ fun CandidacyAdminCard(candidacy: Candidacy) {
                         Spacer(Modifier.width(6.dp))
                         Text("Vedi Video")
                     }
+                }
+            }
+
+            // Bottoni Inoltro
+            if (!isForwarded) {
+                Spacer(Modifier.height(12.dp))
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Button(
+                        onClick = { 
+                            val index = AllCandidacies.indexOfFirst { it.id == candidacy.id }
+                            if (index != -1) {
+                                AllCandidacies[index] = candidacy.copy(stato = "Inoltrata a HR")
+                            }
+                            android.widget.Toast.makeText(context, "Candidatura inviata a HR con successo", android.widget.Toast.LENGTH_SHORT).show()
+                        },
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE3F2FD), contentColor = Color(0xFF1976D2)),
+                        contentPadding = PaddingValues(horizontal = 4.dp)
+                    ) {
+                        Text("Invia a HR", fontSize = 12.sp, textAlign = TextAlign.Center)
+                    }
+                    Button(
+                        onClick = { 
+                            val index = AllCandidacies.indexOfFirst { it.id == candidacy.id }
+                            if (index != -1) {
+                                AllCandidacies[index] = candidacy.copy(stato = "Inoltrata al Responsabile")
+                            }
+                            android.widget.Toast.makeText(context, "Candidatura inviata al Responsabile con successo", android.widget.Toast.LENGTH_SHORT).show()
+                        },
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE3F2FD), contentColor = Color(0xFF1976D2)),
+                        contentPadding = PaddingValues(horizontal = 4.dp)
+                    ) {
+                        Text("Invia a Responsabile", fontSize = 12.sp, textAlign = TextAlign.Center)
+                    }
+                }
+            } else {
+                Spacer(Modifier.height(12.dp))
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                    Text("Candidatura ${candidacy.stato}", color = Color.Gray, fontSize = 14.sp, fontWeight = FontWeight.Bold)
                 }
             }
         }

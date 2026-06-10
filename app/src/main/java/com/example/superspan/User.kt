@@ -903,14 +903,14 @@ val AllCandidacies = mutableStateListOf<Candidacy>(
     Candidacy(
         id = 1,
         userEmail = "mario.rossi@email.com",
-        offerId = 1, // ID offerta esistente
+        offerId = 34, // ID offerta esistente
         nome = "Mario",
         cognome = "Rossi",
         emailContatto = "mario.rossi@email.com",
-        telefono = "3331234567",
+        telefono = "+39 3331234567",
         cvPath = "dummy_cv",
-        videoPath = "dummy_video",
-        dataInvio = "2023-10-25"
+        videoPath = "dummy_video_mario",
+        dataInvio = "2026-06-25"
     ),
     Candidacy(
         id = 2,
@@ -919,22 +919,22 @@ val AllCandidacies = mutableStateListOf<Candidacy>(
         nome = "Luigi",
         cognome = "Verdi",
         emailContatto = "luigi.verdi@email.com",
-        telefono = "3339876543",
+        telefono = "+39 3339876543",
         cvPath = "dummy_cv",
-        videoPath = "dummy_video", // Aggiunto video
-        dataInvio = "2023-10-26"
+        videoPath = "dummy_video_luigi", // Aggiunto video
+        dataInvio = "2026-05-28"
     ),
     Candidacy(
         id = 3,
-        userEmail = "giulia.bianchi@email.com",
+        userEmail = "chiara.bianchi@email.com",
         offerId = 1, 
-        nome = "Giulia",
+        nome = "Chiara",
         cognome = "Bianchi",
-        emailContatto = "giulia.bianchi@email.com",
-        telefono = "3335555555",
+        emailContatto = "chiara.bianchi@email.com",
+        telefono = "+39 3335555555",
         cvPath = "dummy_cv",
-        videoPath = "dummy_video",
-        dataInvio = "2023-10-27"
+        videoPath = "dummy_video_chiara",
+        dataInvio = "2026-06-27"
     )
 )
 var currentOfferIdApplying by mutableIntStateOf(0)
