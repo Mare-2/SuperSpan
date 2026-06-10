@@ -46,7 +46,8 @@ import androidx.compose.foundation.layout.*
 @Composable
 fun WorkSearchPageComplete(
     padding: PaddingValues,
-    navController: NavController?
+    navController: NavController?,
+    hideHeader: Boolean = false
 ) {
     var enabled: Boolean by remember { mutableStateOf(false) }
     val filterData by remember { mutableStateOf(WorkFilterData()) }
@@ -56,24 +57,26 @@ fun WorkSearchPageComplete(
         verticalArrangement = Arrangement.Top
     ) {
         if (!enabled) {
-            Column(
-                modifier = Modifier.padding(vertical = 20.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text(
-                    text = "Lavora con noi!",
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center
-                )
-                Text(
-                    text = "Trova la posizione adatta a te",
-                    fontSize = 20.sp,
-                    color = Color.Gray,
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center
-                )
+            if (!hideHeader) {
+                Column(
+                    modifier = Modifier.padding(vertical = 20.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = "Lavora con noi!",
+                        fontSize = 32.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center
+                    )
+                    Text(
+                        text = "Trova la posizione adatta a te",
+                        fontSize = 20.sp,
+                        color = Color.Gray,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
             WorkSearchPage(Modifier.weight(4f), navController, filterData) {
                 enabled = true
@@ -116,7 +119,7 @@ fun WorkOfferCompose(workOffer: WorkOffer, navController: NavController?) {
             )
             Spacer(Modifier.height(8.dp))
             Text(
-                text = "${workOffer.citta} • ${workOffer.tipoContratto.nome} • ${workOffer.orario.nome} • ${workOffer.distanzaKm} km",
+                text = "${workOffer.supermarket.citta} • ${workOffer.tipoContratto.nome} • ${workOffer.orario.nome} • ${workOffer.distanzaKm} km",
                 fontSize = 13.sp,
                 color = Color.Gray,
                 fontWeight = FontWeight.Light
@@ -401,7 +404,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -424,7 +431,8 @@ import androidx.navigation.NavController
 @Composable
 fun WorkSearchPageComplete(
     padding: PaddingValues,
-    navController: NavController?
+    navController: NavController?,
+    hideHeader: Boolean = false
 ) {
     var enabled by remember { mutableStateOf(false) }
 
@@ -439,9 +447,12 @@ fun WorkSearchPageComplete(
         })
     }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    val listState = rememberLazyListState()
+
     Box(modifier = Modifier.padding(padding).fillMaxSize()) {
         if (!enabled) {
-            WorkSearchPage(navController, filterData) {
+            WorkSearchPage(navController, filterData, listState, snackbarHostState, hideHeader) {
                 enabled = true
             }
         } else {
@@ -449,6 +460,11 @@ fun WorkSearchPageComplete(
                 enabled = false
             }
         }
+        
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
 
         if (actualUser.admin && !enabled) {
             FloatingActionButton(
@@ -467,35 +483,59 @@ fun WorkSearchPageComplete(
 fun WorkSearchPage(
     navController: NavController?,
     filterData: WorkFilterData,
+    listState: LazyListState,
+    snackbarHostState: SnackbarHostState,
+    hideHeader: Boolean = false,
     onOpenFilters: () -> Unit
 ) {
     val workSearchList by remember {
         derivedStateOf { searchWorkOffer(filterData) }
     }
+    
+    var highlightCurrentId by remember { mutableStateOf<Int?>(null) }
+
+    LaunchedEffect(highlightedWorkOfferId) {
+        val targetId = highlightedWorkOfferId
+        if (targetId != null) {
+            highlightCurrentId = targetId
+            val index = workSearchList.indexOfFirst { it.id == targetId }
+            if (index != -1) {
+                // Scorriamo aggiungendo +2 per l'header e la barra di ricerca
+                listState.animateScrollToItem(index + 2)
+            }
+            snackbarHostState.showSnackbar("Offerta inserita con successo!")
+            kotlinx.coroutines.delay(1500)
+            highlightCurrentId = null
+            highlightedWorkOfferId = null
+        }
+    }
 
     LazyColumn(
+        state = listState,
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 20.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         // 1. HEADER (Scorre con la pagina)
-        item {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "Lavora con noi!",
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.ExtraBold
-                )
-                Text(
-                    text = "Trova la posizione adatta a te",
-                    fontSize = 16.sp,
-                    color = Color.Gray
-                )
+        if (!hideHeader) {
+            item {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Lavora con noi!",
+                        fontSize = 32.sp,
+                        fontWeight = FontWeight.ExtraBold
+                    )
+                    Text(
+                        text = "Trova la posizione adatta a te",
+                        fontSize = 16.sp,
+                        color = Color.Gray
+                    )
+                }
             }
         }
 
@@ -540,7 +580,7 @@ fun WorkSearchPage(
 
         // 3. LISTA DELLE OFFERTE
         items(workSearchList, key = { it.id }) { offer ->
-            WorkOfferCompose(offer, navController)
+            WorkOfferCompose(offer, navController, isHighlighted = (highlightCurrentId == offer.id))
         }
     }
 }
@@ -548,14 +588,19 @@ fun WorkSearchPage(
 
 
 @Composable
-fun WorkOfferCompose(workOffer: WorkOffer, navController: NavController?) {
+fun WorkOfferCompose(workOffer: WorkOffer, navController: NavController?, isHighlighted: Boolean = false) {
+    val backgroundColor by animateColorAsState(
+        targetValue = if (isHighlighted) Color(0xFFC8E6C9) else Color(0xFFF1F1F1),
+        animationSpec = tween(durationMillis = 500)
+    )
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
             .clickable { navController?.navigate("dettaglio_offerta/${workOffer.id}") },
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF1F1F1))
+        colors = CardDefaults.cardColors(containerColor = backgroundColor)
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -567,7 +612,7 @@ fun WorkOfferCompose(workOffer: WorkOffer, navController: NavController?) {
                 verticalAlignment = Alignment.Top
             ) {
                 Text(
-                    text = workOffer.ruolo,
+                    text = workOffer.titolo,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.weight(1f)
@@ -605,7 +650,7 @@ fun WorkOfferCompose(workOffer: WorkOffer, navController: NavController?) {
                 )
                 Text(
                     // AGGIUNTO: workOffer.orario.nome alla fine della stringa
-                    text = " ${workOffer.citta} • ${workOffer.tipoContratto.nome} • ${workOffer.orario.nome}",
+                    text = " ${workOffer.supermarket.citta} • ${workOffer.tipoContratto.nome} • ${workOffer.orario.nome}",
                     fontSize = 12.sp,
                     color = Color.Gray
                 )

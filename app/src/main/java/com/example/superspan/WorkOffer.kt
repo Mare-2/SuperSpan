@@ -81,13 +81,13 @@ fun WorkOfferPage(offer: WorkOffer?, navController: NavController?, paddingValue
 
             // Titolo e Luogo
             Text(
-                text = offer?.ruolo ?: "",
+                text = offer?.titolo ?: "",
                 fontSize = 28.sp,
                 fontWeight = FontWeight.ExtraBold,
                 color = Color(0xFF1A1A1A)
             )
             Text(
-                text = offer?.citta ?: "",
+                text = offer?.supermarket?.citta ?: "",
                 fontSize = 18.sp,
                 color = Color.Gray,
                 fontWeight = FontWeight.Medium
@@ -103,7 +103,7 @@ fun WorkOfferPage(offer: WorkOffer?, navController: NavController?, paddingValue
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                InfoRowItem(Icons.Default.LocationOn, "Indirizzo:", offer?.indirizzo ?: "-")
+                InfoRowItem(Icons.Default.LocationOn, "Indirizzo:", offer?.supermarket?.indirizzo ?: "-")
                 InfoRowItem(Icons.Default.Schedule, "Orario:", offer?.orario?.nome ?: "-")
                 InfoRowItem(Icons.Default.WorkOutline, "Contratto:", offer?.tipoContratto?.nome ?: "-")
             }
@@ -159,30 +159,32 @@ fun WorkOfferPage(offer: WorkOffer?, navController: NavController?, paddingValue
         }
 
 
-        // --- TASTO CANDIDATI (Fisso con ombra) ---
-        Box(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .background(Color.White.copy(alpha = 0.9f)) // Effetto sfumato dietro il tasto
-                .padding(vertical = 20.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Button(
-                onClick = { currentOfferIdApplying = offer?.id ?: 0 // Salviamo l'ID
-                    navController?.navigate(Destination.APPLY_STEP_1.route)},
+        // --- TASTO CANDIDATI (Fisso con ombra) - NASCOSTO PER GLI ADMIN ---
+        if (!actualUser.admin) {
+            Box(
                 modifier = Modifier
-                    .align(Alignment.BottomCenter) // Resta centrato in basso
-                    .padding(bottom = 24.dp)      // Distanza fissa dalla navbar
-                    .height(56.dp),               // Altezza fissa per un buon touch-target
-                shape = CircleShape,               // Lo rende perfettamente stondato (pillola)
-                contentPadding = PaddingValues(horizontal = 32.dp) // Aggiunge spazio a destra e sinistra del testo
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .background(Color.White.copy(alpha = 0.9f)) // Effetto sfumato dietro il tasto
+                    .padding(vertical = 20.dp),
+                contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "Invia Candidatura",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                Button(
+                    onClick = { currentOfferIdApplying = offer?.id ?: 0 // Salviamo l'ID
+                        navController?.navigate(Destination.APPLY_STEP_1.route)},
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter) // Resta centrato in basso
+                        .padding(bottom = 24.dp)      // Distanza fissa dalla navbar
+                        .height(56.dp),               // Altezza fissa per un buon touch-target
+                    shape = CircleShape,               // Lo rende perfettamente stondato (pillola)
+                    contentPadding = PaddingValues(horizontal = 32.dp) // Aggiunge spazio a destra e sinistra del testo
+                ) {
+                    Text(
+                        text = "Invia Candidatura",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
         }
     }

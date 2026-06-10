@@ -514,7 +514,7 @@ fun QuickActionsSection(isAdmin: Boolean, navController: NavController?) {
                     navController?.navigate(Destination.ADD_COUPON.route)
                 }
                 QuickActionItem(Modifier.weight(1f), "Candidature", Icons.Default.Badge, Color(0xFF1565C0)) {
-                    // Rotta da definire per Daniela
+                    navController?.navigate(Destination.ADMIN_CANDIDACIES.route)
                 }
             } else {
                 // Azioni Paolo: Semplicità e Lavoro vicino casa
@@ -632,13 +632,15 @@ private fun TagChip(text: String, accent: Color) {
 fun getHomeCards(isAdmin: Boolean): List<HomeCardData> {
     val list = mutableListOf<HomeCardData>()
     if (isAdmin) {
-        list.add(HomeCardData("adm_1", "Controllo Settimanale", "Lunedì mattina: verifica i coupon in scadenza e le nuove offerte.", Icons.Default.EventNote, Color(0xFFD32F2F), Color(0xFFFFEBEE), CardSize.LARGE, "Urgente", "Gestisci"))
-        list.add(HomeCardData("adm_2", "Candidature Ricevute", "Ci sono nuovi video CV da revisionare per la sede di Cagliari.", Icons.Default.VideoCameraFront, Color(0xFF1565C0), Color(0xFFE8F1FB), CardSize.MEDIUM, "HR"))
+        list.add(HomeCardData("adm_1", "Gestione Promozioni", "Controlla, modifica o aggiungi nuovi coupon e offerte per i clienti.", Icons.Default.LocalOffer, Color(0xFFD32F2F), Color(0xFFFFEBEE), CardSize.LARGE, "Urgente", "Gestisci", Destination.OFFERTE.route))
+        list.add(HomeCardData("adm_2", "Revisione Candidature", "Ci sono nuovi video CV e candidature da revisionare per i punti vendita.", Icons.Default.VideoCameraFront, Color(0xFF1565C0), Color(0xFFE8F1FB), CardSize.MEDIUM, "HR", "Vedi", Destination.ADMIN_CANDIDACIES.route))
+        list.add(HomeCardData("adm_3", "Posizioni Aperte", "Gestisci gli annunci di lavoro attivi, aggiungine di nuovi o modificali.", Icons.Default.Work, Color(0xFF388E3C), Color(0xFFEAF5EC), CardSize.MEDIUM, "Annunci", "Gestisci", Destination.LAVORO.route))
     } else {
-        list.add(HomeCardData("usr_1", "Lavora con noi", "Trova le posizioni aperte a Cagliari e dintorni. Carica il tuo CV e video.", Icons.Default.Work, Color(0xFF2E7D32), Color(0xFFEAF5EC), CardSize.LARGE, "Per Te", "Candidati", Destination.LAVORO.route))
-        list.add(HomeCardData("usr_2", "Sconto Fedeltà", "Hai un nuovo coupon del 20% su tutta la linea freschi.", Icons.Default.AutoAwesome, Color(0xFFF57C00), Color(0xFFFFF4E6), CardSize.MEDIUM, "Bonus", "Vedi", Destination.OFFERTE.route))
+        list.add(HomeCardData("usr_1", "Lavora con noi", "Trova le posizioni aperte a Cagliari e dintorni. Invia il tuo CV video.", Icons.Default.Work, Color(0xFF2E7D32), Color(0xFFEAF5EC), CardSize.LARGE, "Per Te", "Candidati", Destination.LAVORO.route))
+        list.add(HomeCardData("usr_2", "Le tue Offerte", "Scopri i coupon e gli sconti esclusivi pensati per te questa settimana.", Icons.Default.LocalOffer, Color(0xFFF57C00), Color(0xFFFFF4E6), CardSize.MEDIUM, "Risparmio", "Vedi Sconti", Destination.OFFERTE.route))
+        list.add(HomeCardData("usr_3", "Ricerca Prodotti", "Sfoglia il nostro catalogo e trova quello di cui hai bisogno nel supermercato più vicino.", Icons.Default.Search, Color(0xFF1565C0), Color(0xFFE8F1FB), CardSize.MEDIUM, "Catalogo", "Cerca", Destination.SEARCH.route))
     }
-    list.add(HomeCardData("news_1", "Nuova Apertura Roma", "SuperSpan arriva a Roma Viale Marconi! Cerchiamo 15 nuovi collaboratori.", Icons.Default.NewReleases, Color(0xFF6A1B9A), Color(0xFFF3E5F5), CardSize.MEDIUM, "News"))
-    list.add(HomeCardData("news_2", "Eco-Sostenibilità", "SuperSpan riduce la plastica: scopri i nuovi sacchetti bio.", Icons.Default.Eco, Color(0xFF00897B), Color(0xFFE8F7F4), CardSize.SMALL, "Ambiente"))
+    list.add(HomeCardData("news_1", "Nuova Apertura Roma", "SuperSpan arriva a Roma Viale Marconi! Cerchiamo 15 nuovi collaboratori.", Icons.Default.NewReleases, Color(0xFF6A1B9A), Color(0xFFF3E5F5), CardSize.MEDIUM, "News", "Vedi posizioni", Destination.LAVORO.route))
+    list.add(HomeCardData("news_2", "Eco-Sostenibilità", "SuperSpan riduce la plastica: scopri i nuovi sacchetti bio nel tuo negozio.", Icons.Default.Eco, Color(0xFF00897B), Color(0xFFE8F7F4), CardSize.SMALL, "Ambiente", "Scopri", Destination.HOME.route))
     return list
 }

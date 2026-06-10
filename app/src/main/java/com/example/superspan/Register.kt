@@ -100,16 +100,18 @@ fun FormDati(
     var cognome by rememberSaveable { mutableStateOf(_cognome) }
     var check by rememberSaveable { mutableStateOf(false) }
     var exist by rememberSaveable { mutableStateOf(false) }
+    val isEmailValid = android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
     exist = MapOfUser.contains(email)
-    check = email.isNotEmpty() && nome.isNotEmpty() && cognome.isNotEmpty() && !exist
+    check = email.isNotEmpty() && isEmailValid && nome.isNotEmpty() && cognome.isNotEmpty() && !exist
+    val isEmailError = exist || (!isEmailValid && email.isNotEmpty())
     
     Column(modifier = Modifier.padding(horizontal = 25.dp)) {
         EditTextField(
             label = "E-mail",
             value = email,
             keyboardType = androidx.compose.ui.text.input.KeyboardType.Email,
-            isError = exist,
-            errorMessage = if (exist) "E-mail già registrata!" else "",
+            isError = isEmailError,
+            errorMessage = if (exist) "E-mail già registrata!" else if (!isEmailValid && email.isNotEmpty()) "Formato email non valido" else "",
             modifier = Modifier.padding(bottom = 10.dp),
             onValueChange = {
                 email = it

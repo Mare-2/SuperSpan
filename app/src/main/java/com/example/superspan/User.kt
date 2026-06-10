@@ -112,36 +112,15 @@ val MapOfUser = mutableMapOf<String, User>(
 )
 
 //var currentUser by mutableStateOf(MapOfUser["p.cortellesi@gmail.com"]!!)
-var actualUser: User by mutableStateOf(User())
+var actualUser: User by mutableStateOf(MapOfUser["d.tinti@superspan.it"]!!)
 //------------------------------Da sistemare-------------------------------------------
-/*class FilterData() {
-    var nome: String by mutableStateOf("")
-    var ordinamento: String by mutableStateOf("Nome")
-    var ordinamentoCrescente: Boolean by mutableStateOf(true)
-    var categorie: MutableList<Category> = mutableStateListOf<Category>()
-    var minPrice: Double by mutableDoubleStateOf( 0.0)
-    var maxPrice: Double by mutableDoubleStateOf( maxPossiblePrice().toDouble())
-
-    fun minPossiblePrice(): Float {
-        return ListOfProduct.minOf { product ->
-            product.prezzo
-        }
-    }
-
-    fun maxPossiblePrice(): Float {
-        return ListOfProduct.maxOf { product ->
-            product.prezzo
-        }
-    }
-}*/
-
 class FilterData() {
     var nome: String by mutableStateOf("")
 
-    // MODIFICA: Inizia con stringa vuota per non avere ordinamenti attivi all'avvio
-    var ordinamento: String by mutableStateOf("")
+    // Ordinamenti indipendenti (null = disattivo, true = crescente, false = decrescente)
+    var ordinamentoNomeCrescente: Boolean? by mutableStateOf(null)
+    var ordinamentoPrezzoCrescente: Boolean? by mutableStateOf(null)
 
-    var ordinamentoCrescente: Boolean by mutableStateOf(true)
     var categorie: MutableList<Category> = mutableStateListOf<Category>()
     var minPrice: Double by mutableDoubleStateOf(0.0)
     var maxPrice: Double by mutableDoubleStateOf(maxPossiblePrice().toDouble())
@@ -248,12 +227,32 @@ class Coupon(
     var products: List<Product> = products.toList()
 
     fun calculateDiscountedPrice(product: Product): Float {
-        return if (products.contains(product)) {
-            product.prezzo * (1 - discount / 100)
-        } else {
-            product.prezzo
-        }
+        return product.prezzo - (product.prezzo * (_discount / 100))
     }
+
+    fun isExpired(): Boolean {
+        return false
+    }
+
+    override fun toString(): String {
+        return "$_code, $_discount"
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if(other is Coupon) {
+            return this.code == other.code
+        }
+        return false
+    }
+
+    override fun hashCode(): Int {
+        var result = _code.hashCode()
+        result = 31 * result + _discount.hashCode()
+        result = 31 * result + _description.hashCode()
+        result = 31 * result + _dateOfExpiration.hashCode()
+        return result
+    }
+
 }
 
 val ListOfCoupon = mutableStateListOf<Coupon>(
@@ -402,24 +401,38 @@ data class Work(
 
 fun searchProduct(filterData: FilterData): List<Product> {
     var list: List<Product> = ListOfProduct
-    if (filterData.ordinamento=="Nome") {
-        list = list.sortedBy { it.nome }
-    } else {
-        list = list.sortedBy { it.prezzo }
-    }
-    if(!filterData.ordinamentoCrescente) list = list.reversed()
+    
+    // Filtro categorie
     if (filterData.categorie.isNotEmpty()) {
         list = filterProduct(list, filterData.categorie)
     }
+    // Filtro testo
     if (filterData.nome.isNotEmpty()) {
         list = list.filter { product ->
             product.nome.contains(filterData.nome, ignoreCase = true)
         }
     }
-
+    // Filtro prezzo
     list = list.filter { product ->
         product.prezzo >= filterData.minPrice && product.prezzo <= filterData.maxPrice
     }
+
+    // Ordinamento combinato
+    list = list.sortedWith { p1, p2 ->
+        var cmp = 0
+        // Ordina prima per Prezzo (se attivo)
+        if (filterData.ordinamentoPrezzoCrescente != null) {
+            cmp = p1.prezzo.compareTo(p2.prezzo)
+            if (!filterData.ordinamentoPrezzoCrescente!!) cmp = -cmp
+        }
+        // Se i prezzi sono uguali o il prezzo non è attivo, ordina per Nome (se attivo)
+        if (cmp == 0 && filterData.ordinamentoNomeCrescente != null) {
+            cmp = p1.nome.compareTo(p2.nome)
+            if (!filterData.ordinamentoNomeCrescente!!) cmp = -cmp
+        }
+        cmp
+    }
+
     return list
 }
 
@@ -434,8 +447,8 @@ fun searchWorkOffer(filterData: WorkFilterData): List<WorkOffer> {
     // Ricerca per ruolo o città
     if (filterData.nome.isNotEmpty()) {
         list = list.filter { offer ->
-            offer.ruolo.contains(filterData.nome, ignoreCase = true) ||
-            offer.citta.contains(filterData.nome, ignoreCase = true)
+            offer.titolo.contains(filterData.nome, ignoreCase = true) ||
+            offer.supermarket.citta.contains(filterData.nome, ignoreCase = true)
         }
     }
     // Filtro per ruolo
@@ -454,18 +467,34 @@ fun searchWorkOffer(filterData: WorkFilterData): List<WorkOffer> {
     list = list.filter { offer -> offer.distanzaKm <= filterData.distanzaMax }
     // Ordinamento
     list = when (filterData.ordinamento) {
-        "Città" -> list.sortedBy { it.citta }
-        else    -> list.sortedBy { it.ruolo }
+        "Città" -> list.sortedBy { it.supermarket.citta }
+        else    -> list.sortedBy { it.titolo }
     }
     if (!filterData.ordinamentoCrescente) list = list.reversed()
     return list
+}
+
+fun calcolaDistanzaSimulata(citta: String): Int {
+    return when (citta.lowercase().trim()) {
+        "cagliari" -> (1..5).random()
+        "quartu sant'elena" -> (6..11).random()
+        "monserrato", "selargius" -> (5..8).random()
+        "sestu" -> (10..15).random()
+        "iglesias" -> 55
+        "sanluri" -> 45
+        "muravera" -> 65
+        "sassari" -> 212
+        "roma" -> 410
+        "milano" -> 695
+        else -> (10..50).random()
+    }
 }
 
 //-------------------------------SHAPES--------------------------------------------------
 
 
 //Parabola header
-class BottomOvalShape(private val curveDepth: androidx.compose.ui.unit.Dp) : androidx.compose.ui.graphics.Shape {
+/*class BottomOvalShape(private val curveDepth: androidx.compose.ui.unit.Dp) : androidx.compose.ui.graphics.Shape {
     override fun createOutline(
         size: androidx.compose.ui.geometry.Size,
         layoutDirection: androidx.compose.ui.unit.LayoutDirection,
@@ -487,8 +516,8 @@ class BottomOvalShape(private val curveDepth: androidx.compose.ui.unit.Dp) : and
         }
         return androidx.compose.ui.graphics.Outline.Generic(path)
     }
-}
-/*class BottomOvalShape(private val curveDepth: androidx.compose.ui.unit.Dp) : androidx.compose.ui.graphics.Shape {
+}*/
+class BottomOvalShape(private val curveDepth: androidx.compose.ui.unit.Dp) : androidx.compose.ui.graphics.Shape {
     override fun createOutline(size: androidx.compose.ui.geometry.Size, layoutDirection: androidx.compose.ui.unit.LayoutDirection, density: androidx.compose.ui.unit.Density): androidx.compose.ui.graphics.Outline {
         val depthPx = with(density) { curveDepth.toPx() }
         val path = androidx.compose.ui.graphics.Path().apply {
@@ -500,7 +529,7 @@ class BottomOvalShape(private val curveDepth: androidx.compose.ui.unit.Dp) : and
         }
         return androidx.compose.ui.graphics.Outline.Generic(path)
     }
-}*/
+}
 
 /*class TopOvalShape(private val curveDepth: androidx.compose.ui.unit.Dp) : androidx.compose.ui.graphics.Shape {
     override fun createOutline(
@@ -557,6 +586,34 @@ class TopOvalShape(private val curveDepth: androidx.compose.ui.unit.Dp) : androi
 
 //-------------------------------WORK OFFERS--------------------------------------------------
 
+data class Supermarket(
+    val id: Int,
+    val nome: String,
+    val citta: String,
+    val indirizzo: String
+)
+
+val ListOfSupermarkets = mutableStateListOf(
+    Supermarket(1, "SuperSpan Cagliari Roma", "Cagliari", "Via Roma, 50"),
+    Supermarket(2, "SuperSpan Cagliari Dante", "Cagliari", "Via Dante, 102"),
+    Supermarket(3, "SuperSpan Cagliari Villasanta", "Cagliari", "Via Riva Villasanta, 25"),
+    Supermarket(4, "SuperSpan Cagliari Diaz", "Cagliari", "Viale Diaz, 40"),
+    Supermarket(5, "SuperSpan Cagliari Trieste", "Cagliari", "Viale Trieste, 110"),
+    Supermarket(6, "SuperSpan Cagliari Paoli", "Cagliari", "Via Paoli, 15"),
+    Supermarket(7, "SuperSpan Quartu Merello", "Quartu Sant'Elena", "Via Merello, 85"),
+    Supermarket(8, "SuperSpan Quartu Colombo", "Quartu Sant'Elena", "Viale Colombo, 42"),
+    Supermarket(9, "SuperSpan Quartu Fiume", "Quartu Sant'Elena", "Via Fiume, 2"),
+    Supermarket(10, "SuperSpan Monserrato", "Monserrato", "Via Cesare Cabras, 12"),
+    Supermarket(11, "SuperSpan Sestu", "Sestu", "Ex SS 131, Km 10"),
+    Supermarket(12, "SuperSpan Selargius", "Selargius", "Via Lussu, 8"),
+    Supermarket(13, "SuperSpan Iglesias", "Iglesias", "Via Valverde, 10"),
+    Supermarket(14, "SuperSpan Sanluri", "Sanluri", "Piazza San Rocco, 4"),
+    Supermarket(15, "SuperSpan Muravera", "Muravera", "Via Roma, 210"),
+    Supermarket(16, "SuperSpan Sassari", "Sassari", "Viale Italia, 88"),
+    Supermarket(17, "SuperSpan Roma", "Roma", "Viale Marconi, 45"),
+    Supermarket(18, "SuperSpan Milano", "Milano", "Via Torino, 12")
+)
+
 // 1. Definizione delle opzioni fisse
 enum class TipoContratto(val nome: String) {
     DETERMINATO("Determinato"),
@@ -571,13 +628,12 @@ enum class OrarioLavoro(val nome: String) {
 // 2. Struttura dati
 data class WorkOffer(
     val id: Int,
-    val ruolo: String,
+    val titolo: String,
     val ruoloEnum: Role,
     val descrizioneBreve: String,
     val descrizioneEstesa: String,
     val requisiti: String,
-    val citta: String,
-    val indirizzo: String,
+    val supermarket: Supermarket,
     val tipoContratto: TipoContratto,
     val orario: OrarioLavoro,
     val distanzaKm: Int = 50
@@ -588,78 +644,72 @@ val WorkOfferSearchList = mutableStateListOf(
     // --- CAGLIARI (6 SEDI) ---
     WorkOffer(
         id = 9,
-        ruolo = "Addetto alle vendite",
+        titolo = "Addetto alle vendite",
         ruoloEnum = Role.ADDETTO_VENDITE,
         descrizioneBreve = "Supporto alla clientela e allestimento reparti.",
         descrizioneEstesa = "La risorsa si occuperà dell'accoglienza dei clienti, della gestione dei prodotti a scaffale e del mantenimento dell'ordine nel punto vendita. È prevista la partecipazione alle attività di inventario.",
         requisiti = "Ottime doti comunicative, capacità di lavorare in team, flessibilità negli orari e attitudine al problem solving.",
-        citta = "Cagliari",
-        indirizzo = "Via Roma, 50",
+        supermarket = ListOfSupermarkets[0],
         tipoContratto = TipoContratto.INDETERMINATO,
         orario = OrarioLavoro.FULL_TIME,
         distanzaKm = 1
     ),
     WorkOffer(
         id = 15,
-        ruolo = "Cassiere/a esperto/a",
+        titolo = "Cassiere/a esperto/a",
         ruoloEnum = Role.CASSIERE,
         descrizioneBreve = "Gestione dei pagamenti e delle procedure di cassa.",
         descrizioneEstesa = "Il ruolo prevede la responsabilità della gestione del denaro, l'apertura e chiusura cassa, e la gestione dei programmi fedeltà aziendali. Si richiede precisione e velocità nelle operazioni.",
         requisiti = "Diploma di scuola superiore, precisione nel calcolo, cordialità e pregressa esperienza nell'uso di software gestionali di cassa.",
-        citta = "Cagliari",
-        indirizzo = "Via Dante, 102",
+        supermarket = ListOfSupermarkets[1],
         tipoContratto = TipoContratto.DETERMINATO,
         orario = OrarioLavoro.PART_TIME,
         distanzaKm = 2
     ),
     WorkOffer(
         id = 16,
-        ruolo = "Addetto Rifornimento Scaffali",
+        titolo = "Addetto Rifornimento Scaffali",
         ruoloEnum = Role.ADDETTO_SCAFFALI,
         descrizioneBreve = "Gestione scorte e posizionamento merce.",
         descrizioneEstesa = "L'attività principale consiste nel prelievo della merce dal magazzino, nel posizionamento ordinato sugli scaffali e nella rotazione dei prodotti in base alla data di scadenza (FIFO).",
         requisiti = "Resistenza fisica, puntualità, attenzione ai dettagli e capacità di seguire le indicazioni dei responsabili di reparto.",
-        citta = "Cagliari",
-        indirizzo = "Via Riva Villasanta, 25",
+        supermarket = ListOfSupermarkets[2],
         tipoContratto = TipoContratto.DETERMINATO,
         orario = OrarioLavoro.FULL_TIME,
         distanzaKm = 4
     ),
     WorkOffer(
         id = 17,
-        ruolo = "Specialista Gastronomia",
+        titolo = "Specialista Gastronomia",
         ruoloEnum = Role.ADDETTO_BANCO,
         descrizioneBreve = "Vendita assistita e preparazione di prodotti freschi.",
         descrizioneEstesa = "La figura si occuperà del servizio al banco salumi e formaggi, della preparazione di preparati pronti e della pulizia quotidiana degli strumenti di taglio e delle vetrine espositive.",
         requisiti = "Conoscenza approfondita dei prodotti alimentari, abilità nell'uso dell'affettatrice, possesso dell'attestato HACCP e cortesia verso il pubblico.",
-        citta = "Cagliari",
-        indirizzo = "Viale Diaz, 40",
+        supermarket = ListOfSupermarkets[3],
         tipoContratto = TipoContratto.INDETERMINATO,
         orario = OrarioLavoro.FULL_TIME,
         distanzaKm = 2
     ),
     WorkOffer(
         id = 31,
-        ruolo = "Magazziniere di Punto Vendita",
+        titolo = "Magazziniere di Punto Vendita",
         ruoloEnum = Role.MAGAZZINIERE,
         descrizioneBreve = "Ricezione merci e organizzazione stock.",
         descrizioneEstesa = "Il candidato si occuperà dello scarico dei mezzi, della verifica della merce in entrata rispetto agli ordini e dell'organizzazione del magazzino per ottimizzare i tempi di rifornimento.",
         requisiti = "Capacità organizzative, dimestichezza con terminali portatili per inventario, velocità e attenzione alla sicurezza sul lavoro.",
-        citta = "Cagliari",
-        indirizzo = "Viale Trieste, 110",
+        supermarket = ListOfSupermarkets[4],
         tipoContratto = TipoContratto.DETERMINATO,
         orario = OrarioLavoro.FULL_TIME,
         distanzaKm = 2
     ),
     WorkOffer(
         id = 32,
-        ruolo = "Responsabile di Turno",
+        titolo = "Responsabile di Turno",
         ruoloEnum = Role.RESPONSABILE,
         descrizioneBreve = "Coordinamento del personale e apertura/chiusura.",
         descrizioneEstesa = "Figura di responsabilità che assicura il corretto funzionamento del punto vendita durante il proprio turno, gestendo le priorità dei vari reparti e l'assistenza clienti critica.",
         requisiti = "Esperienza pregressa nel retail, doti di leadership, affidabilità e capacità di gestione dei conflitti.",
-        citta = "Cagliari",
-        indirizzo = "Via Paoli, 15",
+        supermarket = ListOfSupermarkets[5],
         tipoContratto = TipoContratto.INDETERMINATO,
         orario = OrarioLavoro.FULL_TIME,
         distanzaKm = 3
@@ -668,39 +718,36 @@ val WorkOfferSearchList = mutableStateListOf(
     // --- QUARTU SANT'ELENA (3 SEDI) ---
     WorkOffer(
         id = 10,
-        ruolo = "Addetto Cassa e Informazioni",
+        titolo = "Addetto Cassa e Informazioni",
         ruoloEnum = Role.CASSIERE,
         descrizioneBreve = "Assistenza al cliente e operazioni di pagamento.",
         descrizioneEstesa = "Oltre alle normali operazioni di cassa, la risorsa fungerà da punto di riferimento per le informazioni sui servizi del supermercato e sulla risoluzione di piccoli reclami.",
         requisiti = "Ottima dialettica, pazienza, orientamento al cliente e capacità di gestione dello stress nei momenti di affluenza.",
-        citta = "Quartu Sant'Elena",
-        indirizzo = "Via Merello, 85",
+        supermarket = ListOfSupermarkets[6],
         tipoContratto = TipoContratto.INDETERMINATO,
         orario = OrarioLavoro.FULL_TIME,
         distanzaKm = 8
     ),
     WorkOffer(
         id = 33,
-        ruolo = "Addetto Vendite Reparto Ortofrutta",
+        titolo = "Addetto Vendite Reparto Ortofrutta",
         ruoloEnum = Role.ADDETTO_VENDITE,
         descrizioneBreve = "Cura del reparto freschi e assistenza.",
         descrizioneEstesa = "La figura garantisce la freschezza e la qualità dei prodotti esposti nel reparto ortofrutta, occupandosi della pesatura e della consulenza ai clienti.",
         requisiti = "Attenzione alla qualità del prodotto, dinamismo, forza fisica per la movimentazione delle cassette e disponibilità al turno mattutino.",
-        citta = "Quartu Sant'Elena",
-        indirizzo = "Viale Colombo, 42",
+        supermarket = ListOfSupermarkets[7],
         tipoContratto = TipoContratto.DETERMINATO,
         orario = OrarioLavoro.FULL_TIME,
         distanzaKm = 9
     ),
     WorkOffer(
         id = 34,
-        ruolo = "Specialista Macelleria",
+        titolo = "Specialista Macelleria",
         ruoloEnum = Role.MACELLERIA,
         descrizioneBreve = "Lavorazione carni e vendita assistita.",
         descrizioneEstesa = "Il candidato si occuperà del disosso, del taglio delle carni bovini e suini e della preparazione dei preparati pronto-cuoci.",
         requisiti = "Maneggevolezza nell'uso dei coltelli, pregressa esperienza nel ruolo, conoscenza delle norme igieniche e cortesia al banco.",
-        citta = "Quartu Sant'Elena",
-        indirizzo = "Via Fiume, 2",
+        supermarket = ListOfSupermarkets[8],
         tipoContratto = TipoContratto.INDETERMINATO,
         orario = OrarioLavoro.FULL_TIME,
         distanzaKm = 11
@@ -709,13 +756,12 @@ val WorkOfferSearchList = mutableStateListOf(
     // --- MONSERRATO (1 SEDE) ---
     WorkOffer(
         id = 20,
-        ruolo = "Macellaio/a di reparto",
+        titolo = "Macellaio/a di reparto",
         ruoloEnum = Role.MACELLERIA,
         descrizioneBreve = "Lavorazione carni e allestimento banco macelleria.",
         descrizioneEstesa = "Garantirà il rispetto rigoroso delle norme igienico-sanitarie occupandosi della preparazione dei tagli di carne richiesti dalla clientela.",
         requisiti = "Esperienza specifica nel settore carni, possesso di attestato HACCP, serietà e capacità di gestire gli ordini di reparto.",
-        citta = "Monserrato",
-        indirizzo = "Via Cesare Cabras, 12",
+        supermarket = ListOfSupermarkets[9],
         tipoContratto = TipoContratto.INDETERMINATO,
         orario = OrarioLavoro.FULL_TIME,
         distanzaKm = 7
@@ -724,13 +770,12 @@ val WorkOfferSearchList = mutableStateListOf(
     // --- SESTU (1 SEDE) ---
     WorkOffer(
         id = 35,
-        ruolo = "Addetto Logistica di Magazzino",
+        titolo = "Addetto Logistica di Magazzino",
         ruoloEnum = Role.MAGAZZINIERE,
         descrizioneBreve = "Gestione flussi logistici e stoccaggio.",
         descrizioneEstesa = "La risorsa coordinerà lo smistamento dei colli in arrivo verso i vari reparti del punto vendita tramite l'utilizzo di transpallet elettrici.",
         requisiti = "Patentino per il muletto in corso di validità, affidabilità, capacità di leggere le bolle di carico e attitudine al lavoro di precisione.",
-        citta = "Sestu",
-        indirizzo = "Ex SS 131, Km 10",
+        supermarket = ListOfSupermarkets[10],
         tipoContratto = TipoContratto.DETERMINATO,
         orario = OrarioLavoro.FULL_TIME,
         distanzaKm = 12
@@ -739,13 +784,12 @@ val WorkOfferSearchList = mutableStateListOf(
     // --- SELARGIUS (1 SEDE) ---
     WorkOffer(
         id = 36,
-        ruolo = "Addetto Banco Pescheria",
+        titolo = "Addetto Banco Pescheria",
         ruoloEnum = Role.PESCHERIA,
         descrizioneBreve = "Selezione, pulizia e vendita di pescato fresco.",
         descrizioneEstesa = "Responsabile della vendita assistita al banco pesce: si occuperà della pulizia, sfilettatura e preparazione del banco per l'esposizione giornaliera.",
         requisiti = "Conoscenza dei prodotti ittici locali, ottima manualità nella sfilettatura, igiene rigorosa e capacità di consigliare i metodi di cottura.",
-        citta = "Selargius",
-        indirizzo = "Via Lussu, 8",
+        supermarket = ListOfSupermarkets[11],
         tipoContratto = TipoContratto.DETERMINATO,
         orario = OrarioLavoro.PART_TIME,
         distanzaKm = 6
@@ -754,78 +798,72 @@ val WorkOfferSearchList = mutableStateListOf(
     // --- ALTRE SARDEGNA E ITALIA---
     WorkOffer(
         id = 23,
-        ruolo = "Magazziniere Logistico",
+        titolo = "Magazziniere Logistico",
         ruoloEnum = Role.MAGAZZINIERE,
         descrizioneBreve = "Movimentazione merci Iglesias.",
         descrizioneEstesa = "Controllo merci in entrata e verifica bolle di trasporto.",
         requisiti = "Conoscenza base Office, puntualità e organizzazione.",
-        citta = "Iglesias",
-        indirizzo = "Via Valverde, 10",
+        supermarket = ListOfSupermarkets[12],
         tipoContratto = TipoContratto.DETERMINATO,
         orario = OrarioLavoro.FULL_TIME,
         distanzaKm = 55
     ),
     WorkOffer(
         id = 24,
-        ruolo = "Store Manager",
+        titolo = "Store Manager",
         ruoloEnum = Role.RESPONSABILE,
         descrizioneBreve = "Direzione operativa Sanluri.",
         descrizioneEstesa = "Supervisione completa del punto vendita e coordinamento team.",
         requisiti = "Leadership comprovata, esperienza retail pluriennale.",
-        citta = "Sanluri",
-        indirizzo = "Piazza San Rocco, 4",
+        supermarket = ListOfSupermarkets[13],
         tipoContratto = TipoContratto.INDETERMINATO,
         orario = OrarioLavoro.FULL_TIME,
         distanzaKm = 45
     ),
     WorkOffer(
         id = 26,
-        ruolo = "Specialista Banco Pesce",
+        titolo = "Specialista Banco Pesce",
         ruoloEnum = Role.PESCHERIA,
         descrizioneBreve = "Pulizia e vendita Muravera.",
         descrizioneEstesa = "Gestione del banco pesce fresco ed esposizione.",
         requisiti = "Ottima manualità, conoscenza stagionalità ittica.",
-        citta = "Muravera",
-        indirizzo = "Via Roma, 210",
+        supermarket = ListOfSupermarkets[14],
         tipoContratto = TipoContratto.DETERMINATO,
         orario = OrarioLavoro.FULL_TIME,
         distanzaKm = 65
     ),
     WorkOffer(
         id = 13,
-        ruolo = "Addetto Macelleria Senior",
+        titolo = "Addetto Macelleria Senior",
         ruoloEnum = Role.MACELLERIA,
         descrizioneBreve = "Specialista nella lavorazione carni.",
         descrizioneEstesa = "Gestione completa del reparto macelleria, dalla ricezione mezzene al banco servito.",
         requisiti = "Esperienza decennale, autonomia totale, leadership.",
-        citta = "Sassari",
-        indirizzo = "Viale Italia, 88",
+        supermarket = ListOfSupermarkets[15],
         tipoContratto = TipoContratto.INDETERMINATO,
         orario = OrarioLavoro.FULL_TIME,
         distanzaKm = 212
     ),
     WorkOffer(
         id = 2,
-        ruolo = "Operatore di Cassa",
+        titolo = "Operatore di Cassa",
         ruoloEnum = Role.CASSIERE,
         descrizioneBreve = "Supporto alle operazioni di front-end.",
         descrizioneEstesa = "Gestione transazioni monetarie e informazioni ai clienti. Supporto all'allestimento avancassa.",
         requisiti = "Cordialità, velocità d'esecuzione, precisione nel conteggio.",
-        citta = "Roma",
-        indirizzo = "Viale Marconi, 45",
+        supermarket = ListOfSupermarkets[16],
         tipoContratto = TipoContratto.INDETERMINATO,
         orario = OrarioLavoro.PART_TIME,
         distanzaKm = 410
     ),
     WorkOffer(
         id = 1,
-        ruolo = "Addetto Reparto Ortofrutta",
+        titolo = "Addetto Reparto Ortofrutta",
         ruoloEnum = Role.ADDETTO_VENDITE,
         descrizioneBreve = "Cura del reparto freschi e assistenza.",
         descrizioneEstesa = "Selezione qualità frutta e verdura, pesatura per i clienti e rifornimento banchi.",
         requisiti = "Dinamismo, forza fisica e attenzione alla freschezza.",
-        citta = "Milano",
-        indirizzo = "Via Torino, 12",
+        supermarket = ListOfSupermarkets[17],
         tipoContratto = TipoContratto.DETERMINATO,
         orario = OrarioLavoro.FULL_TIME,
         distanzaKm = 695
@@ -861,5 +899,45 @@ data class Candidacy(
 )
 
 // --- 4. STATI GLOBALI ---
-val AllCandidacies = mutableStateListOf<Candidacy>()
+val AllCandidacies = mutableStateListOf<Candidacy>(
+    Candidacy(
+        id = 1,
+        userEmail = "mario.rossi@email.com",
+        offerId = 1, // ID offerta esistente
+        nome = "Mario",
+        cognome = "Rossi",
+        emailContatto = "mario.rossi@email.com",
+        telefono = "3331234567",
+        cvPath = "dummy_cv",
+        videoPath = "dummy_video",
+        dataInvio = "2023-10-25"
+    ),
+    Candidacy(
+        id = 2,
+        userEmail = "luigi.verdi@email.com",
+        offerId = 2, 
+        nome = "Luigi",
+        cognome = "Verdi",
+        emailContatto = "luigi.verdi@email.com",
+        telefono = "3339876543",
+        cvPath = "dummy_cv",
+        videoPath = "dummy_video", // Aggiunto video
+        dataInvio = "2023-10-26"
+    ),
+    Candidacy(
+        id = 3,
+        userEmail = "giulia.bianchi@email.com",
+        offerId = 1, 
+        nome = "Giulia",
+        cognome = "Bianchi",
+        emailContatto = "giulia.bianchi@email.com",
+        telefono = "3335555555",
+        cvPath = "dummy_cv",
+        videoPath = "dummy_video",
+        dataInvio = "2023-10-27"
+    )
+)
 var currentOfferIdApplying by mutableIntStateOf(0)
+
+// Global UI State
+var highlightedWorkOfferId by mutableStateOf<Int?>(null)

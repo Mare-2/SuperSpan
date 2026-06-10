@@ -60,7 +60,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.navigation.NavGraph.Companion.findStartDestination
 
-//p.cortellesi@gmail.com  d.tinti@superspan.it
+
 
 enum class Destination (
     val route: String,
@@ -88,7 +88,8 @@ enum class Destination (
     ADD_WORK_OFFER("add_work_offer", "Aggiungi Lavoro", null),
     EDIT_WORK_OFFER("edit_work_offer", "Modifica Lavoro", null),
     ACCOUNT_SUMMARY("account_summary", "Il mio account", null),
-    ACCOUNT_EDIT("account_edit", "Modifica Account", null)
+    ACCOUNT_EDIT("account_edit", "Modifica Account", null),
+    ADMIN_CANDIDACIES("admin_candidacies", "Revisione Candidature", Icons.Default.Badge)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -104,7 +105,13 @@ fun Navigation(navController: NavHostController, startDestination: Destination, 
                     Destination.HOME -> Home(paddingValues, navController)
                     Destination.OFFERTE -> CouponPageComplete(paddingValues, navController)
                     Destination.ADD_COUPON -> AddCoupon(paddingValues, navController)
-                    Destination.LAVORO -> WorkSearchPageComplete(paddingValues, navController)
+                    Destination.LAVORO -> {
+                        if (actualUser.admin) {
+                            AdminWorkMainPage(paddingValues, navController)
+                        } else {
+                            WorkSearchPageComplete(paddingValues, navController)
+                        }
+                    }
                     Destination.PROFILO -> ProfilePage(user = actualUser, navController = navController, paddingValues = paddingValues)
                     Destination.PERSONAL_DATA_SUMMARY -> PersonalDataSummaryPage(navController = navController, padding = paddingValues)
                     Destination.PERSONAL_DATA_EDIT -> PersonalDataEditPage(navController = navController, padding = paddingValues)
@@ -119,6 +126,7 @@ fun Navigation(navController: NavHostController, startDestination: Destination, 
                     Destination.EDIT_WORK_OFFER -> AdminWorkOfferEditPage(null, navController, paddingValues) // Will be handled by ID route
                     Destination.ACCOUNT_SUMMARY -> AccountSummaryPage(actualUser, navController, paddingValues)
                     Destination.ACCOUNT_EDIT -> AccountSettingsPage(actualUser, navController, paddingValues)
+                    Destination.ADMIN_CANDIDACIES -> AdminCandidaciesPage(navController, paddingValues)
                     else -> {}
                 }
             }
@@ -204,7 +212,8 @@ fun MainNavigation() {
                             Destination.APPLY_STEP_2_INTRO,
                             Destination.APPLY_STEP_2_RECORD,
                             Destination.APPLY_STEP_2_REVIEW,
-                            Destination.APPLY_STEP_3 -> {
+                            Destination.APPLY_STEP_3,
+                            Destination.ADMIN_CANDIDACIES -> {
                                 // Non facciamo nulla: queste pagine NON appaiono nella Navbar
                             }
                             else -> {
@@ -286,7 +295,7 @@ fun MainNavigation() {
             }
         }
     ) { contentPadding ->
-        Navigation(navController, Destination.LOGIN, contentPadding)
+        Navigation(navController, Destination.HOME, contentPadding)
     }
 }
 
@@ -305,7 +314,7 @@ fun CustomAnimatedBottomBar(currentRoute: String, onNavigate: (String) -> Unit) 
         if (index == -1) {
             // Se siamo in una sottopagina, cerchiamo di capire a quale macro-area appartiene
             when {
-                currentRoute.contains("apply") || currentRoute.contains("offerta") -> 3 // Icona Lavoro
+                currentRoute.contains("apply") || currentRoute.contains("offerta") || currentRoute == Destination.ADMIN_CANDIDACIES.route -> 3 // Icona Lavoro
                 currentRoute.contains("product") -> 1 // Icona Ricerca
                 currentRoute.contains("data") -> 4 // Icona Profilo
                 else -> 0 // Torna a Home se non sa dove andare

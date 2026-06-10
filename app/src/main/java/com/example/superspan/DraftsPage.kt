@@ -69,8 +69,8 @@ fun DraftsPage(navController: NavController?, padding: PaddingValues) {
                             shadowElevation = 2.dp
                         ) {
                             Column(Modifier.padding(12.dp)) {
-                                Text(offer?.ruolo ?: "Offerta #$offerId", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                                Text(offer?.citta ?: "-", color = Color.Gray, fontSize = 13.sp)
+                                Text(offer?.titolo ?: "Offerta #$offerId", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                                Text(offer?.supermarket?.citta ?: "-", color = Color.Gray, fontSize = 13.sp)
                                 Spacer(Modifier.height(8.dp))
                                 Text("Nome: ${draft.nome} ${draft.cognome}", fontSize = 14.sp)
                                 Text("Email: ${draft.emailLavoro}", fontSize = 14.sp)

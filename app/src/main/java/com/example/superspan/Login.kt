@@ -76,13 +76,16 @@ fun Login(
                 verticalArrangement = Arrangement.Center
             ) {
                 var passwordVisible by rememberSaveable { mutableStateOf(false) }
+                val isEmailValid = android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+                val isEmailError = loginError || (email.isNotEmpty() && !isEmailValid)
+
                 Spacer(Modifier.weight(0.4f))
                 EditTextField(
                     label = "E-mail",
                     value = email,
                     keyboardType = KeyboardType.Email,
-                    isError = loginError,
-                    errorMessage = "Credenziali errate",
+                    isError = isEmailError,
+                    errorMessage = if (!isEmailValid && email.isNotEmpty()) "Formato email non valido" else "Credenziali errate",
                     modifier = Modifier.padding(bottom = 10.dp),
                     onValueChange = { email = it; loginError = false }
                 )
@@ -113,6 +116,7 @@ fun Login(
                             loginError = true
                         }
                     },
+                    enabled = isEmailValid || email.isEmpty(),
                     modifier = Modifier.padding(bottom = 15.dp)) { Text(text) }
             }
         }

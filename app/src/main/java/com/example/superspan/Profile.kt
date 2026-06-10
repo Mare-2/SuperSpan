@@ -17,7 +17,7 @@ import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Inventory
+import androidx.compose.material.icons.filled.LocalOffer
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -107,9 +107,8 @@ fun ProfilePage(user: User, navController: NavController?, paddingValues: Paddin
                 if (user.admin) { //TODO: Decisamente da rivedere quelle admin
                     // SEZIONE ADMIN (Titolo a sinistra)
                     ProfileSectionTitle("Gestione Negozio")
-                    ProfileMenuTile(Icons.Default.Inventory, "Gestione Prodotti", "Aggiungi o modifica prodotti") { }
-                    ProfileMenuTile(Icons.Default.Badge, "Revisione Candidature", "Vedi i CV ricevuti") { }
-                    ProfileMenuTile(Icons.Default.Assessment, "Statistiche Vendite", "Andamento coupon") { }
+                    ProfileMenuTile(Icons.Default.LocalOffer, "Gestione Offerte e Coupon", "Crea o modifica le promozioni") { navController?.navigate(Destination.OFFERTE.route) }
+                    ProfileMenuTile(Icons.Default.Badge, "Revisione Candidature", "Vedi i CV ricevuti") { navController?.navigate(Destination.ADMIN_CANDIDACIES.route) }
                 } else {
                     // SEZIONE UTENTE (Titolo a sinistra)
                     ProfileSectionTitle("Candidature")

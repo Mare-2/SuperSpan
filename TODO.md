@@ -59,6 +59,7 @@
 - [x] rendere i luoghi dei supermercati e i km più realistici scegliendo città e paesi vicino a cagliari e in varie vie di cagliari
 - [ ] la barra di ricerca e il tasto filtri sono giganteschi
 - [ ] quando Daniela inserisce un'offerta di lavoro mettere un messaggio di conferma che è stata caricata
+- [ ] quando guarda le candidature daniela deve poter filtrare per ruolo sede e data 
 
 
 ### 🎨 Design e UI/UX Generale
