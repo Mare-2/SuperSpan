@@ -61,8 +61,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.navigation.NavGraph.Companion.findStartDestination
 
 //p.cortellesi@gmail.com  d.tinti@superspan.it
-var actualUser by mutableStateOf(MapOfUser["p.cortellesi@gmail.com"]!!)
-//var actualUser: User? = MapOfUser.getValue("p.cortellesi@gmail.com")
 
 enum class Destination (
     val route: String,
@@ -262,7 +260,7 @@ fun MainNavigation() {
 fun MainNavigation() {
     val navController = rememberNavController()
     val navBarStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBarStackEntry?.destination?.route ?: Destination.HOME.route
+    val currentRoute = navBarStackEntry?.destination?.route ?: Destination.LOGIN.route
 
     val showBar = currentRoute != Destination.LOGIN.route &&
             currentRoute != Destination.REGISTER.route &&
@@ -274,21 +272,21 @@ fun MainNavigation() {
                 CustomAnimatedBottomBar(currentRoute) { route ->
                     // --- NAVIGAZIONE CORRETTA ---
                     navController.navigate(route) {
-                        // Pulisce tutto lo stack fino alla destinazione iniziale (Home)
+                        // Pulisce tutto lo stack fino alla destinazione iniziale (Login)
                         // Questo evita l'accumulo di pagine e risolve il tuo bug
                         popUpTo(navController.graph.findStartDestination().id) {
                             saveState = false // NON salviamo lo stato "sporco"
                         }
                         // Evita di creare più copie della stessa pagina
                         launchSingleTop = true
-                        // NON ripristiniamo il vecchio stato (così torniamo alla Home pulita)
+                        // NON ripristiniamo il vecchio stato (così torniamo puliti)
                         restoreState = false
                     }
                 }
             }
         }
     ) { contentPadding ->
-        Navigation(navController, Destination.HOME, contentPadding)
+        Navigation(navController, Destination.LOGIN, contentPadding)
     }
 }
 

@@ -1,15 +1,7 @@
 package com.example.superspan
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -80,7 +72,9 @@ fun Register(
         }
         Box(Modifier.weight(0.5f), contentAlignment = Alignment.Center) {
             Button({
-                MapOfUser.put(email, User(nome, cognome, email, password))
+                val newUser = User(nome, cognome, email, password)
+                MapOfUser.put(email, newUser)
+                actualUser = newUser
                 navController?.navigate(Destination.HOME.route)}, enabled = check) {Text("Registrati")}
         }
         Box(contentAlignment = Alignment.BottomStart, modifier = Modifier.fillMaxWidth()) {
@@ -107,44 +101,44 @@ fun FormDati(
     var check by rememberSaveable { mutableStateOf(false) }
     var exist by rememberSaveable { mutableStateOf(false) }
     exist = MapOfUser.contains(email)
-    check = !email.isEmpty() && !nome.isEmpty() && !cognome.isEmpty() && !exist
-    if(exist) Text("E-mail già registrata!", modifier = Modifier.padding(bottom = 10.dp, top = 2.dp), color = Color.Red)
-    OutlinedTextField(
-        value = email,
-        isError = exist,
-        onValueChange = {
+    check = email.isNotEmpty() && nome.isNotEmpty() && cognome.isNotEmpty() && !exist
+    
+    Column(modifier = Modifier.padding(horizontal = 25.dp)) {
+        EditTextField(
+            label = "E-mail",
+            value = email,
+            keyboardType = androidx.compose.ui.text.input.KeyboardType.Email,
+            isError = exist,
+            errorMessage = if (exist) "E-mail già registrata!" else "",
+            modifier = Modifier.padding(bottom = 10.dp),
+            onValueChange = {
                 email = it
                 onEmailChange(email)
-            },
-        label = {Text("E-mail") },
-        modifier = Modifier.padding(bottom = 25.dp),
-        shape = RoundedCornerShape(30.dp),
-        singleLine = true
-    )
-    OutlinedTextField(
-        value = nome,
-        onValueChange = {
+            }
+        )
+        EditTextField(
+            label = "Nome",
+            value = nome,
+            keyboardType = androidx.compose.ui.text.input.KeyboardType.Text,
+            modifier = Modifier.padding(bottom = 10.dp),
+            onValueChange = {
                 nome = it
                 onNameChange(nome)
-            },
-        label = {Text("Nome") },
-        modifier = Modifier.padding(bottom = 25.dp),
-        shape = RoundedCornerShape(30.dp),
-        singleLine = true
-    )
-    OutlinedTextField(
-        value = cognome,
-        onValueChange = {
+            }
+        )
+        EditTextField(
+            label = "Cognome",
+            value = cognome,
+            keyboardType = androidx.compose.ui.text.input.KeyboardType.Text,
+            modifier = Modifier.padding(bottom = 10.dp),
+            onValueChange = {
                 cognome = it
                 onSurnameChange(cognome)
-            },
-        label = {Text("Cognome") },
-        modifier = Modifier.padding(bottom = 50.dp),
-        shape = RoundedCornerShape(30.dp),
-        singleLine = true
-    )
-    Spacer(Modifier.size(70.dp))
-    Button({onAdvance(true)}, enabled = check, modifier = Modifier.padding(bottom = 15.dp)) {Text("Avanti")}
+            }
+        )
+        Spacer(Modifier.height(30.dp))
+        Button({onAdvance(true)}, enabled = check, modifier = Modifier.padding(bottom = 15.dp).align(Alignment.CenterHorizontally)) {Text("Avanti")}
+    }
 }
 
 

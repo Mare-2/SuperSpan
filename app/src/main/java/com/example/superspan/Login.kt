@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
@@ -23,9 +24,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import androidx.navigation.NavController
+
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 
 @Composable
 fun Login(
@@ -35,6 +41,7 @@ fun Login(
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     var text by rememberSaveable { mutableStateOf("Accedi") }
+    var loginError by rememberSaveable { mutableStateOf(false) }
     var _user : User? = actualUser
     Column(
         Modifier.padding(padding),
@@ -63,26 +70,37 @@ fun Login(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(5f),
+                    .weight(5f)
+                    .padding(horizontal = 25.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
+                var passwordVisible by rememberSaveable { mutableStateOf(false) }
                 Spacer(Modifier.weight(0.4f))
-                OutlinedTextField(
+                EditTextField(
+                    label = "E-mail",
                     value = email,
-                    onValueChange = { email = it },
-                    label = { Text("E-mail") },
-                    modifier = Modifier.padding(bottom = 20.dp),
-                    shape = RoundedCornerShape(30.dp),
-                    singleLine = true
+                    keyboardType = KeyboardType.Email,
+                    isError = loginError,
+                    errorMessage = "Credenziali errate",
+                    modifier = Modifier.padding(bottom = 10.dp),
+                    onValueChange = { email = it; loginError = false }
                 )
-                OutlinedTextField(
+                EditTextField(
+                    label = "Password",
                     value = password,
-                    onValueChange = { password = it },
-                    label = {Text("Confirm Password") },
+                    keyboardType = KeyboardType.Password,
+                    visualTransformation = if (passwordVisible) androidx.compose.ui.text.input.VisualTransformation.None else PasswordVisualTransformation(),
+                    isError = loginError,
+                    errorMessage = "Credenziali errate",
                     modifier = Modifier.padding(bottom = 20.dp),
-                    shape = RoundedCornerShape(30.dp),
-                    singleLine = true
+                    trailingIcon = {
+                        val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                        androidx.compose.material3.IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                            androidx.compose.material3.Icon(imageVector  = image, contentDescription = if (passwordVisible) "Nascondi password" else "Mostra password")
+                        }
+                    },
+                    onValueChange = { password = it; loginError = false }
                 )
                 Spacer(Modifier.weight(0.6f))
                 Button(
@@ -91,6 +109,8 @@ fun Login(
                         if(_user!=null) {
                             actualUser = _user
                             navController?.navigate(Destination.HOME.route)
+                        } else {
+                            loginError = true
                         }
                     },
                     modifier = Modifier.padding(bottom = 15.dp)) { Text(text) }
@@ -114,15 +134,13 @@ fun LoginPreview() {
 }
 
 fun accessAccount(email: String, password: String): User? {
-    var user: User
     try {
-        user = MapOfUser.getValue(email)
-        if(user.email==email) {
-           if(user.password==password) return user
-           return null
+        val user = MapOfUser[email]
+        if(user != null && user.email == email && user.password == password) {
+            return user
         }
         return null
-    } catch (e: Error) {
+    } catch (e: Exception) {
         return null
     }
 }

@@ -43,6 +43,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.foundation.layout.*
 import androidx.compose.ui.unit.dp
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 
 
 
@@ -103,6 +105,8 @@ fun Header(modifier: Modifier = Modifier) {
     }
 }*/
 
+
+
 @Composable
 fun FormPassword(
     onPasswordChange: (String)-> Unit,
@@ -111,33 +115,51 @@ fun FormPassword(
     var password by rememberSaveable { mutableStateOf("") }
     var confirmPassword by rememberSaveable { mutableStateOf("") }
     var check by rememberSaveable { mutableStateOf(false) }
-    OutlinedTextField(
-        value = password,
-        onValueChange = {
-            password = it
-            onPasswordChange(password) },
-        label = {Text("Password") },
-        modifier = Modifier.padding(bottom = 25.dp),
-        shape = RoundedCornerShape(30.dp),
-        singleLine = true
-    )
-    OutlinedTextField(
-        value = confirmPassword,
-        onValueChange = {
-            confirmPassword = it
-            check = !password.isEmpty() && !confirmPassword.isEmpty() && password==confirmPassword
-            checking(check)
-        },
-        isError = password!=confirmPassword && confirmPassword.isNotEmpty(),
-        label = {Text("Confirm Password") },
-        modifier = Modifier.padding(bottom = 50.dp, top = 55.dp),
-        shape = RoundedCornerShape(30.dp),
-        singleLine = true
-    )
-    CheckPassword(password, {check = it})
+    var passwordVisible by rememberSaveable { mutableStateOf(false) }
+    var confirmPasswordVisible by rememberSaveable { mutableStateOf(false) }
+    
+    Column(modifier = Modifier.padding(horizontal = 25.dp)) {
+        EditTextField(
+            label = "Password",
+            value = password,
+            keyboardType = androidx.compose.ui.text.input.KeyboardType.Password,
+            visualTransformation = if (passwordVisible) androidx.compose.ui.text.input.VisualTransformation.None else androidx.compose.ui.text.input.PasswordVisualTransformation(),
+            modifier = Modifier.padding(bottom = 10.dp),
+            trailingIcon = {
+                val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                androidx.compose.material3.IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    androidx.compose.material3.Icon(imageVector  = image, contentDescription = if (passwordVisible) "Nascondi password" else "Mostra password")
+                }
+            },
+            onValueChange = {
+                password = it
+                onPasswordChange(password)
+            }
+        )
+        EditTextField(
+            label = "Confirm Password",
+            value = confirmPassword,
+            keyboardType = androidx.compose.ui.text.input.KeyboardType.Password,
+            visualTransformation = if (confirmPasswordVisible) androidx.compose.ui.text.input.VisualTransformation.None else androidx.compose.ui.text.input.PasswordVisualTransformation(),
+            isError = password != confirmPassword && confirmPassword.isNotEmpty(),
+            errorMessage = "Le password non coincidono",
+            modifier = Modifier.padding(bottom = 30.dp),
+            trailingIcon = {
+                val image = if (confirmPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                androidx.compose.material3.IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
+                    androidx.compose.material3.Icon(imageVector  = image, contentDescription = if (confirmPasswordVisible) "Nascondi password" else "Mostra password")
+                }
+            },
+            onValueChange = {
+                confirmPassword = it
+                check = password.isNotEmpty() && confirmPassword.isNotEmpty() && password == confirmPassword
+                checking(check)
+            }
+        )
+        CheckPassword(password, {check = it})
 
-
-    Spacer(Modifier.size(80.dp))
+        Spacer(Modifier.size(50.dp))
+    }
 }
 
 @Composable
