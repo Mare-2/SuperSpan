@@ -429,17 +429,17 @@ fun CouponPageComplete(paddingValues: PaddingValues, navController: NavControlle
 
                 // 3. LISTA FILTRATA
                 val filteredList = if (selectedTab == 0) {
-                    ListOfCoupon.filter { it.products.size == 1 }
+                    ListOfCoupon.filter { it.products.size == 3 }
                 } else {
-                    ListOfCoupon.filter { it.products.size > 1 }
+                    ListOfCoupon.filter { it.products.size == 1 }
                 }
 
                 items(filteredList) { item ->
                     Box(modifier = Modifier.padding(vertical = 6.dp)) {
                         if (selectedTab == 0) {
-                            CouponTicketCard(item, navController)
+                            CouponTicketCard(item, navController) { selectedOffer = item }
                         } else {
-                            OfferBundleCard(item) { selectedOffer = item }
+                            OfferPromoCard(item, navController)
                         }
                     }
                 }
@@ -500,12 +500,11 @@ fun TabButton(text: String, isSelected: Boolean, modifier: Modifier, onClick: ()
 }
 
 @Composable
-fun CouponTicketCard(coupon: Coupon, navController: NavController? = null) {
+fun CouponTicketCard(coupon: Coupon, navController: NavController? = null, onClick: () -> Unit) {
     val status = getExpirationStatus(coupon.dateOfExpiration)
-    val product = coupon.products.first()
 
     Card(
-        modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
+        modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth().clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(2.dp)
@@ -520,8 +519,8 @@ fun CouponTicketCard(coupon: Coupon, navController: NavController? = null) {
                     Text(text = "Scade: ${formatDisplayDate(coupon.dateOfExpiration)}", fontSize = 11.sp, color = Color.Gray)
                 }
                 Spacer(Modifier.height(8.dp))
-                Text(product.nome, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                Text(coupon.description, fontSize = 13.sp, color = Color.Gray)
+                Text(coupon.description, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text("Valido su: ${coupon.products.joinToString(", ") { it.nome }}", fontSize = 12.sp, color = Color.Gray)
                 Spacer(Modifier.height(12.dp))
                 Surface(color = Color(0xFFF1F1F1), shape = RoundedCornerShape(8.dp), border = androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray.copy(0.5f))) {
                     Text(coupon.code, modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp), fontWeight = FontWeight.ExtraBold, letterSpacing = 2.sp, color = Color.DarkGray)
@@ -546,24 +545,34 @@ fun CouponTicketCard(coupon: Coupon, navController: NavController? = null) {
 }
 
 @Composable
-fun OfferBundleCard(coupon: Coupon, onClick: () -> Unit) {
+fun OfferPromoCard(coupon: Coupon, navController: NavController? = null) {
+    val status = getExpirationStatus(coupon.dateOfExpiration)
+    val product = coupon.products.firstOrNull() ?: return
+
     Card(
-        modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth().clickable { onClick() },
+        modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
-        Column(Modifier.padding(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(Modifier.size(40.dp).background(Color(0xFFE8F5E9), CircleShape), contentAlignment = Alignment.Center) {
-                    Icon(Icons.Default.LocalOffer, null, tint = Color(0xFF388E3C), modifier = Modifier.size(20.dp))
+        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(40.dp).background(Color(0xFFE8F5E9), CircleShape), contentAlignment = Alignment.Center) {
+                Icon(Icons.Default.LocalOffer, null, tint = Color(0xFF388E3C), modifier = Modifier.size(20.dp))
+            }
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f)) {
+                Text(product.nome, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(coupon.description, fontSize = 12.sp, color = Color.Gray)
+                Spacer(Modifier.height(4.dp))
+                Text(text = "Scade: ${formatDisplayDate(coupon.dateOfExpiration)}", fontSize = 12.sp, color = Color(0xFFD32F2F), fontWeight = FontWeight.Medium)
+            }
+            Column(horizontalAlignment = Alignment.End) {
+                if (actualUser.admin) {
+                    IconButton(onClick = { navController?.navigate("${Destination.EDIT_COUPON.route}/${coupon.code}") }) {
+                        Icon(Icons.Default.Edit, contentDescription = "Modifica", tint = status.color)
+                    }
                 }
-                Spacer(Modifier.width(12.dp))
-                Column(Modifier.weight(1f)) {
-                    Text(coupon.description, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                    Text(text = "Valida fino al ${formatDisplayDate(coupon.dateOfExpiration)}", fontSize = 12.sp, color = Color(0xFFD32F2F), fontWeight = FontWeight.Medium)
-                }
-                Icon(Icons.Default.ChevronRight, null, tint = Color.LightGray)
+                Text("-${coupon.discount.toInt()}%", fontSize = 24.sp, fontWeight = FontWeight.Black, color = status.color)
             }
         }
     }

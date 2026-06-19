@@ -1,5 +1,6 @@
 package com.example.superspan
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -45,12 +46,14 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -58,12 +61,19 @@ import androidx.navigation.NavController
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedTextFieldDefaults
 
 @Composable
 fun AddCoupon(paddingValues: PaddingValues, navController: NavController?) {
     var selected by remember { mutableIntStateOf(0) }
     var isSelectionOpen by remember { mutableStateOf(false) }
     var pendingProductSelection by remember { mutableStateOf<((Product) -> Unit)?>(null) }
+    val context = LocalContext.current
 
     if (isSelectionOpen) {
         ProductSelectionScreen(
@@ -81,18 +91,22 @@ fun AddCoupon(paddingValues: PaddingValues, navController: NavController?) {
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = { navController?.popBackStack() }) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Indietro"
-                    )
-                }
-                Text("Aggiungi promo", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+        // --- HEADER ---
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(130.dp)
+                .clip(BottomOvalShape(25.dp))
+                .background(Color.Gray)
+        ) {
+            IconButton(onClick = { navController?.popBackStack() }, modifier = Modifier.padding(8.dp)) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = Color.White)
             }
+            Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("Aggiungi Promo/Coupon", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                Text("I campi verdi sono completati", color = Color.White.copy(alpha = 0.8f), fontSize = 12.sp)
+            }
+        }
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -125,19 +139,22 @@ fun AddCoupon(paddingValues: PaddingValues, navController: NavController?) {
                     },
                     onSave = { newCoupon ->
                         ListOfCoupon.add(newCoupon)
+                        Toast.makeText(context, "Coupon salvato con successo", Toast.LENGTH_SHORT).show()
                         navController?.popBackStack()
                     }
                 )
             } else {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Form offerta non ancora completato")
-                        Text("Le offerte potranno contenere 2 o 3 prodotti.")
+                PromoForm(
+                    onSelectProductRequest = { callback ->
+                        pendingProductSelection = callback
+                        isSelectionOpen = true
+                    },
+                    onSave = { newPromo ->
+                        ListOfCoupon.add(newPromo)
+                        Toast.makeText(context, "Offerta salvata con successo", Toast.LENGTH_SHORT).show()
+                        navController?.popBackStack()
                     }
-                }
+                )
             }
         }
     }
@@ -153,40 +170,43 @@ private fun CouponForm(
     var discount by rememberSaveable { mutableStateOf("") }
     var description by rememberSaveable { mutableStateOf("") }
     var expirationDate by rememberSaveable { mutableStateOf("") }
-    var selectedProduct by remember { mutableStateOf<Product?>(null) }
+    val selectedProducts = remember { mutableStateListOf<Product>() }
 
     val discountValue = discount.toFloatOrNull()
     val isFormValid =
         code.isNotBlank() &&
         description.isNotBlank() &&
         expirationDate.isNotBlank() &&
-        selectedProduct != null &&
+        selectedProducts.size == 3 &&
         discountValue != null &&
         discountValue in 0f..100f
 
     Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-        OutlinedTextField(
+        CouponTextField(
             value = code,
             onValueChange = { code = it },
-            label = { Text("Codice coupon") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            label = "Codice coupon",
+            keyboardType = if ("code" == "discount") KeyboardType.Number else KeyboardType.Text,
+            minLines = if ("code" == "description") 2 else 1,
+            singleLine = "code" != "description"
         )
 
-        OutlinedTextField(
+        CouponTextField(
             value = discount,
             onValueChange = { discount = it },
-            label = { Text("Sconto %") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            label = "Sconto %",
+            keyboardType = if ("discount" == "discount") KeyboardType.Number else KeyboardType.Text,
+            minLines = if ("discount" == "description") 2 else 1,
+            singleLine = "discount" != "description"
         )
 
-        OutlinedTextField(
+        CouponTextField(
             value = description,
             onValueChange = { description = it },
-            label = { Text("Descrizione") },
-            modifier = Modifier.fillMaxWidth(),
-            minLines = 2
+            label = "Descrizione (es. Kit Pranzo Veloce)",
+            keyboardType = if ("description" == "discount") KeyboardType.Number else KeyboardType.Text,
+            minLines = if ("description" == "description") 2 else 1,
+            singleLine = "description" != "description"
         )
 
         var showDatePicker by remember { mutableStateOf(false) }
@@ -217,14 +237,169 @@ private fun CouponForm(
             }
         }
 
-        OutlinedTextField(
+        CouponTextField(
             value = expirationDate,
             onValueChange = { },
-            label = { Text("Scadenza") },
-            modifier = Modifier.fillMaxWidth(),
+            label = "Scadenza",
             readOnly = true,
             trailingIcon = {
-                IconButton(onClick = { showDatePicker = true }) {
+                IconButton(onClick = { showDatePicker = true }
+        ) {
+                    Icon(androidx.compose.material.icons.Icons.Default.DateRange, contentDescription = "Seleziona Data")
+                }
+            }
+        )
+
+        Text("Prodotti nel Coupon (Selezionati ${selectedProducts.size}/3)", fontWeight = FontWeight.Bold)
+
+        selectedProducts.forEach { p ->
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9)),
+                elevation = CardDefaults.cardElevation(2.dp)
+            ) {
+                Row(Modifier.padding(16.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.ShoppingCart, null, tint = Color(0xFF388E3C), modifier = Modifier.size(32.dp))
+                    Spacer(Modifier.width(12.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text(p.nome, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF1B5E20))
+                        Text("Prezzo originario: €${p.prezzo}", fontSize = 14.sp, color = Color(0xFF2E7D32))
+                    }
+                    IconButton(onClick = { selectedProducts.remove(p) }) {
+                        Icon(Icons.Default.Close, "Rimuovi", tint = Color.Red)
+                    }
+                }
+            }
+        }
+
+        if (selectedProducts.size < 3) {
+            OutlinedButton(
+                onClick = {
+                    onSelectProductRequest { product ->
+                        if (!selectedProducts.contains(product) && selectedProducts.size < 3) {
+                            selectedProducts.add(product)
+                        }
+                    }
+                },
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Icon(Icons.Default.ShoppingCart, contentDescription = null)
+                Spacer(Modifier.width(8.dp))
+                Text("Aggiungi Prodotto")
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = {
+                val discountFloat = discount.toFloatOrNull() ?: return@Button
+                onSave(
+                    Coupon(
+                        code.trim(),
+                        discountFloat,
+                        description.trim(),
+                        expirationDate.trim(),
+                        *selectedProducts.toTypedArray()
+                    )
+                )
+            },
+            enabled = isFormValid,
+            modifier = Modifier.height(55.dp).width(220.dp).align(Alignment.CenterHorizontally),
+            shape = CircleShape,
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF388E3C))
+        ) {
+            Text("Salva coupon")
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun PromoForm(
+    onSelectProductRequest: ((Product) -> Unit) -> Unit,
+    onSave: (Coupon) -> Unit
+) {
+    var code by rememberSaveable { mutableStateOf("") }
+    var discount by rememberSaveable { mutableStateOf("") }
+    var description by rememberSaveable { mutableStateOf("") }
+    var expirationDate by rememberSaveable { mutableStateOf("") }
+    var selectedProduct by remember { mutableStateOf<Product?>(null) }
+
+    val discountValue = discount.toFloatOrNull()
+    val isFormValid =
+        code.isNotBlank() &&
+        description.isNotBlank() &&
+        expirationDate.isNotBlank() &&
+        selectedProduct != null &&
+        discountValue != null &&
+        discountValue in 0f..100f
+
+    Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        CouponTextField(
+            value = code,
+            onValueChange = { code = it },
+            label = "Codice offerta (interno)",
+            keyboardType = if ("code" == "discount") KeyboardType.Number else KeyboardType.Text,
+            minLines = if ("code" == "description") 2 else 1,
+            singleLine = "code" != "description"
+        )
+
+        CouponTextField(
+            value = discount,
+            onValueChange = { discount = it },
+            label = "Sconto %",
+            keyboardType = if ("discount" == "discount") KeyboardType.Number else KeyboardType.Text,
+            minLines = if ("discount" == "description") 2 else 1,
+            singleLine = "discount" != "description"
+        )
+
+        CouponTextField(
+            value = description,
+            onValueChange = { description = it },
+            label = "Descrizione",
+            keyboardType = if ("description" == "discount") KeyboardType.Number else KeyboardType.Text,
+            minLines = if ("description" == "description") 2 else 1,
+            singleLine = "description" != "description"
+        )
+
+        var showDatePicker by remember { mutableStateOf(false) }
+        val datePickerState = androidx.compose.material3.rememberDatePickerState()
+
+        if (showDatePicker) {
+            androidx.compose.material3.DatePickerDialog(
+                onDismissRequest = { showDatePicker = false },
+                confirmButton = {
+                    androidx.compose.material3.TextButton(onClick = {
+                        datePickerState.selectedDateMillis?.let { millis ->
+                            val formatter = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+                            formatter.timeZone = java.util.TimeZone.getTimeZone("UTC")
+                            expirationDate = formatter.format(java.util.Date(millis))
+                        }
+                        showDatePicker = false
+                    }) {
+                        Text("OK")
+                    }
+                },
+                dismissButton = {
+                    androidx.compose.material3.TextButton(onClick = { showDatePicker = false }) {
+                        Text("Annulla")
+                    }
+                }
+            ) {
+                androidx.compose.material3.DatePicker(state = datePickerState)
+            }
+        }
+
+        CouponTextField(
+            value = expirationDate,
+            onValueChange = { },
+            label = "Scadenza",
+            readOnly = true,
+            trailingIcon = {
+                IconButton(onClick = { showDatePicker = true }
+        ) {
                     Icon(androidx.compose.material.icons.Icons.Default.DateRange, contentDescription = "Seleziona Data")
                 }
             }
@@ -287,14 +462,65 @@ private fun CouponForm(
                 )
             },
             enabled = isFormValid,
-            modifier = Modifier.fillMaxWidth().height(56.dp),
-            shape = RoundedCornerShape(12.dp)
+            modifier = Modifier.height(55.dp).width(220.dp).align(Alignment.CenterHorizontally),
+            shape = CircleShape,
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF388E3C))
         ) {
-            Text("Salva coupon")
+            Text("Salva offerta")
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CouponTextField(
+    label: String,
+    value: String,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    isError: Boolean = false,
+    errorMessage: String = "",
+    readOnly: Boolean = false,
+    minLines: Int = 1,
+    singleLine: Boolean = true,
+    trailingIcon: @Composable (() -> Unit)? = null,
+    onValueChange: (String) -> Unit
+) {
+    val containerColor = when {
+        isError -> Color(0xFFFDECEA)
+        value.isEmpty() -> Color(0xFFFFF3E0)
+        else -> Color(0xFFE8F5E9)
+    }
+
+    val borderColor = when {
+        isError -> Color.Red
+        value.isEmpty() -> Color(0xFFFFB74D)
+        else -> Color(0xFF81C784)
+    }
+
+    Column(modifier = Modifier.padding(vertical = 4.dp)) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            label = { Text(label) },
+            modifier = Modifier.fillMaxWidth().background(containerColor, RoundedCornerShape(20.dp)),
+            shape = RoundedCornerShape(20.dp),
+            singleLine = singleLine,
+            minLines = minLines,
+            readOnly = readOnly,
+            isError = isError,
+            trailingIcon = trailingIcon,
+            keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+            colors = OutlinedTextFieldDefaults.colors(
+                unfocusedBorderColor = borderColor,
+                focusedBorderColor = borderColor,
+                errorBorderColor = Color.Red
+            )
+        )
+        if (isError) {
+            Text(errorMessage, color = Color.Red, fontSize = 12.sp, modifier = Modifier.padding(start = 12.dp))
+        }
+    }
+}
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductSelectionScreen(

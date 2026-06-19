@@ -256,53 +256,33 @@ class Coupon(
 }
 
 val ListOfCoupon = mutableStateListOf<Coupon>(
-    // Offerte (2-3 prodotti)
-    Coupon("Sconto10", 10f, "10% di sconto su Pane Fresco e Latte Intero", "2026-06-30",
-        ListOfProduct.find { it.nome == "Pane Fresco" }!!,
-        ListOfProduct.find { it.nome == "Latte Intero 1L" }!!
-    ),
-    Coupon("Sconto20", 20f, "20% di sconto su Pasta Barilla e Salsa di Pomodoro", "2026-07-15",
-        ListOfProduct.find { it.nome == "Pasta Barilla 500g" }!!,
-        ListOfProduct.find { it.nome == "Salsa di Pomodoro" }!!
-    ),
-    Coupon("Sconto15", 15f, "15% di sconto su Mele e Banane", "2026-07-05",
-        ListOfProduct.find { it.nome == "Mele (sacchetto 1kg)" }!!,
-        ListOfProduct.find { it.nome == "Banane (al kg)" }!!
-    ),
-    Coupon("FRESCO25", 25f, "25% di sconto su Pane Integrale e Uova", "2026-07-20",
-        ListOfProduct.find { it.nome == "Pane Integrale 500g" }!!,
-        ListOfProduct.find { it.nome == "Uova (confezione da 6)" }!!
-    ),
-    Coupon("LATTICINI30", 30f, "30% di sconto su Parmigiano Reggiano, Latte e Yogurt", "2026-08-10",
-        ListOfProduct.find { it.nome == "Parmigiano Reggiano 200g" }!!,
+    // Coupon (3 prodotti)
+    Coupon("Sconto10", 10f, "10% di sconto su Colazione Completa", "2026-06-30",
         ListOfProduct.find { it.nome == "Latte Intero 1L" }!!,
+        ListOfProduct.find { it.nome == "Cereali Muesli" }!!,
+        ListOfProduct.find { it.nome == "Biscotti al Cioccolato" }!!
+    ),
+    Coupon("Sconto20", 20f, "20% di sconto su Kit Pranzo Veloce", "2026-07-15",
+        ListOfProduct.find { it.nome == "Pasta Barilla 500g" }!!,
+        ListOfProduct.find { it.nome == "Salsa di Pomodoro" }!!,
+        ListOfProduct.find { it.nome == "Parmigiano Reggiano 200g" }!!
+    ),
+    Coupon("FRESCO25", 25f, "25% di sconto su Kit Frutta e Verdura", "2026-07-20",
+        ListOfProduct.find { it.nome == "Mele (sacchetto 1kg)" }!!,
+        ListOfProduct.find { it.nome == "Banane (al kg)" }!!,
         ListOfProduct.find { it.nome == "Yogurt Naturale 125g" }!!
     ),
-    Coupon("CUCINA18", 18f, "18% di sconto su Riso Arborio e Olio d'Oliva", "2026-07-25",
-        ListOfProduct.find { it.nome == "Riso Arborio 1kg" }!!,
-        ListOfProduct.find { it.nome == "Olio d'Oliva Extra Vergine 500ml" }!!
-    ),
-    Coupon("BREAKFAST12", 12f, "12% di sconto su Cereali Muesli e Caffè Macinato", "2026-08-01",
-        ListOfProduct.find { it.nome == "Cereali Muesli" }!!,
-        ListOfProduct.find { it.nome == "Caffè Macinato 250g" }!!
-    ),
-    Coupon("CASA22", 22f, "22% di sconto su Detersivo e Carta Igienica", "2026-07-10",
+    Coupon("CASA22", 22f, "22% di sconto su Kit Pulizia", "2026-07-10",
         ListOfProduct.find { it.nome == "Detersivo Piatti" }!!,
-        ListOfProduct.find { it.nome == "Carta Igienica (4 rotoli)" }!!
+        ListOfProduct.find { it.nome == "Carta Igienica (4 rotoli)" }!!,
+        ListOfProduct.find { it.nome == "Shampoo Neutro 250ml" }!!
     ),
-    Coupon("IGIENE28", 28f, "28% di sconto su Shampoo Neutro e Spazzolino", "2026-08-15",
-        ListOfProduct.find { it.nome == "Shampoo Neutro 250ml" }!!,
-        ListOfProduct.find { it.nome == "Spazzolino da Denti" }!!
-    ),
-    Coupon("BEVANDE16", 16f, "16% di sconto su Acqua Naturale e Succo d'Arancia", "2026-07-28",
-        ListOfProduct.find { it.nome == "Acqua Naturale 1.5L" }!!,
-        ListOfProduct.find { it.nome == "Succo d'Arancia 1L" }!!
-    ),
-    Coupon("VERDURA20", 20f, "20% di sconto su Pollo Intero e Mele", "2026-07-18",
+    Coupon("PROTEIN30", 30f, "30% di sconto su Kit Proteico", "2026-08-10",
         ListOfProduct.find { it.nome == "Pollo Intero 1kg" }!!,
-        ListOfProduct.find { it.nome == "Mele (sacchetto 1kg)" }!!
+        ListOfProduct.find { it.nome == "Uova (confezione da 6)" }!!,
+        ListOfProduct.find { it.nome == "Trancio di Salmone 250g" }!!
     ),
-    // Coupon (1 solo prodotto)
+    // Promozioni (1 solo prodotto)
     Coupon("PANE5", 5f, "Sconto 5% su Pane Fresco", "2026-06-25",
         ListOfProduct.find { it.nome == "Pane Fresco" }!!
     ),
