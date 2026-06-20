@@ -1,6 +1,7 @@
 package com.example.superspan
 
 import android.widget.Toast
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -75,15 +76,7 @@ fun AddCoupon(paddingValues: PaddingValues, navController: NavController?) {
     var pendingProductSelection by remember { mutableStateOf<((Product) -> Unit)?>(null) }
     val context = LocalContext.current
 
-    if (isSelectionOpen) {
-        ProductSelectionScreen(
-            onBack = { isSelectionOpen = false },
-            onSelected = { product ->
-                pendingProductSelection?.invoke(product)
-                isSelectionOpen = false
-            }
-        )
-    } else {
+    Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .padding(paddingValues)
@@ -91,22 +84,22 @@ fun AddCoupon(paddingValues: PaddingValues, navController: NavController?) {
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
-        // --- HEADER ---
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(130.dp)
-                .clip(BottomOvalShape(25.dp))
-                .background(Color.Gray)
-        ) {
-            IconButton(onClick = { navController?.popBackStack() }, modifier = Modifier.padding(8.dp)) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = Color.White)
+            // --- HEADER ---
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(130.dp)
+                    .clip(BottomOvalShape(25.dp))
+                    .background(Color.Gray)
+            ) {
+                IconButton(onClick = { navController?.popBackStack() }, modifier = Modifier.padding(8.dp)) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = Color.White)
+                }
+                Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("Aggiungi Promo/Coupon", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                    Text("I campi verdi sono completati", color = Color.White.copy(alpha = 0.8f), fontSize = 12.sp)
+                }
             }
-            Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("Aggiungi Promo/Coupon", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
-                Text("I campi verdi sono completati", color = Color.White.copy(alpha = 0.8f), fontSize = 12.sp)
-            }
-        }
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -153,6 +146,26 @@ fun AddCoupon(paddingValues: PaddingValues, navController: NavController?) {
                         ListOfCoupon.add(newPromo)
                         Toast.makeText(context, "Offerta salvata con successo", Toast.LENGTH_SHORT).show()
                         navController?.popBackStack()
+                    }
+                )
+            }
+        }
+
+        if (isSelectionOpen) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = {} // Intercept clicks so they don't fall through to the form below
+                    )
+            ) {
+                ProductSelectionScreen(
+                    onBack = { isSelectionOpen = false },
+                    onSelected = { product ->
+                        pendingProductSelection?.invoke(product)
+                        isSelectionOpen = false
                     }
                 )
             }

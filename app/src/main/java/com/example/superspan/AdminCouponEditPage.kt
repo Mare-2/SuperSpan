@@ -42,6 +42,29 @@ fun AdminCouponEditPage(
     var isSelectionOpen by remember { mutableStateOf(false) }
     var pendingProductSelection by remember { mutableStateOf<((Product) -> Unit)?>(null) }
 
+    var code by remember { mutableStateOf(existingCoupon?.code ?: "") }
+    var discount by remember { mutableStateOf(existingCoupon?.discount?.toInt()?.toString() ?: "") }
+    var description by remember { mutableStateOf(existingCoupon?.description ?: "") }
+    var dateOfExpiration by remember { mutableStateOf(existingCoupon?.dateOfExpiration ?: "") }
+    
+    val selectedProducts = remember { 
+        mutableStateListOf<Product>().apply { 
+            existingCoupon?.products?.let { addAll(it) } 
+        } 
+    }
+
+    val isCoupon = existingCoupon?.products?.size == 3
+    val requiredProductsCount = if (isCoupon) 3 else 1
+    val discountVal = discount.toFloatOrNull()
+    
+    val isFormValid =
+        code.isNotBlank() &&
+        description.isNotBlank() &&
+        dateOfExpiration.isNotBlank() &&
+        selectedProducts.size == requiredProductsCount &&
+        discountVal != null &&
+        discountVal in 0f..100f
+
     if (isSelectionOpen) {
         ProductSelectionScreen(
             onBack = { isSelectionOpen = false },
@@ -51,29 +74,6 @@ fun AdminCouponEditPage(
             }
         )
     } else {
-        var code by remember { mutableStateOf(existingCoupon?.code ?: "") }
-        var discount by remember { mutableStateOf(existingCoupon?.discount?.toInt()?.toString() ?: "") }
-        var description by remember { mutableStateOf(existingCoupon?.description ?: "") }
-        var dateOfExpiration by remember { mutableStateOf(existingCoupon?.dateOfExpiration ?: "") }
-        
-        val selectedProducts = remember { 
-            mutableStateListOf<Product>().apply { 
-                existingCoupon?.products?.let { addAll(it) } 
-            } 
-        }
-
-        val isCoupon = existingCoupon?.products?.size == 3
-        val requiredProductsCount = if (isCoupon) 3 else 1
-        val discountVal = discount.toFloatOrNull()
-        
-        val isFormValid =
-            code.isNotBlank() &&
-            description.isNotBlank() &&
-            dateOfExpiration.isNotBlank() &&
-            selectedProducts.size == requiredProductsCount &&
-            discountVal != null &&
-            discountVal in 0f..100f
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -243,7 +243,7 @@ fun AdminCouponEditPage(
                         )
 
                         if (existingCoupon != null) {
-                            val index = ListOfCoupon.indexOf(existingCoupon)
+                            val index = ListOfCoupon.indexOfFirst { it.code == existingCoupon.code }
                             if (index != -1) {
                                 ListOfCoupon[index] = newCoupon
                             }

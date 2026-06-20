@@ -239,10 +239,16 @@ class Coupon(
     }
 
     override fun equals(other: Any?): Boolean {
-        if(other is Coupon) {
-            return this.code == other.code
-        }
-        return false
+        if (this === other) return true
+        if (other !is Coupon) return false
+
+        if (this.code != other.code) return false
+        if (this.discount != other.discount) return false
+        if (this.description != other.description) return false
+        if (this.dateOfExpiration != other.dateOfExpiration) return false
+        if (this.products != other.products) return false
+
+        return true
     }
 
     override fun hashCode(): Int {
@@ -250,6 +256,7 @@ class Coupon(
         result = 31 * result + _discount.hashCode()
         result = 31 * result + _description.hashCode()
         result = 31 * result + _dateOfExpiration.hashCode()
+        result = 31 * result + products.hashCode()
         return result
     }
 

@@ -376,12 +376,16 @@ fun CouponPageComplete(paddingValues: PaddingValues, navController: NavControlle
         listState.scrollToItem(0)
     }
 
+    val currentSelectedOffer = selectedOffer?.let { offer ->
+        ListOfCoupon.find { it.code == offer.code }
+    } ?: selectedOffer
+
     Box(modifier = Modifier
         .padding(paddingValues)
         .fillMaxSize()
         .background(Color(0xFFF8F9FA))
     ) {
-        if (selectedOffer == null) {
+        if (currentSelectedOffer == null) {
             LazyColumn(
                 state = listState,
                 modifier = Modifier.fillMaxSize(),
@@ -445,7 +449,7 @@ fun CouponPageComplete(paddingValues: PaddingValues, navController: NavControlle
                 }
             }
         } else {
-            OfferDetailPage(selectedOffer!!, navController) { selectedOffer = null }
+            OfferDetailPage(currentSelectedOffer!!, navController) { selectedOffer = null }
         }
 
         if (actualUser.admin) {

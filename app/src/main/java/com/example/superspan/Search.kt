@@ -6,9 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -436,31 +434,25 @@ fun SearchPage(
         }
 
         // 3. GRIGLIA PRODOTTI (2 colonne fisse per look coerente)
-        item {
-            val columns = 2
-            val chunked = productSearchList.chunked(columns)
-            Column(
+        val columns = 2
+        val chunked = productSearchList.chunked(columns)
+        
+        items(chunked) { row ->
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                    .padding(start = 16.dp, bottom = 12.dp, end = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                chunked.forEach { row ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        row.forEach { product ->
-                            Box(Modifier.weight(1f)) {
-                                ProductCompose(product, navController)
-                            }
-                        }
-                        // Riempi riga incompleta
-                        if (row.size < columns) {
-                            repeat(columns - row.size) {
-                                Spacer(Modifier.weight(1f))
-                            }
-                        }
+                row.forEach { product ->
+                    Box(Modifier.weight(1f)) {
+                        ProductCompose(product, navController)
+                    }
+                }
+                // Riempi riga incompleta
+                if (row.size < columns) {
+                    repeat(columns - row.size) {
+                        Spacer(Modifier.weight(1f))
                     }
                 }
             }
