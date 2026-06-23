@@ -23,8 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
 @Composable
-fun AdminWorkMainPage(paddingValues: PaddingValues, navController: NavController?) {
-    var selectedTabIndex by remember { mutableStateOf(0) }
+fun AdminWorkMainPage(paddingValues: PaddingValues, navController: NavController?, initialTab: Int = 0) {
+    var selectedTabIndex by remember { mutableStateOf(initialTab) }
     val tabs = listOf("Posizioni Aperte", "Candidature")
 
     Scaffold(

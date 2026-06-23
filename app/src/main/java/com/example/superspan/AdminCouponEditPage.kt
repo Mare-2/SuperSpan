@@ -42,6 +42,9 @@ fun AdminCouponEditPage(
     var isSelectionOpen by remember { mutableStateOf(false) }
     var pendingProductSelection by remember { mutableStateOf<((Product) -> Unit)?>(null) }
 
+    var showSaveConfirm by remember { mutableStateOf(false) }
+    var showDeleteConfirm by remember { mutableStateOf(false) }
+
     var code by remember { mutableStateOf(existingCoupon?.code ?: "") }
     var discount by remember { mutableStateOf(existingCoupon?.discount?.toInt()?.toString() ?: "") }
     var description by remember { mutableStateOf(existingCoupon?.description ?: "") }
@@ -74,192 +77,230 @@ fun AdminCouponEditPage(
             }
         )
     } else {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .background(Color.White)
-        ) {
-            // --- HEADER ---
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(130.dp)
-                    .clip(BottomOvalShape(25.dp))
-                    .background(Color.Gray)
-            ) {
-                IconButton(onClick = { navController?.popBackStack() }, modifier = Modifier.padding(8.dp)) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = Color.White)
-                }
-                if (existingCoupon != null) {
-                    IconButton(
-                        onClick = {
-                            ListOfCoupon.remove(existingCoupon)
-                            Toast.makeText(context, "Eliminato con successo", Toast.LENGTH_SHORT).show()
-                            navController?.popBackStack()
-                        },
-                        modifier = Modifier.align(Alignment.TopEnd).padding(8.dp)
-                    ) {
-                        Icon(Icons.Default.Delete, contentDescription = "Elimina", tint = Color(0xFFEF5350))
-                    }
-                }
-                Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(if (isCoupon) "Modifica Coupon" else "Modifica Offerta", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
-                    Text("I campi verdi sono completati", color = Color.White.copy(alpha = 0.8f), fontSize = 12.sp)
-                }
-            }
-
+        Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 25.dp)
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .padding(paddingValues)
+                    .background(Color.White)
             ) {
-                Spacer(modifier = Modifier.height(20.dp))
-                CouponTextField(
-                    value = code,
-                    onValueChange = { code = it },
-                    label = if (isCoupon) "Codice Coupon" else "Codice Offerta",
-                    keyboardType = if ("code" == "discount") KeyboardType.Number else KeyboardType.Text,
-                    readOnly = existingCoupon != null && "code" == "code",
-                    minLines = if ("code" == "description") 2 else 1,
-                    singleLine = "code" != "description"
-                )
-
-                CouponTextField(
-                    value = discount,
-                    onValueChange = { discount = it },
-                    label = "Sconto (%)",
-                    keyboardType = if ("discount" == "discount") KeyboardType.Number else KeyboardType.Text,
-                    readOnly = existingCoupon != null && "discount" == "code",
-                    minLines = if ("discount" == "description") 2 else 1,
-                    singleLine = "discount" != "description"
-                )
-
-                CouponTextField(
-                    value = description,
-                    onValueChange = { description = it },
-                    label = "Descrizione",
-                    keyboardType = if ("description" == "discount") KeyboardType.Number else KeyboardType.Text,
-                    readOnly = existingCoupon != null && "description" == "code",
-                    minLines = if ("description" == "description") 2 else 1,
-                    singleLine = "description" != "description"
-                )
-
-                var showDatePicker by remember { mutableStateOf(false) }
-                val datePickerState = rememberDatePickerState()
-
-                if (showDatePicker) {
-                    DatePickerDialog(
-                        onDismissRequest = { showDatePicker = false },
-                        confirmButton = {
-                            TextButton(onClick = {
-                                datePickerState.selectedDateMillis?.let { millis ->
-                                    val formatter = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
-                                    formatter.timeZone = java.util.TimeZone.getTimeZone("UTC")
-                                    dateOfExpiration = formatter.format(java.util.Date(millis))
-                                }
-                                showDatePicker = false
-                            }) {
-                                Text("OK")
-                            }
-                        },
-                        dismissButton = {
-                            TextButton(onClick = { showDatePicker = false }) {
-                                Text("Annulla")
-                            }
-                        }
-                    ) {
-                        DatePicker(state = datePickerState)
-                    }
-                }
-
-                CouponTextField(
-                    value = dateOfExpiration,
-                    onValueChange = { },
-                    label = "Data Scadenza",
-                    readOnly = true,
-                    trailingIcon = {
-                        IconButton(onClick = { showDatePicker = true }
+                // --- HEADER ---
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(130.dp)
+                        .clip(BottomOvalShape(25.dp))
+                        .background(Color.Gray)
                 ) {
-                            Icon(Icons.Default.DateRange, contentDescription = "Seleziona Data")
+                    IconButton(onClick = { navController?.popBackStack() }, modifier = Modifier.padding(8.dp)) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = Color.White)
+                    }
+                    if (existingCoupon != null) {
+                        IconButton(
+                            onClick = { showDeleteConfirm = true },
+                            modifier = Modifier.align(Alignment.TopEnd).padding(8.dp)
+                        ) {
+                            Icon(Icons.Default.Delete, contentDescription = "Elimina", tint = Color(0xFFEF5350))
                         }
                     }
-                )
-
-                Text("Prodotti (${selectedProducts.size}/$requiredProductsCount)", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                
-                selectedProducts.forEach { p ->
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9)),
-                        elevation = CardDefaults.cardElevation(2.dp)
-                    ) {
-                        Row(Modifier.padding(16.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.ShoppingCart, null, tint = Color(0xFF388E3C), modifier = Modifier.size(32.dp))
-                            Spacer(Modifier.width(12.dp))
-                            Column(Modifier.weight(1f)) {
-                                Text(p.nome, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF1B5E20))
-                                Text("Prezzo originario: €${p.prezzo}", fontSize = 14.sp, color = Color(0xFF2E7D32))
-                            }
-                            IconButton(onClick = { selectedProducts.remove(p) }) {
-                                Icon(Icons.Default.Close, "Rimuovi", tint = Color.Red)
-                            }
-                        }
+                    Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(if (isCoupon) "Modifica Coupon" else "Modifica Offerta", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                        Text("I campi verdi sono completati", color = Color.White.copy(alpha = 0.8f), fontSize = 12.sp)
                     }
                 }
 
-                if (selectedProducts.size < requiredProductsCount) {
-                    OutlinedButton(
-                        onClick = {
-                            pendingProductSelection = { product ->
-                                if (!selectedProducts.contains(product) && selectedProducts.size < requiredProductsCount) {
-                                    selectedProducts.add(product)
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 25.dp)
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Spacer(modifier = Modifier.height(20.dp))
+                    CouponTextField(
+                        value = code,
+                        onValueChange = { code = it },
+                        label = if (isCoupon) "Codice Coupon" else "Codice Offerta",
+                        keyboardType = if ("code" == "discount") KeyboardType.Number else KeyboardType.Text,
+                        readOnly = existingCoupon != null && "code" == "code",
+                        minLines = if ("code" == "description") 2 else 1,
+                        singleLine = "code" != "description"
+                    )
+
+                    CouponTextField(
+                        value = discount,
+                        onValueChange = { discount = it },
+                        label = "Sconto (%)",
+                        keyboardType = if ("discount" == "discount") KeyboardType.Number else KeyboardType.Text,
+                        readOnly = existingCoupon != null && "discount" == "code",
+                        minLines = if ("discount" == "description") 2 else 1,
+                        singleLine = "discount" != "description"
+                    )
+
+                    CouponTextField(
+                        value = description,
+                        onValueChange = { description = it },
+                        label = "Descrizione",
+                        keyboardType = if ("description" == "discount") KeyboardType.Number else KeyboardType.Text,
+                        readOnly = existingCoupon != null && "description" == "code",
+                        minLines = if ("description" == "description") 2 else 1,
+                        singleLine = "description" != "description"
+                    )
+
+                    var showDatePicker by remember { mutableStateOf(false) }
+                    val datePickerState = rememberDatePickerState()
+
+                    if (showDatePicker) {
+                        DatePickerDialog(
+                            onDismissRequest = { showDatePicker = false },
+                            confirmButton = {
+                                TextButton(onClick = {
+                                    datePickerState.selectedDateMillis?.let { millis ->
+                                        val formatter = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+                                        formatter.timeZone = java.util.TimeZone.getTimeZone("UTC")
+                                        dateOfExpiration = formatter.format(java.util.Date(millis))
+                                    }
+                                    showDatePicker = false
+                                }) {
+                                    Text("OK")
+                                }
+                            },
+                            dismissButton = {
+                                TextButton(onClick = { showDatePicker = false }) {
+                                    Text("Annulla")
                                 }
                             }
-                            isSelectionOpen = true
-                        },
-                        modifier = Modifier.fillMaxWidth().height(56.dp),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Icon(Icons.Default.ShoppingCart, contentDescription = null)
-                        Spacer(Modifier.width(8.dp))
-                        Text(if (isCoupon) "Aggiungi Prodotto" else "Seleziona Prodotto")
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Button(
-                    onClick = {
-                        val finalDiscount = discountVal ?: 0f
-                        val newCoupon = Coupon(
-                            _code = code,
-                            _discount = finalDiscount,
-                            _description = description,
-                            _dateOfExpiration = dateOfExpiration,
-                            *selectedProducts.toTypedArray()
-                        )
-
-                        if (existingCoupon != null) {
-                            val index = ListOfCoupon.indexOfFirst { it.code == existingCoupon.code }
-                            if (index != -1) {
-                                ListOfCoupon[index] = newCoupon
-                            }
-                        } else {
-                            ListOfCoupon.add(newCoupon)
+                        ) {
+                            DatePicker(state = datePickerState)
                         }
-                        Toast.makeText(context, "Modifica salvata con successo", Toast.LENGTH_SHORT).show()
-                        navController?.popBackStack()
+                    }
+
+                    CouponTextField(
+                        value = dateOfExpiration,
+                        onValueChange = { },
+                        label = "Data Scadenza",
+                        readOnly = true,
+                        trailingIcon = {
+                            IconButton(onClick = { showDatePicker = true }
+                    ) {
+                                Icon(Icons.Default.DateRange, contentDescription = "Seleziona Data")
+                            }
+                        }
+                    )
+
+                    Text("Prodotti (${selectedProducts.size}/$requiredProductsCount)", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                    
+                    selectedProducts.forEach { p ->
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9)),
+                            elevation = CardDefaults.cardElevation(2.dp)
+                        ) {
+                            Row(Modifier.padding(16.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.ShoppingCart, null, tint = Color(0xFF388E3C), modifier = Modifier.size(32.dp))
+                                Spacer(Modifier.width(12.dp))
+                                Column(Modifier.weight(1f)) {
+                                    Text(p.nome, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF1B5E20))
+                                    Text("Prezzo originario: €${p.prezzo}", fontSize = 14.sp, color = Color(0xFF2E7D32))
+                                }
+                                IconButton(onClick = { selectedProducts.remove(p) }) {
+                                    Icon(Icons.Default.Close, "Rimuovi", tint = Color.Red)
+                                }
+                            }
+                        }
+                    }
+
+                    if (selectedProducts.size < requiredProductsCount) {
+                        OutlinedButton(
+                            onClick = {
+                                pendingProductSelection = { product ->
+                                    if (!selectedProducts.contains(product) && selectedProducts.size < requiredProductsCount) {
+                                        selectedProducts.add(product)
+                                    }
+                                }
+                                isSelectionOpen = true
+                            },
+                            modifier = Modifier.fillMaxWidth().height(56.dp),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Icon(Icons.Default.ShoppingCart, contentDescription = null)
+                            Spacer(Modifier.width(8.dp))
+                            Text(if (isCoupon) "Aggiungi Prodotto" else "Seleziona Prodotto")
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Button(
+                        onClick = { showSaveConfirm = true },
+                        enabled = isFormValid,
+                        modifier = Modifier.height(55.dp).width(220.dp),
+                        shape = CircleShape,
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF388E3C))
+                    ) {
+                        Text("Salva Modifiche", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    }
+                    
+                    Spacer(modifier = Modifier.height(100.dp))
+                }
+            }
+
+            if (showSaveConfirm) {
+                AlertDialog(
+                    onDismissRequest = { showSaveConfirm = false },
+                    title = { Text(if (existingCoupon != null) "Conferma Modifica" else "Conferma Creazione") },
+                    text = { Text(if (existingCoupon != null) "Vuoi salvare le modifiche apportate?" else "Vuoi salvare il nuovo elemento?") },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            showSaveConfirm = false
+                            val finalDiscount = discountVal ?: 0f
+                            val newCoupon = Coupon(
+                                _code = code,
+                                _discount = finalDiscount,
+                                _description = description,
+                                _dateOfExpiration = dateOfExpiration,
+                                *selectedProducts.toTypedArray()
+                            )
+    
+                            if (existingCoupon != null) {
+                                val index = ListOfCoupon.indexOfFirst { it.code == existingCoupon.code }
+                                if (index != -1) {
+                                    ListOfCoupon[index] = newCoupon
+                                }
+                            } else {
+                                ListOfCoupon.add(newCoupon)
+                            }
+                            Toast.makeText(context, "Salvato con successo", Toast.LENGTH_SHORT).show()
+                            navController?.popBackStack()
+                        }) {
+                            Text("Salva", color = Color(0xFF388E3C))
+                        }
                     },
-                    enabled = isFormValid,
-                    modifier = Modifier.height(55.dp).width(220.dp),
-                    shape = CircleShape,
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF388E3C))
-                ) {
-                    Text("Salva Modifiche", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                }
+                    dismissButton = {
+                        TextButton(onClick = { showSaveConfirm = false }) { Text("Annulla", color = Color.Gray) }
+                    }
+                )
+            }
+
+            if (showDeleteConfirm) {
+                AlertDialog(
+                    onDismissRequest = { showDeleteConfirm = false },
+                    title = { Text("Conferma Eliminazione") },
+                    text = { Text("Sei sicuro di voler eliminare questo elemento?") },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            showDeleteConfirm = false
+                            ListOfCoupon.remove(existingCoupon)
+                            Toast.makeText(context, "Eliminato con successo", Toast.LENGTH_SHORT).show()
+                            navController?.popBackStack()
+                        }) {
+                            Text("Elimina", color = Color.Red)
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showDeleteConfirm = false }) { Text("Annulla", color = Color.Gray) }
+                    }
+                )
             }
         }
     }

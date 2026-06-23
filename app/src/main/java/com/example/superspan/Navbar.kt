@@ -126,7 +126,7 @@ fun Navigation(navController: NavHostController, startDestination: Destination, 
                     Destination.EDIT_WORK_OFFER -> AdminWorkOfferEditPage(null, navController, paddingValues) // Will be handled by ID route
                     Destination.ACCOUNT_SUMMARY -> AccountSummaryPage(actualUser, navController, paddingValues)
                     Destination.ACCOUNT_EDIT -> AccountSettingsPage(actualUser, navController, paddingValues)
-                    Destination.ADMIN_CANDIDACIES -> AdminCandidaciesPage(navController, paddingValues)
+                    Destination.ADMIN_CANDIDACIES -> AdminWorkMainPage(paddingValues, navController, initialTab = 1)
                     else -> {}
                 }
             }

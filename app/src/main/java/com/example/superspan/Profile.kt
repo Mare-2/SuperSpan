@@ -50,11 +50,8 @@ fun ProfilePage(user: User, navController: NavController?, paddingValues: Paddin
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Row(modifier = Modifier.fillMaxWidth().padding(10.dp)) {
-                IconButton(onClick = { navController?.popBackStack() }) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
-                }
-            }
+            // Tasto Indietro rimosso
+
             Text(
                 text = "LOGO",
                 fontSize = 40.sp,

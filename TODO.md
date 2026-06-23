@@ -4,9 +4,9 @@
 
 ### 👤 Profilo Utente
 - [x] fare la pagina dei dati personali con area di modifica del profilo utente
-- [ ] fare pagina del riepilogo delle candidature nel profilo utente con storico 
+- [x] fare pagina del riepilogo delle candidature nel profilo utente con storico 
 - [ ] fare pagina dati account nel profilo utente con possibile modifica di email e password (da controllare se mail cambiata funziona )
-- [ ] nella pagina candidature far vedere se la candidatura viene scartata o mandata all'hr/ responsabile 
+- [x] nella pagina candidature far vedere se la candidatura viene scartata o mandata all'hr/ responsabile 
 
 
 ### 👨‍💼 Profilo Admin (Gestione)
@@ -19,7 +19,7 @@
 ### Profilo Generico
 - [x] far funzionare il tasto logout nel profilo
 - [ ] aggiustare scorrimento nel profilo
-- [ ] togliere freccia in alto a sinistra 
+- [x] togliere freccia in alto a sinistra 
 
 ### 📝 Flusso Candidatura (Lavora con noi)
 - [x] continuare le pagine per le fasi di candidatura
@@ -34,6 +34,8 @@
   - [x] siccome si potranno salvare le bozze se uno tenta di uscire mettere un messaggio con opzioni "elimina tutto", "annulla" e "salva in bozza"
 - [ ] mostrare un feedback visivo chiaro e il nome del file caricato per rassicurare l'utente che il CV è stato acquisito (pop-up)
 - [ ] aggiungere istruzioni chiare sulla durata del video (circa 30 secondi) e un messaggio di conferma al termine della registrazione
+- [ ] se il video è già stato registrato andare al riepilogo video se si torna indietro e non alla registrazione, perchè si perde
+- [ ] salvare anche il video quando si salva nelle bozze
 
 
 ### 🔍 Pagina Ricerca Prodotti e pagina Prodotto

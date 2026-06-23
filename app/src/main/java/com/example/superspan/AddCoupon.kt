@@ -44,6 +44,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.AlertDialog
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -74,6 +75,7 @@ fun AddCoupon(paddingValues: PaddingValues, navController: NavController?) {
     var selected by remember { mutableIntStateOf(0) }
     var isSelectionOpen by remember { mutableStateOf(false) }
     var pendingProductSelection by remember { mutableStateOf<((Product) -> Unit)?>(null) }
+    var pendingCouponSave by remember { mutableStateOf<Coupon?>(null) }
     val context = LocalContext.current
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -131,9 +133,7 @@ fun AddCoupon(paddingValues: PaddingValues, navController: NavController?) {
                         isSelectionOpen = true
                     },
                     onSave = { newCoupon ->
-                        ListOfCoupon.add(newCoupon)
-                        Toast.makeText(context, "Coupon salvato con successo", Toast.LENGTH_SHORT).show()
-                        navController?.popBackStack()
+                        pendingCouponSave = newCoupon
                     }
                 )
             } else {
@@ -143,9 +143,7 @@ fun AddCoupon(paddingValues: PaddingValues, navController: NavController?) {
                         isSelectionOpen = true
                     },
                     onSave = { newPromo ->
-                        ListOfCoupon.add(newPromo)
-                        Toast.makeText(context, "Offerta salvata con successo", Toast.LENGTH_SHORT).show()
-                        navController?.popBackStack()
+                        pendingCouponSave = newPromo
                     }
                 )
             }
@@ -169,6 +167,28 @@ fun AddCoupon(paddingValues: PaddingValues, navController: NavController?) {
                     }
                 )
             }
+        }
+
+        if (pendingCouponSave != null) {
+            val isCouponSave = pendingCouponSave!!.products.size == 3
+            AlertDialog(
+                onDismissRequest = { pendingCouponSave = null },
+                title = { Text("Conferma Creazione") },
+                text = { Text(if (isCouponSave) "Vuoi salvare il nuovo coupon?" else "Vuoi salvare la nuova offerta?") },
+                confirmButton = {
+                    androidx.compose.material3.TextButton(onClick = {
+                        ListOfCoupon.add(pendingCouponSave!!)
+                        pendingCouponSave = null
+                        Toast.makeText(context, "Salvato con successo", Toast.LENGTH_SHORT).show()
+                        navController?.popBackStack()
+                    }) {
+                        Text("Salva", color = Color(0xFF388E3C))
+                    }
+                },
+                dismissButton = {
+                    androidx.compose.material3.TextButton(onClick = { pendingCouponSave = null }) { Text("Annulla", color = Color.Gray) }
+                }
+            )
         }
     }
 }

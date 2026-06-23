@@ -1,5 +1,6 @@
 package com.example.superspan
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -20,6 +21,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -35,7 +37,11 @@ fun AdminWorkOfferEditPage(
     navController: NavController?,
     paddingValues: PaddingValues
 ) {
+    val context = LocalContext.current
     var isSelectionOpen by remember { mutableStateOf(false) }
+    
+    var showSaveConfirm by remember { mutableStateOf(false) }
+    var showDeleteConfirm by remember { mutableStateOf(false) }
     
     var titolo by remember { mutableStateOf(offer?.titolo ?: "") }
     var ruoloEnum by remember { mutableStateOf<Role?>(offer?.ruoloEnum) }
@@ -55,168 +61,208 @@ fun AdminWorkOfferEditPage(
             }
         )
     } else {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text(if (offer == null) "Aggiungi Offerta Lavoro" else "Modifica Offerta") },
-                    navigationIcon = {
-                        IconButton(onClick = { navController?.popBackStack() }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
+        Box(modifier = Modifier.fillMaxSize()) {
+            Scaffold(
+                topBar = {
+                    TopAppBar(
+                        title = { Text(if (offer == null) "Aggiungi Offerta Lavoro" else "Modifica Offerta") },
+                        navigationIcon = {
+                            IconButton(onClick = { navController?.popBackStack() }) {
+                                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
+                            }
+                        },
+                        actions = {
+                            if (offer != null) {
+                                IconButton(onClick = { showDeleteConfirm = true }) {
+                                    Icon(Icons.Default.Delete, contentDescription = "Elimina", tint = Color.Red)
+                                }
+                            }
+                        }
+                    )
+                },
+                modifier = Modifier.padding(paddingValues)
+            ) { innerPadding ->
+                Column(
+                    modifier = Modifier
+                        .padding(innerPadding)
+                        .fillMaxSize()
+                        .padding(16.dp)
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    // STEP 1: SEDE DI LAVORO
+                    Text("Sede di Lavoro", fontWeight = FontWeight.Bold)
+                    if (selectedSupermarket == null) {
+                        OutlinedButton(
+                            onClick = { isSelectionOpen = true },
+                            modifier = Modifier.fillMaxWidth().height(56.dp),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Icon(Icons.Default.LocationOn, contentDescription = null)
+                            Spacer(Modifier.width(8.dp))
+                            Text("Seleziona Supermercato")
+                        }
+                    } else {
+                        selectedSupermarket?.let { s ->
+                            Card(
+                                modifier = Modifier.fillMaxWidth().clickable { isSelectionOpen = true },
+                                colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9)),
+                                elevation = CardDefaults.cardElevation(2.dp)
+                            ) {
+                                Row(Modifier.padding(16.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(Icons.Default.LocationOn, null, tint = Color(0xFF388E3C), modifier = Modifier.size(32.dp))
+                                    Spacer(Modifier.width(12.dp))
+                                    Column(Modifier.weight(1f)) {
+                                        Text(s.nome, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF1B5E20))
+                                        Text("${s.indirizzo}, ${s.citta}", fontSize = 14.sp, color = Color(0xFF2E7D32))
+                                    }
+                                    Text("Modifica", color = Color(0xFF388E3C), fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                                }
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // STEP 2: CATEGORIA / RUOLO
+                    Text("Ruolo (Categoria)", fontWeight = FontWeight.Bold)
+                    @OptIn(ExperimentalLayoutApi::class)
+                    FlowRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Role.entries.forEach { role ->
+                            FilterChip(
+                                selected = ruoloEnum == role,
+                                onClick = { ruoloEnum = role },
+                                label = { Text(role.nome) }
+                            )
+                        }
+                    }
+
+                    // STEP 3: DETTAGLI
+                    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        OutlinedTextField(value = titolo, onValueChange = { titolo = it }, label = { Text("Titolo Offerta") }, modifier = Modifier.fillMaxWidth())
+
+                        OutlinedTextField(value = descrizioneBreve, onValueChange = { descrizioneBreve = it }, label = { Text("Descrizione Breve") }, modifier = Modifier.fillMaxWidth())
+                        OutlinedTextField(value = descrizioneEstesa, onValueChange = { descrizioneEstesa = it }, label = { Text("Descrizione Estesa") }, modifier = Modifier.fillMaxWidth(), minLines = 3)
+                        OutlinedTextField(value = requisiti, onValueChange = { requisiti = it }, label = { Text("Requisiti") }, modifier = Modifier.fillMaxWidth(), minLines = 2)
+
+                            Text("Tipo Contratto", fontWeight = FontWeight.Bold)
+                            @OptIn(ExperimentalLayoutApi::class)
+                            FlowRow(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                TipoContratto.entries.forEach { tipo ->
+                                    FilterChip(
+                                        selected = tipoContratto == tipo,
+                                        onClick = { tipoContratto = tipo },
+                                        label = { Text(tipo.nome) }
+                                    )
+                                }
+                            }
+
+                            Text("Orario Lavoro", fontWeight = FontWeight.Bold)
+                            @OptIn(ExperimentalLayoutApi::class)
+                            FlowRow(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                OrarioLavoro.entries.forEach { o ->
+                                    FilterChip(
+                                        selected = orario == o,
+                                        onClick = { orario = o },
+                                        label = { Text(o.nome) }
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(24.dp))
+
+                            Button(
+                                onClick = { showSaveConfirm = true },
+                                modifier = Modifier.fillMaxWidth().height(56.dp),
+                                shape = RoundedCornerShape(12.dp),
+                                enabled = titolo.isNotBlank() && descrizioneBreve.isNotBlank() && selectedSupermarket != null && ruoloEnum != null
+                            ) {
+                                Icon(Icons.Default.Save, contentDescription = null)
+                                Spacer(Modifier.width(8.dp))
+                                Text("Salva Offerta")
+                            }
+                            
+                            Spacer(modifier = Modifier.height(100.dp))
+                        }
+                    }
+                }
+                
+            if (showSaveConfirm) {
+                AlertDialog(
+                    onDismissRequest = { showSaveConfirm = false },
+                    title = { Text(if (offer != null) "Conferma Modifica" else "Conferma Creazione") },
+                    text = { Text(if (offer != null) "Vuoi salvare le modifiche apportate all'offerta?" else "Vuoi salvare la nuova offerta di lavoro?") },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            showSaveConfirm = false
+                            val sp = selectedSupermarket ?: return@TextButton
+                            val enumRuolo = ruoloEnum ?: return@TextButton
+                            val dist = calcolaDistanzaSimulata(sp.citta)
+                            val newOffer = WorkOffer(
+                                id = offer?.id ?: ((WorkOfferSearchList.maxOfOrNull { it.id } ?: 0) + 1),
+                                titolo = titolo,
+                                ruoloEnum = enumRuolo,
+                                descrizioneBreve = descrizioneBreve,
+                                descrizioneEstesa = descrizioneEstesa,
+                                requisiti = requisiti,
+                                supermarket = sp,
+                                tipoContratto = tipoContratto,
+                                orario = orario,
+                                distanzaKm = dist
+                            )
+
+                            if (offer != null) {
+                                val index = WorkOfferSearchList.indexOf(offer)
+                                if (index != -1) {
+                                    WorkOfferSearchList[index] = newOffer
+                                }
+                            } else {
+                                WorkOfferSearchList.add(0, newOffer) // Aggiungiamo in cima per comodità
+                            }
+                            highlightedWorkOfferId = newOffer.id
+                            Toast.makeText(context, "Salvato con successo", Toast.LENGTH_SHORT).show()
+                            navController?.popBackStack()
+                        }) {
+                            Text("Salva", color = Color(0xFF388E3C))
                         }
                     },
-                    actions = {
-                        if (offer != null) {
-                            IconButton(onClick = {
-                                WorkOfferSearchList.remove(offer)
-                                navController?.popBackStack()
-                            }) {
-                                Icon(Icons.Default.Delete, contentDescription = "Elimina", tint = Color.Red)
-                            }
-                        }
+                    dismissButton = {
+                        TextButton(onClick = { showSaveConfirm = false }) { Text("Annulla", color = Color.Gray) }
                     }
                 )
-            },
-            modifier = Modifier.padding(paddingValues)
-        ) { innerPadding ->
-            Column(
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .fillMaxSize()
-                    .padding(16.dp)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                // STEP 1: SEDE DI LAVORO
-                Text("Sede di Lavoro", fontWeight = FontWeight.Bold)
-                if (selectedSupermarket == null) {
-                    OutlinedButton(
-                        onClick = { isSelectionOpen = true },
-                        modifier = Modifier.fillMaxWidth().height(56.dp),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Icon(Icons.Default.LocationOn, contentDescription = null)
-                        Spacer(Modifier.width(8.dp))
-                        Text("Seleziona Supermercato")
-                    }
-                } else {
-                    selectedSupermarket?.let { s ->
-                        Card(
-                            modifier = Modifier.fillMaxWidth().clickable { isSelectionOpen = true },
-                            colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9)),
-                            elevation = CardDefaults.cardElevation(2.dp)
-                        ) {
-                            Row(Modifier.padding(16.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Default.LocationOn, null, tint = Color(0xFF388E3C), modifier = Modifier.size(32.dp))
-                                Spacer(Modifier.width(12.dp))
-                                Column(Modifier.weight(1f)) {
-                                    Text(s.nome, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF1B5E20))
-                                    Text("${s.indirizzo}, ${s.citta}", fontSize = 14.sp, color = Color(0xFF2E7D32))
-                                }
-                                Text("Modifica", color = Color(0xFF388E3C), fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                            }
+            }
+
+            if (showDeleteConfirm) {
+                AlertDialog(
+                    onDismissRequest = { showDeleteConfirm = false },
+                    title = { Text("Conferma Eliminazione") },
+                    text = { Text("Sei sicuro di voler eliminare questa offerta di lavoro?") },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            showDeleteConfirm = false
+                            WorkOfferSearchList.remove(offer)
+                            Toast.makeText(context, "Eliminato con successo", Toast.LENGTH_SHORT).show()
+                            navController?.popBackStack()
+                        }) {
+                            Text("Elimina", color = Color.Red)
                         }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showDeleteConfirm = false }) { Text("Annulla", color = Color.Gray) }
                     }
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                // STEP 2: CATEGORIA / RUOLO
-                Text("Ruolo (Categoria)", fontWeight = FontWeight.Bold)
-                @OptIn(ExperimentalLayoutApi::class)
-                FlowRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Role.entries.forEach { role ->
-                        FilterChip(
-                            selected = ruoloEnum == role,
-                            onClick = { ruoloEnum = role },
-                            label = { Text(role.nome) }
-                        )
-                    }
-                }
-
-                // STEP 3: DETTAGLI
-                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    OutlinedTextField(value = titolo, onValueChange = { titolo = it }, label = { Text("Titolo Offerta") }, modifier = Modifier.fillMaxWidth())
-
-                    OutlinedTextField(value = descrizioneBreve, onValueChange = { descrizioneBreve = it }, label = { Text("Descrizione Breve") }, modifier = Modifier.fillMaxWidth())
-                    OutlinedTextField(value = descrizioneEstesa, onValueChange = { descrizioneEstesa = it }, label = { Text("Descrizione Estesa") }, modifier = Modifier.fillMaxWidth(), minLines = 3)
-                    OutlinedTextField(value = requisiti, onValueChange = { requisiti = it }, label = { Text("Requisiti") }, modifier = Modifier.fillMaxWidth(), minLines = 2)
-
-                        Text("Tipo Contratto", fontWeight = FontWeight.Bold)
-                        @OptIn(ExperimentalLayoutApi::class)
-                        FlowRow(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            TipoContratto.entries.forEach { tipo ->
-                                FilterChip(
-                                    selected = tipoContratto == tipo,
-                                    onClick = { tipoContratto = tipo },
-                                    label = { Text(tipo.nome) }
-                                )
-                            }
-                        }
-
-                        Text("Orario Lavoro", fontWeight = FontWeight.Bold)
-                        @OptIn(ExperimentalLayoutApi::class)
-                        FlowRow(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            OrarioLavoro.entries.forEach { o ->
-                                FilterChip(
-                                    selected = orario == o,
-                                    onClick = { orario = o },
-                                    label = { Text(o.nome) }
-                                )
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(24.dp))
-
-                        Button(
-                            onClick = {
-                                val sp = selectedSupermarket ?: return@Button
-                                val enumRuolo = ruoloEnum ?: return@Button
-                                val dist = calcolaDistanzaSimulata(sp.citta)
-                                val newOffer = WorkOffer(
-                                    id = offer?.id ?: ((WorkOfferSearchList.maxOfOrNull { it.id } ?: 0) + 1),
-                                    titolo = titolo,
-                                    ruoloEnum = enumRuolo,
-                                    descrizioneBreve = descrizioneBreve,
-                                    descrizioneEstesa = descrizioneEstesa,
-                                    requisiti = requisiti,
-                                    supermarket = sp,
-                                    tipoContratto = tipoContratto,
-                                    orario = orario,
-                                    distanzaKm = dist
-                                )
-
-                                if (offer != null) {
-                                    val index = WorkOfferSearchList.indexOf(offer)
-                                    if (index != -1) {
-                                        WorkOfferSearchList[index] = newOffer
-                                    }
-                                } else {
-                                    WorkOfferSearchList.add(0, newOffer) // Aggiungiamo in cima per comodità
-                                }
-                                highlightedWorkOfferId = newOffer.id
-                                navController?.popBackStack()
-                            },
-                            modifier = Modifier.fillMaxWidth().height(56.dp),
-                            shape = RoundedCornerShape(12.dp),
-                            enabled = titolo.isNotBlank() && descrizioneBreve.isNotBlank()
-                        ) {
-                            Icon(Icons.Default.Save, contentDescription = null)
-                            Spacer(Modifier.width(8.dp))
-                            Text("Salva Offerta")
-                        }
-                    }
-                }
+                )
             }
         }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
