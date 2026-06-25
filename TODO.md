@@ -14,11 +14,11 @@
   - [x] offerte e coupon e pagina relativa quando ci schiacci, 
   - [x] candidature e pagina relativa quando ci schiacci
 - [ ] fare pagina dati account nel profilo admin con possibile modifica password (da verificare)
-- [ ] togliere username dalla card mio account nel profilo
+- [x] togliere username dalla card mio account nel profilo
 
 ### Profilo Generico
 - [x] far funzionare il tasto logout nel profilo
-- [ ] aggiustare scorrimento nel profilo
+- [x] aggiustare scorrimento nel profilo
 - [x] togliere freccia in alto a sinistra 
 
 ### 📝 Flusso Candidatura (Lavora con noi)
@@ -32,10 +32,10 @@
 - [x] dopo che un utente invia una candidatura riportarlo alla schermata delle offerte di lavoro (non alla home)
 - [x] aggiungere tasto per uscire in quasiasi step e quindi:
   - [x] siccome si potranno salvare le bozze se uno tenta di uscire mettere un messaggio con opzioni "elimina tutto", "annulla" e "salva in bozza"
-- [ ] mostrare un feedback visivo chiaro e il nome del file caricato per rassicurare l'utente che il CV è stato acquisito (pop-up)
-- [ ] aggiungere istruzioni chiare sulla durata del video (circa 30 secondi) e un messaggio di conferma al termine della registrazione
-- [ ] se il video è già stato registrato andare al riepilogo video se si torna indietro e non alla registrazione, perchè si perde
-- [ ] salvare anche il video quando si salva nelle bozze
+- [x] mostrare un feedback visivo chiaro e il nome del file caricato per rassicurare l'utente che il CV è stato acquisito (pop-up)
+- [x] aggiungere istruzioni chiare sulla durata del video (circa 30 secondi) e un messaggio di conferma al termine della registrazione
+- [x] se il video è già stato registrato andare al riepilogo video se si torna indietro e non alla registrazione, perchè si perde
+- [x] salvare anche il video quando si salva nelle bozze
 
 
 ### 🔍 Pagina Ricerca Prodotti e pagina Prodotto
@@ -51,14 +51,16 @@
 - [ ] la barra di ricerca e il tasto filtri sono giganteschi
 
 ### Pagina Coupon e Offerte, pagina Coupon e pagina Offerta
-- [ ] aggiustare pagine coupon e offerte
+- [x] aggiustare pagine coupon e offerte
 - [x] mettere icone per distinguere visivamente tra coupon e offerte oppure magari fare una selezione in alto per decidere se guardare gli uni o le altre
 - [ ] avrebbe senso aggiungere una barra di ricerca(?), da valutare
 - [x] cambiare data in coupon e offerte perchè è tutto scaduto
 - [ ] rendere più netta la differenza tra roba scaduta, in scadenza e valida che mi sembra non si veda tanto (non sono sicura era tutto scaduto)
-- [ ] messaggio di conferma visibile non solo quando viene caricato, ma anche quando viene eliminato o modificato un coupon o un'offerta
-- [ ] capire esattamente cosa sono i coupon e implementare la logica: Daniela deve poter definire un coupon selezionando esattamente 3 prodotti per la campagna promozionale
+- [x] messaggio di conferma visibile non solo quando viene caricato, ma anche quando viene eliminato o modificato un coupon o un'offerta
+- [x] capire esattamente cosa sono i coupon e implementare la logica: Daniela deve poter definire un coupon selezionando esattamente 3 prodotti per la campagna promozionale
 - [ ] vedere se mettere il codice a barre 
+- [x] aggiungere tasto di eliminazione coupon senza dover entrare nella modifica (per l'admin)
+- [ ] barra di ricerca (e filtri ?) per coupon e offerte
 
 
 ### Pagina ricerca Offerte di lavoro e pagina Offerta di lavoro
@@ -66,7 +68,7 @@
 - [x] aggiustare e fare bene i filtri per le offerte di lavoro
 - [x] rendere i luoghi dei supermercati e i km più realistici scegliendo città e paesi vicino a cagliari e in varie vie di cagliari
 - [ ] la barra di ricerca e il tasto filtri sono giganteschi
-- [ ] messaggi di conferma visibili non solo quando Daniela inserisce un'offerta di lavoro, ma anche quando la modifica o la elimina
+- [x] messaggi di conferma visibili non solo quando Daniela inserisce un'offerta di lavoro, ma anche quando la modifica o la elimina
 - [x] quando guarda le candidature daniela deve poter filtrare per ruolo sede e data 
 
 
@@ -86,7 +88,9 @@
 - [ ] far partire dal login
 - [ ] gestire i messaggi di errore per aiutare nella compilazione di dati e form
 - [ ] guardare di aver inserito tutte le feature aggiuntive che abbiamo dedotto con gli scenari
+- [x] controllare che la navbar sia sempre evidenziata la sezione corretta 
 - [ ] spararci in faccia (scherzo(forse))
+- [ ] mettere freccia indietro in tutte le pagine secondarie 
 
 
 

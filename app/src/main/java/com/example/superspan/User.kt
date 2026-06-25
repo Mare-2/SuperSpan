@@ -112,7 +112,7 @@ val MapOfUser = mutableMapOf<String, User>(
 )
 
 //var currentUser by mutableStateOf(MapOfUser["p.cortellesi@gmail.com"]!!)
-var actualUser: User by mutableStateOf(MapOfUser["d.tinti@superspan.it"]!!)
+var actualUser: User by mutableStateOf(MapOfUser["p.cortellesi@gmail.com"]!!)
 //------------------------------Da sistemare-------------------------------------------
 class FilterData() {
     var nome: String by mutableStateOf("")

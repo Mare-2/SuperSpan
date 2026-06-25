@@ -11,6 +11,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,6 +24,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import androidx.navigation.NavController
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 
 @Composable
 fun Register(
@@ -56,7 +61,12 @@ fun Register(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Bottom
             ) {
-                Text("LOGO", fontSize = 55.sp, modifier = Modifier.padding(bottom = 35.dp))
+                Image(
+                    painter = painterResource(id = R.drawable.logo_superspan),
+                    contentDescription = "Logo SuperSpan",
+                    modifier = Modifier.height(80.dp).padding(bottom = 20.dp),
+                    contentScale = ContentScale.Fit
+                )
                 Text("Benvenuto!", fontSize = 40.sp, modifier = Modifier.padding(bottom = 15.dp))
             }
             Column(
@@ -64,22 +74,35 @@ fun Register(
                     .fillMaxWidth()
                     .weight(5f),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Bottom
+                verticalArrangement = Arrangement.Center
             ) {
                 if (!formPass) FormDati(email, nome, cognome, {email = it}, {nome = it}, {cognome = it}, {formPass = it})
                 else FormPassword({password = it}, {check = it})
             }
         }
-        Box(Modifier.weight(0.5f), contentAlignment = Alignment.Center) {
-            Button({
-                val newUser = User(nome, cognome, email, password)
-                MapOfUser.put(email, newUser)
-                actualUser = newUser
-                navController?.navigate(Destination.HOME.route)}, enabled = check) {Text("Registrati")}
-        }
-        Box(contentAlignment = Alignment.BottomStart, modifier = Modifier.fillMaxWidth()) {
-            Button({ navController?.navigate(Destination.LOGIN.route) }) {
-                Text("Cambia")
+        Column(
+            Modifier.weight(0.5f).fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            if (formPass) {
+                Button({
+                    val newUser = User(nome, cognome, email, password)
+                    MapOfUser.put(email, newUser)
+                    actualUser = newUser
+                    navController?.navigate(Destination.HOME.route)}, enabled = check) {Text("Registrati")}
+                
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+            
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("Hai già un account?", color = Color.Gray)
+                TextButton(onClick = { navController?.navigate(Destination.LOGIN.route) }) {
+                    Text("Accedi", fontWeight = FontWeight.Bold, color = Color(0xFF388E3C))
+                }
             }
         }
     }
@@ -138,13 +161,10 @@ fun FormDati(
                 onSurnameChange(cognome)
             }
         )
-        Spacer(Modifier.height(30.dp))
+        Spacer(Modifier.height(10.dp))
         Button({onAdvance(true)}, enabled = check, modifier = Modifier.padding(bottom = 15.dp).align(Alignment.CenterHorizontally)) {Text("Avanti")}
     }
 }
-
-
-
 
 @ExperimentalMaterial3Api
 @Composable
@@ -152,6 +172,3 @@ fun FormDati(
 fun RegisterPreview() {
     Register(PaddingValues(0.dp), null)
 }
-
-
-

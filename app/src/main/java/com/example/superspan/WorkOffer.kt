@@ -55,6 +55,7 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.WorkOutline
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
 
 
 @Composable
@@ -161,6 +162,9 @@ fun WorkOfferPage(offer: WorkOffer?, navController: NavController?, paddingValue
 
         // --- TASTO CANDIDATI (Fisso con ombra) - NASCOSTO PER GLI ADMIN ---
         if (!actualUser.admin) {
+            val hasCandidacy = AllCandidacies.any { it.userEmail == actualUser.email && it.offerId == offer?.id }
+            val draft = offer?.let { getCandidacyDraftForOffer(actualUser, it.id) }
+            
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -169,21 +173,70 @@ fun WorkOfferPage(offer: WorkOffer?, navController: NavController?, paddingValue
                     .padding(vertical = 20.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Button(
-                    onClick = { currentOfferIdApplying = offer?.id ?: 0 // Salviamo l'ID
-                        navController?.navigate(Destination.APPLY_STEP_1.route)},
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter) // Resta centrato in basso
-                        .padding(bottom = 24.dp)      // Distanza fissa dalla navbar
-                        .height(56.dp),               // Altezza fissa per un buon touch-target
-                    shape = CircleShape,               // Lo rende perfettamente stondato (pillola)
-                    contentPadding = PaddingValues(horizontal = 32.dp) // Aggiunge spazio a destra e sinistra del testo
-                ) {
-                    Text(
-                        text = "Invia Candidatura",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                if (hasCandidacy) {
+                    Button(
+                        onClick = { },
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(bottom = 24.dp)
+                            .height(56.dp),
+                        shape = CircleShape,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Gray,
+                            disabledContainerColor = Color.Gray,
+                            disabledContentColor = Color.White
+                        ),
+                        enabled = false,
+                        contentPadding = PaddingValues(horizontal = 32.dp)
+                    ) {
+                        Text(
+                            text = "Candidatura Inviata",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                } else if (draft != null) {
+                    Button(
+                        onClick = { 
+                            currentOfferIdApplying = offer?.id ?: 0
+                            currentDraft = draft.copy()
+                            navController?.navigate(draft.lastStepRoute) 
+                        },
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(bottom = 24.dp)
+                            .height(56.dp),
+                        shape = CircleShape,
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFA000)),
+                        contentPadding = PaddingValues(horizontal = 32.dp)
+                    ) {
+                        Text(
+                            text = "Continua la compilazione",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                    }
+                } else {
+                    Button(
+                        onClick = { 
+                            currentOfferIdApplying = offer?.id ?: 0
+                            candidacySourceRoute = Destination.LAVORO.route
+                            navController?.navigate(Destination.APPLY_STEP_1.route)
+                        },
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter) // Resta centrato in basso
+                            .padding(bottom = 24.dp)      // Distanza fissa dalla navbar
+                            .height(56.dp),               // Altezza fissa per un buon touch-target
+                        shape = CircleShape,               // Lo rende perfettamente stondato (pillola)
+                        contentPadding = PaddingValues(horizontal = 32.dp) // Aggiunge spazio a destra e sinistra del testo
+                    ) {
+                        Text(
+                            text = "Invia Candidatura",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
             }
         }

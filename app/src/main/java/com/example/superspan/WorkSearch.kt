@@ -419,6 +419,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -489,7 +490,13 @@ fun WorkSearchPage(
     onOpenFilters: () -> Unit
 ) {
     val workSearchList by remember {
-        derivedStateOf { searchWorkOffer(filterData) }
+        derivedStateOf { 
+            searchWorkOffer(filterData).sortedBy { offer ->
+                val hasCandidacy = AllCandidacies.any { it.userEmail == actualUser.email && it.offerId == offer.id }
+                val hasDraft = actualUser.candidacyDraftsByOfferId.containsKey(offer.id)
+                if (hasCandidacy || hasDraft) 1 else 0
+            }
+        }
     }
     
     var highlightCurrentId by remember { mutableStateOf<Int?>(null) }
@@ -581,7 +588,18 @@ fun WorkSearchPage(
 
         // 3. LISTA DELLE OFFERTE
         items(workSearchList, key = { it.id }) { offer ->
-            WorkOfferCompose(offer, navController, isHighlighted = (highlightCurrentId == offer.id))
+            val hasCandidacy = AllCandidacies.any { it.userEmail == actualUser.email && it.offerId == offer.id }
+            val hasDraft = actualUser.candidacyDraftsByOfferId.containsKey(offer.id)
+            
+            val badgeText = if (hasCandidacy) "Inviata" else if (hasDraft) "Bozza" else "Nuova"
+            
+            WorkOfferCompose(
+                workOffer = offer, 
+                navController = navController, 
+                isHighlighted = (highlightCurrentId == offer.id),
+                isDisabled = hasCandidacy || hasDraft,
+                badgeText = badgeText
+            )
         }
     }
 }
@@ -589,7 +607,7 @@ fun WorkSearchPage(
 
 
 @Composable
-fun WorkOfferCompose(workOffer: WorkOffer, navController: NavController?, isHighlighted: Boolean = false) {
+fun WorkOfferCompose(workOffer: WorkOffer, navController: NavController?, isHighlighted: Boolean = false, isDisabled: Boolean = false, badgeText: String? = null) {
     val backgroundColor by animateColorAsState(
         targetValue = if (isHighlighted) Color(0xFFC8E6C9) else Color(0xFFF1F1F1),
         animationSpec = tween(durationMillis = 500)
@@ -618,6 +636,52 @@ fun WorkOfferCompose(workOffer: WorkOffer, navController: NavController?, isHigh
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.weight(1f)
                 )
+                if (badgeText != null) {
+                    val badgeColor = if (badgeText == "Bozza") Color(0xFFFFA000) else if (badgeText == "Inviata") Color(0xFF388E3C) else Color(0xFF2196F3)
+                    Surface(
+                        color = badgeColor.copy(alpha = 0.15f),
+                        shape = CircleShape,
+                        modifier = Modifier.padding(start = 8.dp)
+                    ) {
+                        Text(
+                            text = badgeText.uppercase(),
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = badgeColor
+                        )
+                    }
+                }
+            }
+
+            Text(
+                text = workOffer.descrizioneBreve,
+                fontSize = 14.sp,
+                color = Color.Gray,
+                maxLines = 2
+            )
+
+            // RIGA INFERIORE: Città • Contratto • Orario e Badge Distanza
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
+            ) {
+                Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.Top) {
+                    Icon(
+                        imageVector = Icons.Default.LocationOn,
+                        contentDescription = null,
+                        modifier = Modifier.size(14.dp).padding(top = 2.dp),
+                        tint = Color.Gray
+                    )
+                    Text(
+                        text = " ${workOffer.supermarket.citta} • ${workOffer.tipoContratto.nome} • ${workOffer.orario.nome}",
+                        fontSize = 12.sp,
+                        color = Color.Gray,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+
                 // Badge Distanza
                 Surface(
                     color = Color.White,
@@ -632,29 +696,6 @@ fun WorkOfferCompose(workOffer: WorkOffer, navController: NavController?, isHigh
                         color = Color.DarkGray
                     )
                 }
-            }
-
-            Text(
-                text = workOffer.descrizioneBreve,
-                fontSize = 14.sp,
-                color = Color.Gray,
-                maxLines = 2
-            )
-
-            // RIGA INFERIORE: Città • Contratto • Orario
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Default.LocationOn,
-                    contentDescription = null,
-                    modifier = Modifier.size(14.dp),
-                    tint = Color.Gray
-                )
-                Text(
-                    // AGGIUNTO: workOffer.orario.nome alla fine della stringa
-                    text = " ${workOffer.supermarket.citta} • ${workOffer.tipoContratto.nome} • ${workOffer.orario.nome}",
-                    fontSize = 12.sp,
-                    color = Color.Gray
-                )
             }
         }
     }

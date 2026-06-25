@@ -106,15 +106,11 @@ fun DraftsPage(navController: NavController?, padding: PaddingValues) {
                                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                                         TextButton(onClick = {
                                             // Continua: popola currentDraft e vai allo step 1
-                                            currentDraft = currentDraft.copy(
-                                                nome = draft.nome,
-                                                cognome = draft.cognome,
-                                                emailLavoro = draft.emailLavoro,
-                                                telefono = draft.telefono,
-                                                cvFileName = draft.cvFileName ?: ""
-                                            )
+                                            // Continua: popola currentDraft e vai allo step salvato
+                                            currentDraft = draft.copy()
                                             currentOfferIdApplying = offerId
-                                            navController?.navigate(Destination.APPLY_STEP_1.route)
+                                            candidacySourceRoute = Destination.DRAFTS.route
+                                            navController?.navigate(draft.lastStepRoute)
                                         }) {
                                             Icon(Icons.Default.Edit, null)
                                             Spacer(Modifier.width(6.dp))

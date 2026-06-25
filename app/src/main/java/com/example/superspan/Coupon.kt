@@ -375,6 +375,7 @@ data class ExpirationStatus(val label: String, val color: Color)
 fun CouponPageComplete(paddingValues: PaddingValues, navController: NavController?) {
     var selectedTab by remember { mutableIntStateOf(0) }
     var selectedOffer: Coupon? by remember { mutableStateOf(null) }
+    var searchQuery by remember { mutableStateOf("") }
 
     // --- GESTIONE RITORNO IN ALTO ---
     val listState = rememberLazyListState()
@@ -482,6 +483,27 @@ fun CouponPageComplete(paddingValues: PaddingValues, navController: NavControlle
                             fontSize = 16.sp,
                             color = Color.Gray
                         )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        OutlinedTextField(
+                            value = searchQuery,
+                            onValueChange = { searchQuery = it },
+                            placeholder = { Text("Cerca prodotto o offerta...") },
+                            leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Cerca") },
+                            trailingIcon = {
+                                if (searchQuery.isNotEmpty()) {
+                                    IconButton(onClick = { searchQuery = "" }) {
+                                        Icon(Icons.Default.Clear, contentDescription = "Cancella")
+                                    }
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = Color(0xFF388E3C),
+                                focusedLeadingIconColor = Color(0xFF388E3C),
+                                unfocusedBorderColor = Color.LightGray
+                            )
+                        )
                     }
                 }
 
@@ -505,10 +527,14 @@ fun CouponPageComplete(paddingValues: PaddingValues, navController: NavControlle
                 }
 
                 // 3. LISTA FILTRATA
-                val filteredList = if (selectedTab == 0) {
+                val filteredList = (if (selectedTab == 0) {
                     ListOfCoupon.filter { it.products.size == 3 }
                 } else {
                     ListOfCoupon.filter { it.products.size == 1 }
+                }).filter { coupon ->
+                    searchQuery.isEmpty() ||
+                    coupon.description.contains(searchQuery, ignoreCase = true) ||
+                    coupon.products.any { it.nome.contains(searchQuery, ignoreCase = true) }
                 }
 
                 items(filteredList, key = { it.code }) { item ->

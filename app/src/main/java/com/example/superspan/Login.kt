@@ -5,9 +5,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -15,6 +17,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,6 +32,10 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import androidx.navigation.NavController
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -64,7 +71,12 @@ fun Login(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Bottom
             ) {
-                Text("LOGO", fontSize = 55.sp, modifier = Modifier.padding(bottom = 35.dp))
+                Image(
+                    painter = painterResource(id = R.drawable.logo_superspan),
+                    contentDescription = "Logo SuperSpan",
+                    modifier = Modifier.height(80.dp).padding(bottom = 20.dp),
+                    contentScale = ContentScale.Fit
+                )
                 Text("Benvenuto!", fontSize = 40.sp, modifier = Modifier.padding(bottom = 15.dp))
             }
             Column(
@@ -79,7 +91,6 @@ fun Login(
                 val isEmailValid = android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
                 val isEmailError = loginError || (email.isNotEmpty() && !isEmailValid)
 
-                Spacer(Modifier.weight(0.4f))
                 EditTextField(
                     label = "E-mail",
                     value = email,
@@ -105,7 +116,7 @@ fun Login(
                     },
                     onValueChange = { password = it; loginError = false }
                 )
-                Spacer(Modifier.weight(0.6f))
+                Spacer(Modifier.height(15.dp))
                 Button(
                     onClick = {
                         val _user = accessAccount(email, password)
@@ -120,21 +131,18 @@ fun Login(
                     modifier = Modifier.padding(bottom = 15.dp)) { Text(text) }
             }
         }
-        Box(Modifier.weight(0.5f), contentAlignment = Alignment.BottomStart) {
-        }
-        Box(contentAlignment = Alignment.BottomStart, modifier = Modifier.fillMaxWidth()) {
-            Button({ navController?.navigate(Destination.REGISTER.route) }) {
-                Text("Cambia")
+        Box(Modifier.weight(0.5f), contentAlignment = Alignment.Center) {
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("Non hai un account?", color = Color.Gray)
+                TextButton(onClick = { navController?.navigate(Destination.REGISTER.route) }) {
+                    Text("Registrati", fontWeight = FontWeight.Bold, color = Color(0xFF388E3C))
+                }
             }
         }
     }
-}
-
-@ExperimentalMaterial3Api
-@Composable
-@Preview(showBackground = true)
-fun LoginPreview() {
-    Login(PaddingValues(0.dp), null)
 }
 
 fun accessAccount(email: String, password: String): User? {
@@ -147,4 +155,11 @@ fun accessAccount(email: String, password: String): User? {
     } catch (e: Exception) {
         return null
     }
+}
+
+@ExperimentalMaterial3Api
+@Composable
+@Preview(showBackground = true)
+fun LoginPreview() {
+    Login(PaddingValues(0.dp), null)
 }

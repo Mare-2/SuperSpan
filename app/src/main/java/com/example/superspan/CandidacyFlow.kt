@@ -3,6 +3,7 @@
 import android.net.Uri
 import android.util.Patterns
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.compose.BackHandler
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -660,7 +661,7 @@ fun ApplyStep2Record(navController: NavController?, padding: PaddingValues) {
                         isRecording = false
                         currentDraft = currentDraft.copy(videoFileName = "Video_Paolo_Presentazione.mp4")
                         if (isReturnToSummary) { isReturnToSummary = false; navController?.popBackStack() }
-                        else { navController?.navigate(Destination.APPLY_STEP_2_REVIEW.route) }
+                        else { navController?.navigate(Destination.APPLY_STEP_2_INTRO.route) }
                     }
                 })
             }
@@ -757,7 +758,7 @@ fun ApplyStep2Record(navController: NavController?, padding: PaddingValues) {
                 activeRecording.value?.stop()
                 activeRecording.value = null
                 isRecording = false
-                navController?.navigate(Destination.APPLY_STEP_2_REVIEW.route)
+                navController?.navigate(Destination.APPLY_STEP_2_INTRO.route)
             }
         }
     }
@@ -818,7 +819,7 @@ fun ApplyStep2Record(navController: NavController?, padding: PaddingValues) {
                         activeRecording.value = null
                         isRecording = false
                         // Aspettiamo un attimo per il salvataggio file prima di navigare
-                        navController?.navigate(Destination.APPLY_STEP_2_REVIEW.route)
+                        navController?.navigate(Destination.APPLY_STEP_2_INTRO.route)
                     }
             )
         }
@@ -1194,6 +1195,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.util.Patterns
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
@@ -1240,12 +1242,18 @@ import java.io.File
 
 var currentDraft by mutableStateOf(CandidacyDraft())
 var isReturnToSummary by mutableStateOf(false)
+var candidacySourceRoute by mutableStateOf<String?>(null)
 
 // --- UTILITY NAV ---
 fun goToOfferPresentation(navController: NavController?) {
-    navController?.navigate("dettaglio_offerta/$currentOfferIdApplying") {
-        popUpTo(Destination.APPLY_STEP_1.route) { inclusive = true }
-        launchSingleTop = true
+    val targetRoute = candidacySourceRoute ?: Destination.LAVORO.route
+    if (targetRoute == Destination.LAVORO.route) {
+        navController?.navigate(targetRoute) {
+            popUpTo(targetRoute) { inclusive = true }
+            launchSingleTop = true
+        }
+    } else {
+        navController?.popBackStack(targetRoute, inclusive = false)
     }
 }
 
@@ -1294,15 +1302,15 @@ fun ApplyStep1(navController: NavController?, padding: PaddingValues) {
     val context = LocalContext.current
     val draft = getCandidacyDraftForOffer(actualUser, currentOfferIdApplying) ?: CandidacyDraft()
 
-    var nome by remember { mutableStateOf(draft.nome.ifEmpty { actualUser.nome }) }
-    var cognome by remember { mutableStateOf(draft.cognome.ifEmpty { actualUser.cognome }) }
-    var emailLavoro by remember { mutableStateOf(draft.emailLavoro.ifEmpty { actualUser.emailLavoro ?: actualUser.email }) }
+    var nome by remember { mutableStateOf(currentDraft.nome.ifEmpty { draft.nome.ifEmpty { actualUser.nome } }) }
+    var cognome by remember { mutableStateOf(currentDraft.cognome.ifEmpty { draft.cognome.ifEmpty { actualUser.cognome } }) }
+    var emailLavoro by remember { mutableStateOf(currentDraft.emailLavoro.ifEmpty { draft.emailLavoro.ifEmpty { actualUser.emailLavoro ?: actualUser.email } }) }
     var telefonoDigits by remember {
-        val base = draft.telefono.ifEmpty { actualUser.telefono ?: "" }
+        val base = currentDraft.telefono.ifEmpty { draft.telefono.ifEmpty { actualUser.telefono ?: "" } }
         mutableStateOf(base.filter { it.isDigit() }.removePrefix("39"))
     }
-    var cvName by remember { mutableStateOf(draft.cvFileName.ifEmpty { actualUser.cvFileName ?: "" }) }
-    var cvPath by remember { mutableStateOf(draft.cvPath.ifEmpty { actualUser.cvPath ?: "" }) }
+    var cvName by remember { mutableStateOf(currentDraft.cvFileName.ifEmpty { draft.cvFileName.ifEmpty { actualUser.cvFileName ?: "" } }) }
+    var cvPath by remember { mutableStateOf(currentDraft.cvPath.ifEmpty { draft.cvPath.ifEmpty { actualUser.cvPath ?: "" } }) }
 
     var showExitDialog by remember { mutableStateOf(false) }
     var showResetDialog by remember { mutableStateOf(false) }
@@ -1316,6 +1324,8 @@ fun ApplyStep1(navController: NavController?, padding: PaddingValues) {
             saveFileToInternalStorage(context, selectedUri, dest)?.let { path ->
                 cvName = dest
                 cvPath = path
+                currentDraft = currentDraft.copy(cvFileName = dest, cvPath = path)
+                android.widget.Toast.makeText(context, "Curriculum caricato con successo!", android.widget.Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -1336,10 +1346,11 @@ fun ApplyStep1(navController: NavController?, padding: PaddingValues) {
     }
 
     Column(Modifier.fillMaxSize().padding(padding).background(Color.White)) {
-        ApplyHeader("1", "I tuoi dati e CV", { navController?.popBackStack() }, { showExitDialog = true })
+        BackHandler { showExitDialog = true }
+        ApplyHeader("1", "I tuoi dati e CV", { showExitDialog = true }, { showExitDialog = true })
 
         ExitDraftDialog(showExitDialog, { showExitDialog = false }, {
-            val d = CandidacyDraft(nome, cognome, emailLavoro, "+39 $telefonoDigits", cvName, cvPath, currentDraft.videoPath)
+            val d = CandidacyDraft(nome, cognome, emailLavoro, "+39 $telefonoDigits", cvName, cvPath, currentDraft.videoPath, Destination.APPLY_STEP_1.route)
             saveCandidacyDraftForOffer(actualUser, currentOfferIdApplying, d)
             currentDraft = d
             showExitDialog = false
@@ -1398,26 +1409,40 @@ fun ApplyStep1(navController: NavController?, padding: PaddingValues) {
     }
 }
 
-// --- STEP 2a: INTRO ---
+// --- STEP 2: INTRO & REVIEW ---
 @Composable
 fun ApplyStep2Intro(navController: NavController?, padding: PaddingValues) {
     var showExitDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    
+    val videoFile = File(currentDraft.videoPath ?: "")
+    val hasVideo = currentDraft.videoPath != null && videoFile.exists()
+    
+    val exoPlayer = remember(currentDraft.videoPath) {
+        androidx.media3.exoplayer.ExoPlayer.Builder(context).build().apply {
+            if (hasVideo) {
+                setMediaItem(androidx.media3.common.MediaItem.fromUri(android.net.Uri.fromFile(videoFile)))
+                prepare()
+            }
+        }
+    }
+    DisposableEffect(Unit) { onDispose { exoPlayer.release() } }
+
     val videoPickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let { selectedUri ->
             val destinationName = "video_galleria_${actualUser.nome.lowercase()}_${currentOfferIdApplying}.mp4"
             val savedPath = saveFileToInternalStorage(context, selectedUri, destinationName)
             if (savedPath != null) {
                 currentDraft = currentDraft.copy(videoPath = savedPath)
-                navController?.navigate(Destination.APPLY_STEP_2_REVIEW.route)
+                android.widget.Toast.makeText(context, "Video caricato con successo!", android.widget.Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    Column(Modifier.fillMaxSize().padding(padding).background(Color.White)) {
-        ApplyHeader("2", "Preparati al Video", { navController?.popBackStack() }, { showExitDialog = true })
+    Column(Modifier.fillMaxSize().padding(padding).background(Color.White), horizontalAlignment = Alignment.CenterHorizontally) {
+        ApplyHeader("2", if (hasVideo) "Rivedi il tuo video" else "Preparati al Video", { navController?.popBackStack() }, { showExitDialog = true })
         ExitDraftDialog(showExitDialog, { showExitDialog = false }, {
-            saveCandidacyDraftForOffer(actualUser, currentOfferIdApplying, currentDraft.copy())
+            saveCandidacyDraftForOffer(actualUser, currentOfferIdApplying, currentDraft.copy(lastStepRoute = Destination.APPLY_STEP_2_INTRO.route))
             showExitDialog = false
             goToOfferPresentation(navController)
         }, {
@@ -1426,21 +1451,46 @@ fun ApplyStep2Intro(navController: NavController?, padding: PaddingValues) {
             goToOfferPresentation(navController)
         })
 
-        Column(Modifier.padding(30.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(Color(0xFFF5F5F5)).padding(24.dp)) {
-                Column {
-                    Text("${actualUser.nome}, ecco cosa dire:", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                    Text("• Presentati\n• Esperienze lavorative\n• Perché SuperSpan?", Modifier.padding(vertical = 10.dp), lineHeight = 24.sp)
-                    Text("Hai 30 secondi.", fontWeight = FontWeight.Bold, color = Color.Red)
-                }
-            }
-            Spacer(Modifier.weight(1f))
-            Button(onClick = { navController?.navigate(Destination.APPLY_STEP_2_RECORD.route) }, Modifier.height(60.dp).fillMaxWidth(0.8f), colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray), shape = CircleShape) {
-                Icon(Icons.Default.Videocam, null); Spacer(Modifier.width(8.dp)); Text("Inizia Registrazione")
+        if (hasVideo) {
+            Spacer(Modifier.height(10.dp))
+            Box(Modifier.weight(1f).fillMaxWidth(0.9f).clip(RoundedCornerShape(20.dp)).background(Color.Black)) {
+                AndroidView(factory = { ctx -> androidx.media3.ui.PlayerView(ctx).apply { player = exoPlayer; useController = true } }, Modifier.fillMaxSize())
             }
             Spacer(Modifier.height(16.dp))
-            OutlinedButton(onClick = { videoPickerLauncher.launch("video/*") }, Modifier.height(60.dp).fillMaxWidth(0.8f), shape = CircleShape) {
-                Icon(Icons.Default.PhotoLibrary, null, tint = Color.DarkGray); Spacer(Modifier.width(8.dp)); Text("Carica da Galleria", color = Color.DarkGray)
+            Row(Modifier.fillMaxWidth(0.9f), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(onClick = { navController?.navigate(Destination.APPLY_STEP_2_RECORD.route) }, modifier = Modifier.weight(1f).height(50.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray), shape = CircleShape) {
+                    Icon(Icons.Default.Videocam, null, Modifier.size(18.dp)); Spacer(Modifier.width(4.dp)); Text("Registra", fontSize = 12.sp)
+                }
+                OutlinedButton(onClick = { videoPickerLauncher.launch("video/*") }, modifier = Modifier.weight(1f).height(50.dp), shape = CircleShape) {
+                    Icon(Icons.Default.PhotoLibrary, null, Modifier.size(18.dp), tint = Color.DarkGray); Spacer(Modifier.width(4.dp)); Text("Galleria", color = Color.DarkGray, fontSize = 12.sp)
+                }
+            }
+            Spacer(Modifier.height(16.dp))
+            Button(onClick = {
+                if (isReturnToSummary) {
+                    isReturnToSummary = false
+                    navController?.navigate(Destination.APPLY_STEP_3.route) { popUpTo(Destination.APPLY_STEP_3.route) { inclusive = true } }
+                } else navController?.navigate(Destination.APPLY_STEP_3.route)
+            }, Modifier.padding(vertical = 24.dp).height(56.dp).width(200.dp), shape = CircleShape, colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray)) {
+                Text("Avanti")
+            }
+        } else {
+            Column(Modifier.padding(30.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(Color(0xFFF5F5F5)).padding(24.dp)) {
+                    Column {
+                        Text("${actualUser.nome}, ecco cosa dire:", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                        Text("• Presentati\n• Esperienze lavorative\n• Perché SuperSpan?", Modifier.padding(vertical = 10.dp), lineHeight = 24.sp)
+                        Text("Hai 30 secondi.", fontWeight = FontWeight.Bold, color = Color.Red)
+                    }
+                }
+                Spacer(Modifier.weight(1f))
+                Button(onClick = { navController?.navigate(Destination.APPLY_STEP_2_RECORD.route) }, Modifier.height(60.dp).fillMaxWidth(0.8f), colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray), shape = CircleShape) {
+                    Icon(Icons.Default.Videocam, null); Spacer(Modifier.width(8.dp)); Text("Inizia Registrazione")
+                }
+                Spacer(Modifier.height(16.dp))
+                OutlinedButton(onClick = { videoPickerLauncher.launch("video/*") }, Modifier.height(60.dp).fillMaxWidth(0.8f), shape = CircleShape) {
+                    Icon(Icons.Default.PhotoLibrary, null, tint = Color.DarkGray); Spacer(Modifier.width(8.dp)); Text("Carica da Galleria", color = Color.DarkGray)
+                }
             }
         }
     }
@@ -1451,10 +1501,10 @@ fun ApplyStep2Intro(navController: NavController?, padding: PaddingValues) {
 fun ApplyStep2Record(navController: NavController?, padding: PaddingValues) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
-    val activeRecording = remember { mutableStateOf<Recording?>(null) }
+    val activeRecording = remember { mutableStateOf<androidx.camera.video.Recording?>(null) }
     val videoCapture = remember {
-        val r = Recorder.Builder().setQualitySelector(QualitySelector.from(Quality.SD)).build()
-        VideoCapture.withOutput(r)
+        val r = androidx.camera.video.Recorder.Builder().setQualitySelector(androidx.camera.video.QualitySelector.from(androidx.camera.video.Quality.SD)).build()
+        androidx.camera.video.VideoCapture.withOutput(r)
     }
 
     var countdown by remember { mutableStateOf(3) }
@@ -1477,12 +1527,13 @@ fun ApplyStep2Record(navController: NavController?, padding: PaddingValues) {
         else {
             while (countdown > 0) { delay(1000); countdown-- }
             isRecording = true
-            val opts = FileOutputOptions.Builder(videoFile).build()
+            val opts = androidx.camera.video.FileOutputOptions.Builder(videoFile).build()
             activeRecording.value = videoCapture.output.prepareRecording(context, opts).withAudioEnabled()
                 .start(ContextCompat.getMainExecutor(context)) { event ->
-                    if (event is VideoRecordEvent.Finalize) {
+                    if (event is androidx.camera.video.VideoRecordEvent.Finalize) {
                         if (!event.hasError()) {
                             currentDraft = currentDraft.copy(videoPath = videoFile.absolutePath)
+                            android.widget.Toast.makeText(context, "Video registrato con successo!", android.widget.Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
@@ -1496,7 +1547,7 @@ fun ApplyStep2Record(navController: NavController?, padding: PaddingValues) {
                 activeRecording.value?.stop()
                 isRecording = false
                 delay(500)
-                navController?.navigate(Destination.APPLY_STEP_2_REVIEW.route)
+                navController?.popBackStack()
             }
         }
     }
@@ -1504,14 +1555,14 @@ fun ApplyStep2Record(navController: NavController?, padding: PaddingValues) {
     Box(Modifier.fillMaxSize().background(Color.Black)) {
         if (hasPermissions && countdown == 0) {
             AndroidView(factory = { ctx ->
-                PreviewView(ctx).apply {
-                    val cf = ProcessCameraProvider.getInstance(ctx)
+                androidx.camera.view.PreviewView(ctx).apply {
+                    val cf = androidx.camera.lifecycle.ProcessCameraProvider.getInstance(ctx)
                     cf.addListener({
                         val cp = cf.get()
                         val p = androidx.camera.core.Preview.Builder().build()
                         p.setSurfaceProvider(this.surfaceProvider)
                         cp.unbindAll()
-                        cp.bindToLifecycle(lifecycleOwner, CameraSelector.DEFAULT_FRONT_CAMERA, p, videoCapture)
+                        cp.bindToLifecycle(lifecycleOwner, androidx.camera.core.CameraSelector.DEFAULT_FRONT_CAMERA, p, videoCapture)
                     }, ContextCompat.getMainExecutor(ctx))
                 }
             }, Modifier.fillMaxSize())
@@ -1538,7 +1589,7 @@ fun ApplyStep2Record(navController: NavController?, padding: PaddingValues) {
                 else {
                     activeRecording.value?.stop()
                     isRecording = false
-                    navController?.navigate(Destination.APPLY_STEP_2_REVIEW.route)
+                    navController?.popBackStack()
                 }
             })
             if (errorMsg.isNotEmpty()) {
@@ -1546,50 +1597,6 @@ fun ApplyStep2Record(navController: NavController?, padding: PaddingValues) {
                     Text(errorMsg, color = Color.Yellow, modifier = Modifier.padding(12.dp))
                 }
             }
-        }
-    }
-}
-
-// --- STEP 2c: REVIEW ---
-@Composable
-fun ApplyStep2Review(navController: NavController?, padding: PaddingValues) {
-    val context = LocalContext.current
-    val videoFile = File(currentDraft.videoPath)
-    val exoPlayer = remember(currentDraft.videoPath) {
-        ExoPlayer.Builder(context).build().apply {
-            if (videoFile.exists()) {
-                setMediaItem(MediaItem.fromUri(Uri.fromFile(videoFile)))
-                prepare()
-            }
-        }
-    }
-
-    DisposableEffect(Unit) { onDispose { exoPlayer.release() } }
-
-    Column(Modifier.fillMaxSize().padding(padding).background(Color.White), horizontalAlignment = Alignment.CenterHorizontally) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically // FIX ALIGNMENT
-        ) {
-            IconButton(onClick = { navController?.popBackStack() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null) }
-            Text("Riprova", Modifier.clickable { navController?.popBackStack() })
-        }
-        Text("Rivedi il tuo video", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-        Spacer(Modifier.height(10.dp))
-        Box(Modifier.weight(1f).fillMaxWidth(0.9f).clip(RoundedCornerShape(20.dp)).background(Color.Black)) {
-            if (videoFile.exists()) {
-                AndroidView(factory = { ctx -> PlayerView(ctx).apply { player = exoPlayer; useController = true } }, Modifier.fillMaxSize())
-            } else {
-                Text("Nessun video trovato", color = Color.White, modifier = Modifier.align(Alignment.Center))
-            }
-        }
-        Button(onClick = {
-            if (isReturnToSummary) {
-                isReturnToSummary = false
-                navController?.navigate(Destination.APPLY_STEP_3.route) { popUpTo(Destination.APPLY_STEP_3.route) { inclusive = true } }
-            } else navController?.navigate(Destination.APPLY_STEP_3.route)
-        }, Modifier.padding(32.dp).height(56.dp).width(200.dp), shape = CircleShape, colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray)) {
-            Text("Avanti")
         }
     }
 }
@@ -1728,7 +1735,7 @@ fun ApplyStep3(navController: NavController?, padding: PaddingValues) {
     Column(Modifier.fillMaxSize().padding(padding).background(Color.White)) {
         ApplyHeader("3", "Riepilogo e Invio", { navController?.popBackStack() }, { showExitDialog = true })
         ExitDraftDialog(showExitDialog, { showExitDialog = false }, {
-            saveCandidacyDraftForOffer(actualUser, currentOfferIdApplying, currentDraft.copy())
+            saveCandidacyDraftForOffer(actualUser, currentOfferIdApplying, currentDraft.copy(lastStepRoute = Destination.APPLY_STEP_3.route))
             showExitDialog = false
             goToOfferPresentation(navController)
         }, {

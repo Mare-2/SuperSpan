@@ -97,7 +97,7 @@ fun ProfilePage(user: User, navController: NavController?, paddingValues: Paddin
                 ProfileMenuTile(
                     icon = Icons.Default.AccountCircle,
                     title = "Il mio account",
-                    subtitle = "Username, email e password",
+                    subtitle = "Email e password",
                     onClick = { navController?.navigate(Destination.ACCOUNT_SUMMARY.route) }
                 )
 

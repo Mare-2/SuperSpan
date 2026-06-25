@@ -82,8 +82,7 @@ enum class Destination (
     APPLY_STEP_1("apply_1", "Dati e CV", null),
     APPLY_STEP_2_INTRO("apply_2_intro", "Istruzioni Video", null),
     APPLY_STEP_2_RECORD("apply_2_record", "Registra Video", null),
-    APPLY_STEP_2_REVIEW("apply_2_review", "Rivedi Video", null),
-    APPLY_STEP_3("apply_3", "Riepilogo Finale", null),
+    APPLY_STEP_3("apply_3", "Riepilogo Candidatura", null),
     EDIT_COUPON("edit_coupon", "Modifica Offerta", null),
     ADD_WORK_OFFER("add_work_offer", "Aggiungi Lavoro", null),
     EDIT_WORK_OFFER("edit_work_offer", "Modifica Lavoro", null),
@@ -119,7 +118,6 @@ fun Navigation(navController: NavHostController, startDestination: Destination, 
                     Destination.APPLY_STEP_1 -> ApplyStep1(navController, paddingValues)
                     Destination.APPLY_STEP_2_INTRO -> ApplyStep2Intro(navController, paddingValues)
                     Destination.APPLY_STEP_2_RECORD -> ApplyStep2Record(navController, paddingValues)
-                    Destination.APPLY_STEP_2_REVIEW -> ApplyStep2Review(navController, paddingValues)
                     Destination.APPLY_STEP_3 -> ApplyStep3(navController, paddingValues)
                     Destination.EDIT_COUPON -> AdminCouponEditPage(navController, paddingValues)
                     Destination.ADD_WORK_OFFER -> AdminWorkOfferEditPage(null, navController, paddingValues)
@@ -211,7 +209,6 @@ fun MainNavigation() {
                             Destination.APPLY_STEP_1,
                             Destination.APPLY_STEP_2_INTRO,
                             Destination.APPLY_STEP_2_RECORD,
-                            Destination.APPLY_STEP_2_REVIEW,
                             Destination.APPLY_STEP_3,
                             Destination.ADMIN_CANDIDACIES -> {
                                 // Non facciamo nulla: queste pagine NON appaiono nella Navbar
@@ -314,9 +311,10 @@ fun CustomAnimatedBottomBar(currentRoute: String, onNavigate: (String) -> Unit) 
         if (index == -1) {
             // Se siamo in una sottopagina, cerchiamo di capire a quale macro-area appartiene
             when {
-                currentRoute.contains("apply") || currentRoute.contains("offerta") || currentRoute == Destination.ADMIN_CANDIDACIES.route -> 3 // Icona Lavoro
+                currentRoute.contains("apply") || currentRoute.contains("offerta") || currentRoute.contains("work_offer") || currentRoute == Destination.ADMIN_CANDIDACIES.route -> 3 // Icona Lavoro
                 currentRoute.contains("product") -> 1 // Icona Ricerca
-                currentRoute.contains("data") -> 4 // Icona Profilo
+                currentRoute.contains("coupon") -> 2 // Icona Offerte
+                currentRoute.contains("data") || currentRoute.contains("account") || currentRoute.contains("drafts") -> 4 // Icona Profilo
                 else -> 0 // Torna a Home se non sa dove andare
             }
         } else index

@@ -7,7 +7,8 @@ data class CandidacyDraft(
     var telefono: String = "",
     var cvFileName: String = "", // Qui puoi tenere il nome semplice per la UI
     var cvPath: String = "",     // Qui il percorso reale per il salvataggio
-    var videoPath: String = ""   // Il percorso del video appena registrato
+    var videoPath: String? = null,   // Il percorso del video appena registrato
+    var lastStepRoute: String = "apply_step_1" // L'ultima schermata visitata
 )
 
 /*fun saveCandidacyDraftForOffer(user: User, offerId: Int, draft: CandidacyDraft) {
