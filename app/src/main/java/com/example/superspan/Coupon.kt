@@ -207,7 +207,7 @@ fun OfferPage(modifier: Modifier, coupon: Coupon, onDismiss: () -> Unit) {
 
     Column(
         modifier
-            .background(bgColor.copy(alpha = alpha), TopOvalShape(50.dp))
+            .background(bgColor.copy(alpha = alpha), RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
             .fillMaxSize()
             .padding(horizontal = 16.dp, vertical = 20.dp)
             .verticalScroll(rememberScrollState()),
@@ -455,22 +455,21 @@ fun CouponPageComplete(paddingValues: PaddingValues, navController: NavControlle
     } ?: selectedOffer
 
     Box(modifier = Modifier
-        .padding(paddingValues)
         .fillMaxSize()
-        .background(Color(0xFFF8F9FA))
+        .background(com.example.superspan.ui.theme.AppBackgroundBrush)
     ) {
         if (currentSelectedOffer == null) {
             LazyColumn(
                 state = listState,
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(bottom = 100.dp)
+                contentPadding = PaddingValues(bottom = paddingValues.calculateBottomPadding() + 100.dp)
             ) {
                 // 1. TITOLO
                 item {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 32.dp, start = 20.dp, end = 20.dp, bottom = 16.dp)
+                            .padding(top = 70.dp, start = 20.dp, end = 20.dp, bottom = 16.dp)
                     ) {
                         Text(
                             text = "Offerte e Coupon",
@@ -484,26 +483,37 @@ fun CouponPageComplete(paddingValues: PaddingValues, navController: NavControlle
                             color = Color.Gray
                         )
                         Spacer(modifier = Modifier.height(16.dp))
-                        OutlinedTextField(
-                            value = searchQuery,
-                            onValueChange = { searchQuery = it },
-                            placeholder = { Text("Cerca prodotto o offerta...") },
-                            leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Cerca") },
-                            trailingIcon = {
-                                if (searchQuery.isNotEmpty()) {
-                                    IconButton(onClick = { searchQuery = "" }) {
-                                        Icon(Icons.Default.Clear, contentDescription = "Cancella")
+                        androidx.compose.material3.Surface(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp),
+                            shape = RoundedCornerShape(28.dp),
+                            shadowElevation = 6.dp,
+                            color = Color.White
+                        ) {
+                            androidx.compose.material3.TextField(
+                                value = searchQuery,
+                                onValueChange = { searchQuery = it },
+                                placeholder = { Text("Cerca prodotto o offerta...", color = Color.Gray) },
+                                modifier = Modifier.fillMaxSize(),
+                                leadingIcon = { Icon(Icons.Default.Search, null, tint = Color.Gray) },
+                                trailingIcon = {
+                                    if (searchQuery.isNotEmpty()) {
+                                        IconButton(onClick = { searchQuery = "" }) {
+                                            Icon(Icons.Default.Clear, contentDescription = "Cancella", tint = Color.Gray)
+                                        }
                                     }
-                                }
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Color(0xFF388E3C),
-                                focusedLeadingIconColor = Color(0xFF388E3C),
-                                unfocusedBorderColor = Color.LightGray
+                                },
+                                singleLine = true,
+                                colors = androidx.compose.material3.TextFieldDefaults.colors(
+                                    focusedContainerColor = Color.Transparent,
+                                    unfocusedContainerColor = Color.Transparent,
+                                    focusedIndicatorColor = Color.Transparent,
+                                    unfocusedIndicatorColor = Color.Transparent,
+                                    cursorColor = androidx.compose.material3.MaterialTheme.colorScheme.primary
+                                )
                             )
-                        )
+                        }
                     }
                 }
 
@@ -768,7 +778,7 @@ fun OfferPromoCard(coupon: Coupon, isHighlighted: Boolean = false, navController
 
 @Composable
 fun OfferDetailPage(coupon: Coupon, navController: NavController? = null, onBack: () -> Unit) {
-    Column(Modifier.fillMaxSize().background(Color.White)) {
+    Column(Modifier.fillMaxSize().background(com.example.superspan.ui.theme.AppBackgroundBrush)) {
         Row(Modifier.padding(8.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null) }
             Text("Torna alla lista", color = Color.Gray)

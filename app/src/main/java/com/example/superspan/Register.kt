@@ -41,67 +41,97 @@ fun Register(
     var formPass by rememberSaveable { mutableStateOf(false) }
     var check by rememberSaveable { mutableStateOf(false) }
     var text by rememberSaveable { mutableStateOf("Registrati") }
-    Column(
-        Modifier.padding(padding),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+    
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(com.example.superspan.ui.theme.AppBackgroundBrush)
+            .padding(padding)
     ) {
         Column(
-            Modifier
-                .weight(3.5f)
-                .clip(BottomOvalShape(30.dp))
-                .fillMaxWidth()
-                .background(Color.Gray),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
+            // Sezione Superiore: Logo e Benvenuto
             Column(
-                Modifier
-                    .weight(2.5f)
-                    .fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Bottom
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 60.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.logo_superspan),
                     contentDescription = "Logo SuperSpan",
-                    modifier = Modifier.height(80.dp).padding(bottom = 20.dp),
+                    modifier = Modifier.height(70.dp).padding(bottom = 16.dp),
                     contentScale = ContentScale.Fit
                 )
-                Text("Benvenuto!", fontSize = 40.sp, modifier = Modifier.padding(bottom = 15.dp))
+                Text(
+                    text = "Benvenuto!",
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = androidx.compose.material3.MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "Crea un nuovo account",
+                    fontSize = 16.sp,
+                    color = Color.Gray,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
             }
+            
+            // Form Centrale
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(5f),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                    .padding(horizontal = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 if (!formPass) FormDati(email, nome, cognome, {email = it}, {nome = it}, {cognome = it}, {formPass = it})
                 else FormPassword({password = it}, {check = it})
-            }
-        }
-        Column(
-            Modifier.weight(0.5f).fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            if (formPass) {
-                Button({
-                    val newUser = User(nome, cognome, email, password)
-                    MapOfUser.put(email, newUser)
-                    actualUser = newUser
-                    navController?.navigate(Destination.HOME.route)}, enabled = check) {Text("Registrati")}
                 
-                Spacer(modifier = Modifier.height(8.dp))
+                if (formPass) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(
+                        onClick = {
+                            val newUser = User(nome, cognome, email, password)
+                            MapOfUser.put(email, newUser)
+                            actualUser = newUser
+                            navController?.navigate(Destination.HOME.route)
+                        }, 
+                        enabled = check,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                            containerColor = androidx.compose.material3.MaterialTheme.colorScheme.primary
+                        )
+                    ) { 
+                        Text("Registrati", fontSize = 18.sp, fontWeight = FontWeight.Bold) 
+                    }
+                }
             }
             
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
+            // Footer (Link Login)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 32.dp),
+                contentAlignment = Alignment.Center
             ) {
-                Text("Hai già un account?", color = Color.Gray)
-                TextButton(onClick = { navController?.navigate(Destination.LOGIN.route) }) {
-                    Text("Accedi", fontWeight = FontWeight.Bold, color = Color(0xFF388E3C))
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Hai già un account?", color = Color.Gray)
+                    TextButton(onClick = { navController?.navigate(Destination.LOGIN.route) }) {
+                        Text(
+                            "Accedi", 
+                            fontWeight = FontWeight.Bold, 
+                            color = androidx.compose.material3.MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
             }
         }
@@ -162,7 +192,20 @@ fun FormDati(
             }
         )
         Spacer(Modifier.height(10.dp))
-        Button({onAdvance(true)}, enabled = check, modifier = Modifier.padding(bottom = 15.dp).align(Alignment.CenterHorizontally)) {Text("Avanti")}
+        Button(
+            onClick = { onAdvance(true) }, 
+            enabled = check, 
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 15.dp)
+                .height(56.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                containerColor = androidx.compose.material3.MaterialTheme.colorScheme.primary
+            )
+        ) {
+            Text("Avanti", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        }
     }
 }
 

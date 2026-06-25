@@ -83,7 +83,7 @@ fun AddCoupon(paddingValues: PaddingValues, navController: NavController?) {
     var pendingCouponSave by remember { mutableStateOf<Coupon?>(null) }
     val context = LocalContext.current
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize().background(com.example.superspan.ui.theme.AppBackgroundBrush)) {
         Column(
             modifier = Modifier
                 .padding(paddingValues)
@@ -91,20 +91,18 @@ fun AddCoupon(paddingValues: PaddingValues, navController: NavController?) {
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
-            // --- HEADER ---
+            // --- HEADER (Senza rettangolo bianco, testo scuro) ---
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(130.dp)
-                    .clip(BottomOvalShape(25.dp))
-                    .background(Color.Gray)
+                    .padding(top = 80.dp, bottom = 16.dp)
             ) {
-                IconButton(onClick = { navController?.popBackStack() }, modifier = Modifier.padding(8.dp)) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = Color.White)
+                IconButton(onClick = { navController?.popBackStack() }, modifier = Modifier.align(Alignment.CenterStart).padding(start = 8.dp)) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = Color.Black)
                 }
                 Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(if (defaultTab == 0) "Aggiungi Coupon" else "Aggiungi Offerta", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
-                    Text("I campi verdi sono completati", color = Color.White.copy(alpha = 0.8f), fontSize = 12.sp)
+                    Text(if (defaultTab == 0) "Aggiungi Coupon" else "Aggiungi Offerta", color = Color.Black, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                    Text("I campi verdi sono completati", color = Color.DarkGray, fontSize = 12.sp)
                 }
             }
 
@@ -598,16 +596,16 @@ fun CouponTextField(
             label = { Text(label) },
             modifier = Modifier.fillMaxWidth().background(containerColor, RoundedCornerShape(20.dp)),
             shape = RoundedCornerShape(20.dp),
-            singleLine = singleLine,
-            minLines = minLines,
-            readOnly = readOnly,
             isError = isError,
+            readOnly = readOnly,
+            minLines = minLines,
+            singleLine = singleLine,
             trailingIcon = trailingIcon,
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
             colors = OutlinedTextFieldDefaults.colors(
                 unfocusedBorderColor = borderColor,
                 focusedBorderColor = borderColor,
-                errorBorderColor = Color.Red
+                errorBorderColor = borderColor
             )
         )
         if (isError) {

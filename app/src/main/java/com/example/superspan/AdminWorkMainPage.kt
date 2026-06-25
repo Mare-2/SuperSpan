@@ -28,7 +28,7 @@ fun AdminWorkMainPage(paddingValues: PaddingValues, navController: NavController
     val tabs = listOf("Posizioni Aperte", "Candidature")
 
     Scaffold(
-        modifier = Modifier.padding(paddingValues),
+        modifier = Modifier.fillMaxSize(),
         topBar = {
             Surface(
                 modifier = Modifier.fillMaxWidth().background(Color(0xFFF8F9FA)),
@@ -56,11 +56,11 @@ fun AdminWorkMainPage(paddingValues: PaddingValues, navController: NavController
             when (selectedTabIndex) {
                 0 -> {
                     // Posizioni Aperte (Stessa vista degli utenti, con il tasto + se admin)
-                    WorkSearchPageComplete(padding = PaddingValues(0.dp), navController = navController)
+                    WorkSearchPageComplete(padding = paddingValues, navController = navController)
                 }
                 1 -> {
                     // Candidature
-                    AdminCandidaciesPage(navController = navController, paddingValues = PaddingValues(0.dp))
+                    AdminCandidaciesPage(navController = navController, paddingValues = paddingValues)
                 }
             }
         }

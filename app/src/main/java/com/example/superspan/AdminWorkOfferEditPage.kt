@@ -61,10 +61,13 @@ fun AdminWorkOfferEditPage(
             }
         )
     } else {
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier.fillMaxSize().background(com.example.superspan.ui.theme.AppBackgroundBrush)) {
             Scaffold(
+                containerColor = Color.Transparent,
                 topBar = {
+                    @OptIn(ExperimentalMaterial3Api::class)
                     TopAppBar(
+                        colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
                         title = { Text(if (offer == null) "Aggiungi Offerta Lavoro" else "Modifica Offerta") },
                         navigationIcon = {
                             IconButton(onClick = { navController?.popBackStack() }) {
@@ -106,17 +109,17 @@ fun AdminWorkOfferEditPage(
                         selectedSupermarket?.let { s ->
                             Card(
                                 modifier = Modifier.fillMaxWidth().clickable { isSelectionOpen = true },
-                                colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9)),
+                                colors = CardDefaults.cardColors(containerColor = androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer),
                                 elevation = CardDefaults.cardElevation(2.dp)
                             ) {
                                 Row(Modifier.padding(16.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(Icons.Default.LocationOn, null, tint = Color(0xFF388E3C), modifier = Modifier.size(32.dp))
+                                    Icon(Icons.Default.LocationOn, null, tint = androidx.compose.material3.MaterialTheme.colorScheme.primary, modifier = Modifier.size(32.dp))
                                     Spacer(Modifier.width(12.dp))
                                     Column(Modifier.weight(1f)) {
-                                        Text(s.nome, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF1B5E20))
-                                        Text("${s.indirizzo}, ${s.citta}", fontSize = 14.sp, color = Color(0xFF2E7D32))
+                                        Text(s.nome, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = androidx.compose.material3.MaterialTheme.colorScheme.primary)
+                                        Text("${s.indirizzo}, ${s.citta}", fontSize = 14.sp, color = androidx.compose.material3.MaterialTheme.colorScheme.primary)
                                     }
-                                    Text("Modifica", color = Color(0xFF388E3C), fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                                    Text("Modifica", color = androidx.compose.material3.MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, fontSize = 12.sp)
                                 }
                             }
                         }
@@ -232,7 +235,7 @@ fun AdminWorkOfferEditPage(
                             Toast.makeText(context, "Salvato con successo", Toast.LENGTH_SHORT).show()
                             navController?.popBackStack()
                         }) {
-                            Text("Salva", color = Color(0xFF388E3C))
+                            Text("Salva", color = androidx.compose.material3.MaterialTheme.colorScheme.primary)
                         }
                     },
                     dismissButton = {
@@ -345,10 +348,10 @@ fun SupermarketSelectionScreen(
                             Box(
                                 modifier = Modifier
                                     .size(48.dp)
-                                    .background(Color(0xFFE3F2FD), shape = RoundedCornerShape(12.dp)),
+                                    .background(androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant, shape = RoundedCornerShape(12.dp)),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Icon(Icons.Default.LocationOn, contentDescription = null, tint = Color(0xFF1976D2))
+                                Icon(Icons.Default.LocationOn, contentDescription = null, tint = androidx.compose.material3.MaterialTheme.colorScheme.tertiary)
                             }
                             Spacer(Modifier.width(16.dp))
                             Column {

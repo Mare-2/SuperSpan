@@ -38,7 +38,7 @@ fun DraftsPage(navController: NavController?, padding: PaddingValues) {
 
     var showDeleteConfirmFor by remember { mutableStateOf<Int?>(null) }
 
-    Box(Modifier.fillMaxSize().background(Color.White).padding(padding)) {
+    Box(Modifier.fillMaxSize().background(com.example.superspan.ui.theme.AppBackgroundBrush).padding(padding)) {
         Column(Modifier.fillMaxSize()) {
             // Header
             Row(Modifier.fillMaxWidth().padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -71,7 +71,7 @@ fun DraftsPage(navController: NavController?, padding: PaddingValues) {
                 Modifier
                     .fillMaxSize()
                     .padding(top = 8.dp)
-                    .background(Color(0xFFF8F9FA), TopOvalShape(20.dp))
+                    .background(Color(0xFFF8F9FA), RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
                     .verticalScroll(scrollState)
                     .padding(16.dp)
             ) {

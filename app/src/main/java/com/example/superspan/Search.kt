@@ -36,6 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import androidx.navigation.NavController
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.filled.Abc
 import androidx.compose.material.icons.filled.SortByAlpha
@@ -54,9 +55,9 @@ fun SearchPageComplete(
     var showFilters by remember { mutableStateOf(false) }
     val filterData by remember { mutableStateOf(FilterData()) }
 
-    Box(modifier = Modifier.padding(padding)) {
+    Box(modifier = Modifier.fillMaxSize().background(com.example.superspan.ui.theme.AppBackgroundBrush)) {
         if (!showFilters) {
-            SearchPage(navController, filterData) { showFilters = true }
+            SearchPage(navController, filterData, padding) { showFilters = true }
         } else {
             FilterPage(Modifier.fillMaxSize(), filterData) { showFilters = false }
         }
@@ -156,7 +157,7 @@ fun ProductCompose(product: Product, navController: NavController?) {
                 }
             } else {
                 Surface(
-                    color = Color(0xFF388E3C).copy(alpha = 0.1f),
+                    color = androidx.compose.material3.MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(
@@ -164,7 +165,7 @@ fun ProductCompose(product: Product, navController: NavController?) {
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF2E7D32)
+                        color = androidx.compose.material3.MaterialTheme.colorScheme.primary
                     )
                 }
             }
@@ -178,7 +179,7 @@ fun ProductCompose(product: Product, navController: NavController?) {
 
 @Composable
 fun CategoryChip(category: Category, isSelected: Boolean, onClick: () -> Unit) {
-    val bgColor = if (isSelected) Color(0xFF388E3C) else Color(0xFFEEEEEE)
+    val bgColor = if (isSelected) androidx.compose.material3.MaterialTheme.colorScheme.primary else Color(0xFFEEEEEE)
     val textColor = if (isSelected) Color.White else Color.DarkGray
 
     Surface(
@@ -205,26 +206,30 @@ fun CategoryChip(category: Category, isSelected: Boolean, onClick: () -> Unit) {
 fun SearchPage(
     navController: NavController?,
     filterData: FilterData,
+    padding: PaddingValues,
     onOpenFilters: () -> Unit
 ) {
     val productSearchList by remember {
         derivedStateOf { searchProduct(filterData) }
     }
 
+    val listState = rememberLazyListState()
+
     // Direzioni indipendenti per ciascun ordinamento
     var nomeAscendente by remember { mutableStateOf(true) }
     var prezzoAscendente by remember { mutableStateOf(true) }
 
     LazyColumn(
+        state = listState,
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(bottom = 20.dp)
+        contentPadding = PaddingValues(bottom = padding.calculateBottomPadding() + 100.dp)
     ) {
         // 0. HEADER TITOLO (scorre con la pagina)
         item {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 24.dp),
+                    .padding(top = 64.dp, bottom = 24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
@@ -268,7 +273,7 @@ fun SearchPage(
                             unfocusedContainerColor = Color.Transparent,
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
-                            cursorColor = Color(0xFF388E3C)
+                            cursorColor = androidx.compose.material3.MaterialTheme.colorScheme.primary
                         )
                     )
                 }
@@ -278,7 +283,7 @@ fun SearchPage(
                 Surface(
                     modifier = Modifier.size(56.dp).clickable { onOpenFilters() },
                     shape = RoundedCornerShape(16.dp),
-                    color = Color(0xFF388E3C),
+                    color = androidx.compose.material3.MaterialTheme.colorScheme.primary,
                     shadowElevation = 6.dp
                 ) {
                     Box(contentAlignment = Alignment.Center) {
@@ -313,7 +318,7 @@ fun SearchPage(
                         }
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (nomeAttivo) Color(0xFF388E3C) else Color(0xFFA5D6A7)
+                        containerColor = if (nomeAttivo) androidx.compose.material3.MaterialTheme.colorScheme.primary else Color(0xFFA5D6A7)
                     )
                 ) {
                     Text(
@@ -338,7 +343,7 @@ fun SearchPage(
                         }
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (prezzoAttivo) Color(0xFF388E3C) else Color(0xFFA5D6A7)
+                        containerColor = if (prezzoAttivo) androidx.compose.material3.MaterialTheme.colorScheme.primary else Color(0xFFA5D6A7)
                     )
                 ) {
                     Text(
@@ -378,7 +383,7 @@ fun SearchPage(
                         .height(44.dp) // Leggermente più grande (da 40 a 44)
                         .wrapContentWidth(),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (nomeAttivo) Color(0xFF388E3C) else Color.Transparent,
+                        containerColor = if (nomeAttivo) androidx.compose.material3.MaterialTheme.colorScheme.primary else Color.Transparent,
                         contentColor = if (nomeAttivo) Color.White else Color.DarkGray
                     ),
                     border = if (!nomeAttivo) BorderStroke(1.dp, Color.LightGray) else null,
@@ -414,7 +419,7 @@ fun SearchPage(
                         .height(44.dp) // Stessa altezza dell'altro
                         .wrapContentWidth(),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (prezzoAttivo) Color(0xFF388E3C) else Color.Transparent,
+                        containerColor = if (prezzoAttivo) androidx.compose.material3.MaterialTheme.colorScheme.primary else Color.Transparent,
                         contentColor = if (prezzoAttivo) Color.White else Color.DarkGray
                     ),
                     border = if (!prezzoAttivo) BorderStroke(1.dp, Color.LightGray) else null,
@@ -556,7 +561,7 @@ fun FilterPage(modifier: Modifier, filterData: FilterData, onDismiss: () -> Unit
                 Column(Modifier.padding(20.dp)) {
                     Text(
                         text = "Da €${"%.2f".format(sliderPosition.start)} a €${"%.2f".format(sliderPosition.endInclusive)}",
-                        color = Color(0xFF388E3C),
+                        color = androidx.compose.material3.MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.ExtraBold,
                         fontSize = 15.sp
                     )
@@ -573,8 +578,8 @@ fun FilterPage(modifier: Modifier, filterData: FilterData, onDismiss: () -> Unit
                         },
                         valueRange = 0f..absoluteMax,
                         colors = SliderDefaults.colors(
-                            thumbColor = Color(0xFF388E3C),
-                            activeTrackColor = Color(0xFF388E3C),
+                            thumbColor = androidx.compose.material3.MaterialTheme.colorScheme.primary,
+                            activeTrackColor = androidx.compose.material3.MaterialTheme.colorScheme.primary,
                             inactiveTrackColor = Color.LightGray.copy(alpha = 0.3f)
                         ),
                         modifier = Modifier.fillMaxWidth()
@@ -691,7 +696,7 @@ fun FilterPage(modifier: Modifier, filterData: FilterData, onDismiss: () -> Unit
                     .fillMaxWidth()
                     .height(56.dp),
                 shape = CircleShape,
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF388E3C))
+                colors = ButtonDefaults.buttonColors(containerColor = androidx.compose.material3.MaterialTheme.colorScheme.primary)
             ) {
                 Text("Applica filtri", fontSize = 18.sp, fontWeight = FontWeight.Bold)
             }
@@ -768,7 +773,7 @@ fun FilterPage(modifier: Modifier, filterData: FilterData, onDismiss: () -> Unit
                 Column(Modifier.padding(20.dp)) {
                     Text(
                         text = "Da €${"%.2f".format(sliderPosition.start)} a €${"%.2f".format(sliderPosition.endInclusive)}",
-                        color = Color(0xFF388E3C),
+                        color = androidx.compose.material3.MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.ExtraBold,
                         fontSize = 15.sp
                     )
@@ -789,7 +794,7 @@ fun FilterPage(modifier: Modifier, filterData: FilterData, onDismiss: () -> Unit
                             Box(
                                 modifier = Modifier
                                     .size(22.dp)
-                                    .background(Color(0xFF388E3C), CircleShape)
+                                    .background(androidx.compose.material3.MaterialTheme.colorScheme.primary, CircleShape)
                                     .border(2.dp, Color.White, CircleShape)
                             )
                         },
@@ -797,7 +802,7 @@ fun FilterPage(modifier: Modifier, filterData: FilterData, onDismiss: () -> Unit
                             Box(
                                 modifier = Modifier
                                     .size(22.dp)
-                                    .background(Color(0xFF388E3C), CircleShape)
+                                    .background(androidx.compose.material3.MaterialTheme.colorScheme.primary, CircleShape)
                                     .border(2.dp, Color.White, CircleShape)
                             )
                         },
@@ -807,7 +812,7 @@ fun FilterPage(modifier: Modifier, filterData: FilterData, onDismiss: () -> Unit
                                 modifier = Modifier.height(4.dp),
                                 rangeSliderState = rangeSliderState,
                                 colors = SliderDefaults.colors(
-                                    activeTrackColor = Color(0xFF388E3C),
+                                    activeTrackColor = androidx.compose.material3.MaterialTheme.colorScheme.primary,
                                     inactiveTrackColor = Color.LightGray.copy(alpha = 0.3f)
                                 )
                             )
@@ -880,7 +885,7 @@ fun FilterPage(modifier: Modifier, filterData: FilterData, onDismiss: () -> Unit
                     .fillMaxWidth()
                     .height(56.dp),
                 shape = CircleShape,
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF388E3C))
+                colors = ButtonDefaults.buttonColors(containerColor = androidx.compose.material3.MaterialTheme.colorScheme.primary)
             ) {
                 Text("Applica filtri", fontSize = 18.sp, fontWeight = FontWeight.Bold)
             }

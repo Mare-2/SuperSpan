@@ -25,7 +25,7 @@ fun PersonalDataSummaryPage(navController: NavController?, padding: PaddingValue
         modifier = Modifier
             .fillMaxSize()
             .padding(padding)
-            .background(Color.White)
+            .background(com.example.superspan.ui.theme.AppBackgroundBrush)
     ) {
         // --- NUOVO HEADER ---
         Box(

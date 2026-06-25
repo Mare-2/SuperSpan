@@ -56,54 +56,58 @@ fun ProfileIcon() {
 
 @Composable
 fun Header(modifier: Modifier = Modifier) {
-    val gradientBrush = androidx.compose.ui.graphics.Brush.verticalGradient(
-        colors = listOf(
-            Color.Gray, // Grigio chiaro in alto
-            Color.LightGray       // Sfumatura verso il bianco
-        )
-    )
-
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(150.dp) // Altezza simile alla foto
-            .clip(BottomOvalShape(25.dp)) // <--- VALORE RIDOTTO per una curva piatta
-            .background(gradientBrush),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        androidx.compose.foundation.Image(
-            painter = androidx.compose.ui.res.painterResource(id = R.drawable.logo_superspan),
-            contentDescription = "Logo SuperSpan",
-            modifier = Modifier.height(80.dp),
-            contentScale = androidx.compose.ui.layout.ContentScale.Fit
-        )
-        Text(
-            text = "Ciao ${actualUser.nome}!",
-            fontSize = 25.sp,
-            fontWeight = FontWeight.Bold, // Nella foto il nome sembra più marcato
-            color = Color(0xFF424242),
-            modifier = Modifier.padding(top = 5.dp)
-        )
+    Column(modifier = modifier.fillMaxWidth()) {
+        // La "Top Bar" vera e propria col logo (senza rettangolo bianco)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 60.dp, bottom = 8.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            // Effetto bagliore (glow) dietro al logo per farlo risaltare sullo sfondo sfumato
+            Box(
+                modifier = Modifier
+                    .size(110.dp)
+                    .background(
+                        brush = androidx.compose.ui.graphics.Brush.radialGradient(
+                            colors = listOf(
+                                Color.White.copy(alpha = 0.8f),
+                                Color.White.copy(alpha = 0.3f),
+                                Color.Transparent
+                            )
+                        )
+                    )
+            )
+            androidx.compose.foundation.Image(
+                painter = androidx.compose.ui.res.painterResource(id = R.drawable.logo_superspan),
+                contentDescription = "Logo SuperSpan",
+                modifier = Modifier.height(60.dp),
+                contentScale = androidx.compose.ui.layout.ContentScale.Fit
+            )
+        }
+        
+        // Il testo del saluto, fuori dal rettangolo bianco e immerso nello sfondo grigio
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp, start = 24.dp, end = 24.dp, bottom = 8.dp)
+        ) {
+            Text(
+                text = "Ciao ${actualUser.nome}",
+                fontSize = 32.sp,
+                fontWeight = FontWeight.ExtraBold,
+                color = androidx.compose.material3.MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "Cosa cerchi oggi?",
+                fontSize = 16.sp,
+                color = Color.Gray,
+                fontWeight = FontWeight.Medium
+            )
+        }
     }
 }
-
-/*@Composable
-fun Header(modifier: Modifier = Modifier) {
-    Column(
-        modifier
-            .clip(BottomOvalShape(30.dp))
-            .fillMaxSize()
-            .background(Color.LightGray),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Bottom
-    ) {
-        Text("LOGO", fontSize = 50.sp)
-        Text("Ciao ${actualUser?.nome}", fontSize = 20.sp,
-            modifier = Modifier.padding(bottom = 20.dp, top = 15.dp)
-        )
-    }
-}*/
 
 
 
@@ -252,29 +256,65 @@ fun TestoAdattabile(testo: String, modifier: Modifier = Modifier, fontSize: Text
 
 @Composable
 fun HeaderHomeAlt(modifier: Modifier, navController: NavController?) {
-    Column(
-        modifier
-            .clip(BottomOvalShape(30.dp))
-            .fillMaxSize()
-            .background(Color.Gray),
-        verticalArrangement = Arrangement.Top
-    ) {
-        Row(Modifier.padding(top = 20.dp, start = 10.dp, end = 20.dp)) {
-            Text("LOGO", fontSize = 50.sp)
-            Spacer(Modifier.weight(1f))
-            IconButton(
-                {navController?.navigate(Destination.PROFILO.route)},
-                content = {ProfileIcon()},
-                modifier = Modifier.size(60.dp)
+    Column(modifier = modifier.fillMaxWidth()) {
+        // Top Bar
+        androidx.compose.material3.Surface(
+            modifier = Modifier.fillMaxWidth(),
+            color = Color.White,
+            shadowElevation = 4.dp,
+            shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 36.dp, bottom = 12.dp, start = 16.dp, end = 16.dp)
+            ) {
+                // Logo al centro
+                androidx.compose.foundation.Image(
+                    painter = androidx.compose.ui.res.painterResource(id = R.drawable.logo_superspan),
+                    contentDescription = "Logo SuperSpan",
+                    modifier = Modifier.height(45.dp).align(Alignment.Center),
+                    contentScale = androidx.compose.ui.layout.ContentScale.Fit
+                )
+                
+                // Profilo a destra
+                IconButton(
+                    onClick = { navController?.navigate(Destination.PROFILO.route) },
+                    modifier = Modifier
+                        .size(45.dp)
+                        .align(Alignment.CenterEnd)
+                        .background(androidx.compose.material3.MaterialTheme.colorScheme.primary.copy(alpha = 0.08f), androidx.compose.foundation.shape.CircleShape)
+                ) {
+                    Icon(
+                        Icons.Default.AccountCircle,
+                        contentDescription = "Profilo",
+                        modifier = Modifier.size(28.dp),
+                        tint = androidx.compose.material3.MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+        }
+        
+        // Testo fuori dal rettangolo
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 28.dp, start = 24.dp, end = 24.dp, bottom = 8.dp)
+        ) {
+            Text(
+                text = "Ciao ${actualUser?.nome ?: "Ospite"}",
+                fontSize = 32.sp,
+                fontWeight = FontWeight.ExtraBold,
+                color = androidx.compose.material3.MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = "Bentornato in SuperSpan",
+                fontSize = 16.sp,
+                color = Color.Gray,
+                fontWeight = FontWeight.Medium
             )
         }
-        Row(Modifier.padding(start = 10.dp, end = 10.dp).fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-            Text("Ciao ${actualUser?.nome}", fontSize = 20.sp,
-                modifier = Modifier.padding(bottom = 20.dp, top = 15.dp),
-                textAlign = TextAlign.Center
-            )
-        }
-
     }
 }
 

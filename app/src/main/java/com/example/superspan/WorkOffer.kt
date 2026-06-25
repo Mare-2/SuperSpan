@@ -64,7 +64,7 @@ fun WorkOfferPage(offer: WorkOffer?, navController: NavController?, paddingValue
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF5F5F5)) // Un grigio chiarissimo di sfondo
+            .background(com.example.superspan.ui.theme.AppBackgroundBrush) // Sfondo basato sul logo
             .padding(paddingValues)
     ) {
         // --- CONTENUTO ---
@@ -207,7 +207,7 @@ fun WorkOfferPage(offer: WorkOffer?, navController: NavController?, paddingValue
                             .padding(bottom = 24.dp)
                             .height(56.dp),
                         shape = CircleShape,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFA000)),
+                        colors = ButtonDefaults.buttonColors(containerColor = androidx.compose.material3.MaterialTheme.colorScheme.secondary),
                         contentPadding = PaddingValues(horizontal = 32.dp)
                     ) {
                         Text(

@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -57,24 +58,22 @@ fun AccountSettingsPage(user: User, navController: NavController?, paddingValues
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .background(Color.White)
+                .background(com.example.superspan.ui.theme.AppBackgroundBrush)
         ) {
-            // --- HEADER (Come PersonalDataEditPage) ---
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(130.dp)
-                    .clip(BottomOvalShape(25.dp))
-                    .background(Color.Gray)
-            ) {
-                IconButton(onClick = { navController?.popBackStack() }, modifier = Modifier.padding(8.dp)) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = Color.White)
-                }
-                Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Modifica Account", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
-                    Text("I campi verdi sono completati", color = Color.White.copy(alpha = 0.8f), fontSize = 12.sp)
-                }
+        // --- HEADER (Senza rettangolo bianco, testo scuro) ---
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 80.dp, bottom = 16.dp)
+        ) {
+            IconButton(onClick = { navController?.popBackStack() }, modifier = Modifier.align(Alignment.CenterStart).padding(start = 8.dp)) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = Color.Black)
             }
+            Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("Modifica Account", color = Color.Black, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                Text("Email e password", color = Color.DarkGray, fontSize = 12.sp)
+            }
+        }
 
             // --- FORM ---
             Column(

@@ -61,15 +61,13 @@ fun PersonalDataEditPage(navController: NavController?, padding: PaddingValues) 
         modifier = Modifier
             .fillMaxSize()
             .padding(padding)
-            .background(Color.White)
+            .background(com.example.superspan.ui.theme.AppBackgroundBrush)
     ) {
-        // --- HEADER CON PARABOLA ---
+        // --- HEADER ---
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(140.dp)
-                .clip(BottomOvalShape(30.dp))
-                .background(Color.Gray)
+                .padding(vertical = 24.dp)
         ) {
             IconButton(
                 onClick = { navController?.popBackStack() },
@@ -291,22 +289,20 @@ fun PersonalDataEditPage(navController: NavController?, padding: PaddingValues) 
         modifier = Modifier
             .fillMaxSize()
             .padding(padding)
-            .background(Color.White)
+            .background(com.example.superspan.ui.theme.AppBackgroundBrush)
     ) {
-        // --- HEADER ---
+        // --- HEADER (Senza rettangolo bianco, testo scuro) ---
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(130.dp)
-                .clip(BottomOvalShape(25.dp))
-                .background(Color.Gray)
+                .padding(top = 80.dp, bottom = 16.dp)
         ) {
-            IconButton(onClick = { navController?.popBackStack() }, modifier = Modifier.padding(8.dp)) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = Color.White)
+            IconButton(onClick = { navController?.popBackStack() }, modifier = Modifier.align(Alignment.CenterStart).padding(start = 8.dp)) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = Color.Black)
             }
             Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("Modifica Dati", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
-                Text("I campi verdi sono completati", color = Color.White.copy(alpha = 0.8f), fontSize = 12.sp)
+                Text("Modifica Dati", color = Color.Black, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                Text("I campi verdi sono completati", color = Color.DarkGray, fontSize = 12.sp)
             }
         }
 
@@ -451,8 +447,8 @@ fun EditTextField(
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
+            visualTransformation = visualTransformation,
             label = { Text(label) },
-            visualTransformation = visualTransformation, // <--- USALO QUI
             modifier = Modifier.fillMaxWidth().background(containerColor, RoundedCornerShape(20.dp)),
             shape = RoundedCornerShape(20.dp),
             singleLine = true,
@@ -462,7 +458,7 @@ fun EditTextField(
             colors = OutlinedTextFieldDefaults.colors(
                 unfocusedBorderColor = borderColor,
                 focusedBorderColor = borderColor,
-                errorBorderColor = Color.Red
+                errorBorderColor = borderColor
             )
         )
         if (isError) {

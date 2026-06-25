@@ -37,50 +37,75 @@ import androidx.navigation.NavController
 
 @Composable
 fun ProfilePage(user: User, navController: NavController?, paddingValues: PaddingValues) {
-    val scrollState = rememberScrollState()
-
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
-            .padding(paddingValues)
+            .background(com.example.superspan.ui.theme.AppBackgroundBrush)
     ) {
-        // --- 1. HEADER (Logo e Tasto Indietro) ---
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
+        // --- 1. HEADER (Solo Logo, senza sfondo bianco) ---
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 60.dp, bottom = 8.dp),
+            contentAlignment = Alignment.Center
         ) {
-            // Tasto Indietro rimosso
-
-            Text(
-                text = "LOGO",
-                fontSize = 40.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = Color.DarkGray
+            // Effetto bagliore (glow) dietro al logo per farlo risaltare sullo sfondo sfumato
+            Box(
+                modifier = Modifier
+                    .size(110.dp)
+                    .background(
+                        brush = androidx.compose.ui.graphics.Brush.radialGradient(
+                            colors = listOf(
+                                Color.White.copy(alpha = 0.8f),
+                                Color.White.copy(alpha = 0.3f),
+                                Color.Transparent
+                            )
+                        )
+                    )
+            )
+            androidx.compose.foundation.Image(
+                painter = androidx.compose.ui.res.painterResource(id = R.drawable.logo_superspan),
+                contentDescription = "Logo SuperSpan",
+                modifier = Modifier.height(60.dp),
+                contentScale = androidx.compose.ui.layout.ContentScale.Fit
             )
         }
 
-        // --- 2. LA PARABOLA GRIGIA (Contenuto) ---
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 160.dp) // Dove inizia la curva
-                .background(Color.LightGray, TopOvalShape(40.dp)) // Tornata la parabola!
-                .verticalScroll(scrollState)
+                .weight(1f) // Prende lo spazio rimanente in modo corretto
+                .fillMaxWidth()
         ) {
-            // Spazio per l'immagine del profilo che sporge
-            Spacer(modifier = Modifier.height(75.dp))
-
-            // Nome e Ruolo centrati
+            // --- 2. IMMAGINE PROFILO E NOME ---
             Column(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp), 
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("${user.nome} ${user.cognome}", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(CircleShape)
+                        .background(androidx.compose.material3.MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = null,
+                        modifier = Modifier.size(50.dp),
+                        tint = androidx.compose.material3.MaterialTheme.colorScheme.primary
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Text("${user.nome} ${user.cognome}", fontSize = 28.sp, fontWeight = FontWeight.ExtraBold)
                 Text(
-                    text = if (user.admin) "Amministratore" else "",
-                    color = Color.DarkGray.copy(alpha = 0.7f),
-                    fontWeight = FontWeight.Medium
+                    text = if (user.admin) "Amministratore" else "Cliente SuperSpan",
+                    color = Color.Gray,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 16.sp
                 )
             }
 
@@ -89,9 +114,11 @@ fun ProfilePage(user: User, navController: NavController?, paddingValues: Paddin
             // --- SEZIONI CONTENUTO (TILES) ---
             Column(
                 modifier = Modifier
+                    .weight(1f) // Prende lo spazio rimanente per permettere al tasto esci di stare in basso
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                    .padding(horizontal = 24.dp)
+                    .padding(bottom = paddingValues.calculateBottomPadding() + 24.dp), 
+                verticalArrangement = Arrangement.Top
             ) {
                 // Sezione Comune
                 ProfileMenuTile(
@@ -100,88 +127,64 @@ fun ProfilePage(user: User, navController: NavController?, paddingValues: Paddin
                     subtitle = "Email e password",
                     onClick = { navController?.navigate(Destination.ACCOUNT_SUMMARY.route) }
                 )
+                
+                Spacer(modifier = Modifier.height(12.dp))
 
-                if (user.admin) { //TODO: Decisamente da rivedere quelle admin
-                    // SEZIONE ADMIN (Titolo a sinistra)
+                if (user.admin) {
                     ProfileSectionTitle("Gestione Negozio")
                     ProfileMenuTile(Icons.Default.LocalOffer, "Gestione Offerte e Coupon", "Crea o modifica le promozioni") { navController?.navigate(Destination.OFFERTE.route) }
+                    Spacer(modifier = Modifier.height(12.dp))
                     ProfileMenuTile(Icons.Default.Badge, "Revisione Candidature", "Vedi i CV ricevuti") { navController?.navigate(Destination.ADMIN_CANDIDACIES.route) }
                 } else {
-                    // SEZIONE UTENTE (Titolo a sinistra)
                     ProfileSectionTitle("Candidature")
                     ProfileMenuTile(
                         icon = Icons.Default.Description,
                         title = "Dati personali",
                         subtitle = "Contatti e Curriculum Vitae",
-                        onClick = { navController?.navigate(Destination.PERSONAL_DATA_SUMMARY.route) } // Assicurati che questa rotta esista
+                        onClick = { navController?.navigate(Destination.PERSONAL_DATA_SUMMARY.route) }
                     )
+                    Spacer(modifier = Modifier.height(12.dp))
                     ProfileMenuTile(Icons.Default.AssignmentTurnedIn, "Candidature in corso", "Stato delle tue domande") { navController?.navigate(Destination.DRAFTS.route) }
                 }
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.weight(1f)) // Spinge il bottone Esci verso il basso
 
-                // --- 3. TASTO ESCI (Stile pillola centrato, larghezza testo) ---
+                // --- 3. TASTO ESCI ---
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                     Button(
                         onClick = {
                             navController?.navigate(Destination.LOGIN.route) {
-                                popUpTo(0) // Pulisce tutta la back stack per evitare di tornare indietro dopo il logout
-                            } // Resettiamo l'utente attuale
+                                popUpTo(0)
+                            }
                         },
-                        modifier = Modifier.height(56.dp),
-                        shape = CircleShape,
-                        contentPadding = PaddingValues(horizontal = 32.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE57373))
+                        modifier = Modifier.height(56.dp).fillMaxWidth(),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = androidx.compose.material3.MaterialTheme.colorScheme.error)
                     ) {
                         Icon(Icons.AutoMirrored.Filled.Logout, null, modifier = Modifier.size(20.dp))
                         Spacer(Modifier.width(8.dp))
                         Text("Esci", fontSize = 18.sp, fontWeight = FontWeight.Bold)
                     }
                 }
-
-                Spacer(modifier = Modifier.height(100.dp))
             }
-        }
-
-        // --- 4. IMMAGINE PROFILO (Sovrapposta a metà della parabola) ---
-        Box(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = 110.dp) // Posizionata a cavallo della curva
-                .size(110.dp)
-                .clip(CircleShape)
-                .background(Color.White)
-                .padding(4.dp)
-                .clip(CircleShape)
-                .background(Color(0xFFE0E0E0)),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = Icons.Default.Person,
-                contentDescription = null,
-                modifier = Modifier.size(70.dp),
-                tint = Color.Gray
-            )
         }
     }
 }
 
-// Funzione Titolo Sezione (Grande e a SINISTRA)
 @Composable
 fun ProfileSectionTitle(title: String) {
     Text(
         text = title,
         fontSize = 18.sp,
         fontWeight = FontWeight.Bold,
-        color = Color(0xFF388E3C), // Il verde dell'app TODO: cambiare
+        color = androidx.compose.material3.MaterialTheme.colorScheme.primary,
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 8.dp, top = 12.dp, bottom = 4.dp),
-        textAlign = TextAlign.Start // Allineato a sinistra
+        textAlign = TextAlign.Start
     )
 }
 
-// Componente Tassello Menu
 @Composable
 fun ProfileMenuTile(icon: ImageVector, title: String, subtitle: String, onClick: () -> Unit) {
     Surface(
@@ -196,10 +199,12 @@ fun ProfileMenuTile(icon: ImageVector, title: String, subtitle: String, onClick:
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
-                modifier = Modifier.size(40.dp).background(Color(0xFFF1F3F4), CircleShape),
+                modifier = Modifier
+                    .size(44.dp)
+                    .background(androidx.compose.material3.MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(icon, null, modifier = Modifier.size(20.dp), tint = Color.DarkGray)
+                Icon(icon, null, modifier = Modifier.size(24.dp), tint = androidx.compose.material3.MaterialTheme.colorScheme.primary)
             }
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {

@@ -50,42 +50,52 @@ fun Login(
     var text by rememberSaveable { mutableStateOf("Accedi") }
     var loginError by rememberSaveable { mutableStateOf(false) }
     var _user : User? = actualUser
-    Column(
-        Modifier.padding(padding),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+    
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(com.example.superspan.ui.theme.AppBackgroundBrush)
+            .padding(padding)
     ) {
         Column(
-            Modifier
-                .weight(3.5f)
-                .clip(BottomOvalShape(30.dp))
-                .fillMaxSize()
-                .background(Color.Gray),
+            modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Bottom
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Column(
-                Modifier
-                    .weight(2.5f)
-                    .fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Bottom
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.logo_superspan),
-                    contentDescription = "Logo SuperSpan",
-                    modifier = Modifier.height(80.dp).padding(bottom = 20.dp),
-                    contentScale = ContentScale.Fit
-                )
-                Text("Benvenuto!", fontSize = 40.sp, modifier = Modifier.padding(bottom = 15.dp))
-            }
+            
+            // Sezione Superiore: Logo e Benvenuto
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(5f)
-                    .padding(horizontal = 25.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                    .padding(top = 60.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                androidx.compose.foundation.Image(
+                    painter = painterResource(id = R.drawable.logo_superspan),
+                    contentDescription = "Logo SuperSpan",
+                    modifier = Modifier.height(70.dp).padding(bottom = 16.dp),
+                    contentScale = ContentScale.Fit
+                )
+                Text(
+                    text = "Bentornato!",
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = androidx.compose.material3.MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "Accedi al tuo account per continuare",
+                    fontSize = 16.sp,
+                    color = Color.Gray,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
+            
+            // Form Centrale
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 var passwordVisible by rememberSaveable { mutableStateOf(false) }
                 val isEmailValid = android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
@@ -97,7 +107,7 @@ fun Login(
                     keyboardType = KeyboardType.Email,
                     isError = isEmailError,
                     errorMessage = if (!isEmailValid && email.isNotEmpty()) "Formato email non valido" else "Credenziali errate",
-                    modifier = Modifier.padding(bottom = 10.dp),
+                    modifier = Modifier.padding(bottom = 12.dp),
                     onValueChange = { email = it; loginError = false }
                 )
                 EditTextField(
@@ -107,7 +117,7 @@ fun Login(
                     visualTransformation = if (passwordVisible) androidx.compose.ui.text.input.VisualTransformation.None else PasswordVisualTransformation(),
                     isError = loginError,
                     errorMessage = "Credenziali errate",
-                    modifier = Modifier.padding(bottom = 20.dp),
+                    modifier = Modifier.padding(bottom = 32.dp),
                     trailingIcon = {
                         val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
                         androidx.compose.material3.IconButton(onClick = { passwordVisible = !passwordVisible }) {
@@ -116,7 +126,7 @@ fun Login(
                     },
                     onValueChange = { password = it; loginError = false }
                 )
-                Spacer(Modifier.height(15.dp))
+                
                 Button(
                     onClick = {
                         val _user = accessAccount(email, password)
@@ -128,17 +138,37 @@ fun Login(
                         }
                     },
                     enabled = isEmailValid || email.isEmpty(),
-                    modifier = Modifier.padding(bottom = 15.dp)) { Text(text) }
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                        containerColor = androidx.compose.material3.MaterialTheme.colorScheme.primary
+                    )
+                ) { 
+                    Text(text, fontSize = 18.sp, fontWeight = FontWeight.Bold) 
+                }
             }
-        }
-        Box(Modifier.weight(0.5f), contentAlignment = Alignment.Center) {
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
+            
+            // Footer (Link Registrazione)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 32.dp),
+                contentAlignment = Alignment.Center
             ) {
-                Text("Non hai un account?", color = Color.Gray)
-                TextButton(onClick = { navController?.navigate(Destination.REGISTER.route) }) {
-                    Text("Registrati", fontWeight = FontWeight.Bold, color = Color(0xFF388E3C))
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Non hai un account?", color = Color.Gray)
+                    TextButton(onClick = { navController?.navigate(Destination.REGISTER.route) }) {
+                        Text(
+                            "Registrati", 
+                            fontWeight = FontWeight.Bold, 
+                            color = androidx.compose.material3.MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
             }
         }

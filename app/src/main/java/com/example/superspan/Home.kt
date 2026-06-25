@@ -457,9 +457,8 @@ fun Home(paddingValues: PaddingValues, navController: NavController?) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(paddingValues)
-            .background(Color(0xFFF8F9FA)), // Sfondo grigio chiarissimo professionale
-        contentPadding = PaddingValues(bottom = 32.dp)
+            .background(com.example.superspan.ui.theme.AppBackgroundBrush), // Sfondo sfumato basato sul logo
+        contentPadding = PaddingValues(bottom = paddingValues.calculateBottomPadding() + 32.dp)
     ) {
         // 1. HEADER (Scorre via con il resto)
         item {
@@ -556,7 +555,8 @@ fun HomeFeatureCard(card: HomeCardData, navController: NavController?) {
     Card(
         modifier = Modifier.fillMaxWidth().height(180.dp),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = card.background)
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Row(Modifier.fillMaxSize()) {
             Box(Modifier.width(8.dp).fillMaxHeight().background(card.accent))
@@ -589,7 +589,8 @@ fun HomeMediumCard(card: HomeCardData, navController: NavController?) {
     Card(
         modifier = Modifier.fillMaxWidth().height(110.dp).clickable { card.route?.let { navController?.navigate(it) } },
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = card.background)
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Row(Modifier.padding(16.dp).fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(50.dp).background(card.accent.copy(0.1f), CircleShape), contentAlignment = Alignment.Center) {
@@ -610,7 +611,8 @@ fun HomeSmallCard(card: HomeCardData, navController: NavController?) {
     Card(
         modifier = Modifier.fillMaxWidth().clickable { card.route?.let { navController?.navigate(it) } },
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = card.background)
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(card.icon, null, tint = card.accent, modifier = Modifier.size(20.dp))

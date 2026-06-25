@@ -67,8 +67,7 @@ fun AdminCandidaciesPage(navController: NavController?, paddingValues: PaddingVa
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                .background(Color(0xFFF8F9FA))
+                .background(com.example.superspan.ui.theme.AppBackgroundBrush)
         ) {
             // --- SEZIONE FILTRI ---
             Card(
@@ -158,7 +157,7 @@ fun AdminCandidaciesPage(navController: NavController?, paddingValues: PaddingVa
                 }
             } else {
                 LazyColumn(
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = paddingValues.calculateBottomPadding() + 32.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(filteredCandidacies) { candidacy ->

@@ -24,7 +24,7 @@ fun AccountSummaryPage(user: User, navController: NavController?, padding: Paddi
         modifier = Modifier
             .fillMaxSize()
             .padding(padding)
-            .background(Color.White)
+            .background(com.example.superspan.ui.theme.AppBackgroundBrush)
     ) {
         // --- HEADER ---
         Box(

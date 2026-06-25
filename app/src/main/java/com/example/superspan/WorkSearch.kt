@@ -451,9 +451,9 @@ fun WorkSearchPageComplete(
     val snackbarHostState = remember { SnackbarHostState() }
     val listState = rememberLazyListState()
 
-    Box(modifier = Modifier.padding(padding).fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize().background(com.example.superspan.ui.theme.AppBackgroundBrush)) {
         if (!enabled) {
-            WorkSearchPage(navController, filterData, listState, snackbarHostState, hideHeader) {
+            WorkSearchPage(navController, filterData, listState, snackbarHostState, padding, hideHeader) {
                 enabled = true
             }
         } else {
@@ -470,9 +470,9 @@ fun WorkSearchPageComplete(
         if (actualUser.admin && !enabled) {
             FloatingActionButton(
                 onClick = { navController?.navigate(Destination.ADD_WORK_OFFER.route) },
-                containerColor = Color(0xFF388E3C),
+                containerColor = androidx.compose.material3.MaterialTheme.colorScheme.primary,
                 contentColor = Color.White,
-                modifier = Modifier.align(Alignment.BottomEnd).padding(24.dp)
+                modifier = Modifier.align(Alignment.BottomEnd).padding(end = 24.dp, bottom = padding.calculateBottomPadding() + 24.dp)
             ) {
                 Icon(Icons.Default.Add, "Aggiungi")
             }
@@ -486,6 +486,7 @@ fun WorkSearchPage(
     filterData: WorkFilterData,
     listState: LazyListState,
     snackbarHostState: SnackbarHostState,
+    padding: PaddingValues,
     hideHeader: Boolean = false,
     onOpenFilters: () -> Unit
 ) {
@@ -521,7 +522,7 @@ fun WorkSearchPage(
     LazyColumn(
         state = listState,
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(bottom = 20.dp),
+        contentPadding = PaddingValues(bottom = padding.calculateBottomPadding() + 32.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         // 1. HEADER (Scorre con la pagina)
@@ -530,7 +531,7 @@ fun WorkSearchPage(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 24.dp),
+                        .padding(top = 64.dp, bottom = 24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
@@ -555,21 +556,30 @@ fun WorkSearchPage(
                     .padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                OutlinedTextField(
-                    value = filterData.nome,
-                    onValueChange = { filterData.nome = it },
-                    placeholder = { Text("Cerca ruolo o città...") },
+                androidx.compose.material3.Surface(
                     modifier = Modifier
                         .weight(1f)
                         .height(56.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    leadingIcon = { Icon(Icons.Default.Search, null) },
-                    singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = Color(0xFFF7F7F7),
-                        unfocusedContainerColor = Color(0xFFF7F7F7)
+                    shape = RoundedCornerShape(28.dp),
+                    shadowElevation = 6.dp,
+                    color = Color.White
+                ) {
+                    androidx.compose.material3.TextField(
+                        value = filterData.nome,
+                        onValueChange = { filterData.nome = it },
+                        placeholder = { Text("Cerca ruolo o città...", color = Color.Gray) },
+                        modifier = Modifier.fillMaxSize(),
+                        leadingIcon = { Icon(Icons.Default.Search, null, tint = Color.Gray) },
+                        singleLine = true,
+                        colors = androidx.compose.material3.TextFieldDefaults.colors(
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            cursorColor = androidx.compose.material3.MaterialTheme.colorScheme.primary
+                        )
                     )
-                )
+                }
 
                 Spacer(Modifier.width(8.dp))
 
@@ -578,7 +588,7 @@ fun WorkSearchPage(
                     modifier = Modifier.size(56.dp),
                     shape = RoundedCornerShape(16.dp),
                     colors = IconButtonDefaults.filledIconButtonColors(
-                        containerColor = Color(0xFF388E3C)
+                        containerColor = androidx.compose.material3.MaterialTheme.colorScheme.primary
                     )
                 ) {
                     Icon(Icons.Default.Tune, contentDescription = "Filtri", tint = Color.White)
@@ -609,7 +619,7 @@ fun WorkSearchPage(
 @Composable
 fun WorkOfferCompose(workOffer: WorkOffer, navController: NavController?, isHighlighted: Boolean = false, isDisabled: Boolean = false, badgeText: String? = null) {
     val backgroundColor by animateColorAsState(
-        targetValue = if (isHighlighted) Color(0xFFC8E6C9) else Color(0xFFF1F1F1),
+        targetValue = if (isHighlighted) androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer else Color.White,
         animationSpec = tween(durationMillis = 500)
     )
 
@@ -637,7 +647,7 @@ fun WorkOfferCompose(workOffer: WorkOffer, navController: NavController?, isHigh
                     modifier = Modifier.weight(1f)
                 )
                 if (badgeText != null) {
-                    val badgeColor = if (badgeText == "Bozza") Color(0xFFFFA000) else if (badgeText == "Inviata") Color(0xFF388E3C) else Color(0xFF2196F3)
+                    val badgeColor = if (badgeText == "Bozza") androidx.compose.material3.MaterialTheme.colorScheme.secondary else if (badgeText == "Inviata") androidx.compose.material3.MaterialTheme.colorScheme.primary else Color(0xFF2196F3)
                     Surface(
                         color = badgeColor.copy(alpha = 0.15f),
                         shape = CircleShape,
@@ -772,7 +782,7 @@ fun WorkFilterPage(modifier: Modifier, filterData: WorkFilterData, onDismiss: ()
                                 tuttaItalia = it
                                 if (it) filterData.distanzaMax = 1000f else filterData.distanzaMax = 50f
                             },
-                            colors = SwitchDefaults.colors(checkedThumbColor = Color(0xFF388E3C))
+                            colors = SwitchDefaults.colors(checkedThumbColor = androidx.compose.material3.MaterialTheme.colorScheme.primary)
                         )
                     }
 
@@ -792,8 +802,8 @@ fun WorkFilterPage(modifier: Modifier, filterData: WorkFilterData, onDismiss: ()
                         valueRange = 5f..100f,
                         enabled = !tuttaItalia,
                         colors = SliderDefaults.colors(
-                            thumbColor = Color(0xFF388E3C),
-                            activeTrackColor = Color(0xFF388E3C),
+                            thumbColor = androidx.compose.material3.MaterialTheme.colorScheme.primary,
+                            activeTrackColor = androidx.compose.material3.MaterialTheme.colorScheme.primary,
                             inactiveTrackColor = Color.LightGray.copy(alpha = 0.3f)
                         )
                     )
@@ -849,7 +859,7 @@ fun WorkFilterPage(modifier: Modifier, filterData: WorkFilterData, onDismiss: ()
                                 onCheckedChange = { isChecked ->
                                     if (isChecked) filterData.ruoli.add(role) else filterData.ruoli.remove(role)
                                 },
-                                colors = CheckboxDefaults.colors(checkedColor = Color(0xFF388E3C))
+                                colors = CheckboxDefaults.colors(checkedColor = androidx.compose.material3.MaterialTheme.colorScheme.primary)
                             )
                             Text(role.nome, fontSize = 14.sp)
                         }
@@ -867,7 +877,7 @@ fun WorkFilterPage(modifier: Modifier, filterData: WorkFilterData, onDismiss: ()
                     .fillMaxWidth()
                     .height(56.dp),
                 shape = CircleShape,
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF388E3C))
+                colors = ButtonDefaults.buttonColors(containerColor = androidx.compose.material3.MaterialTheme.colorScheme.primary)
             ) {
                 Text("Applica filtri", fontSize = 18.sp, fontWeight = FontWeight.Bold)
             }
@@ -950,7 +960,7 @@ fun WorkFilterPage(modifier: Modifier, filterData: WorkFilterData, onDismiss: ()
                                 tuttaItalia = it
                                 if (it) filterData.distanzaMax = 1000f else filterData.distanzaMax = 50f
                             },
-                            colors = SwitchDefaults.colors(checkedThumbColor = Color(0xFF388E3C))
+                            colors = SwitchDefaults.colors(checkedThumbColor = androidx.compose.material3.MaterialTheme.colorScheme.primary)
                         )
                     }
 
@@ -961,7 +971,7 @@ fun WorkFilterPage(modifier: Modifier, filterData: WorkFilterData, onDismiss: ()
                     // Testo dinamico Distanza
                     Text(
                         text = if (tuttaItalia) "Distanza: Senza limiti" else "Entro ${filterData.distanzaMax.toInt()} km da te",
-                        color = if (tuttaItalia) Color.Gray else Color(0xFF388E3C),
+                        color = if (tuttaItalia) Color.Gray else androidx.compose.material3.MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.ExtraBold,
                         fontSize = 15.sp
                     )
@@ -980,7 +990,7 @@ fun WorkFilterPage(modifier: Modifier, filterData: WorkFilterData, onDismiss: ()
                                 modifier = Modifier
                                     .size(22.dp)
                                     .background(
-                                        if (tuttaItalia) Color.LightGray else Color(0xFF388E3C),
+                                        if (tuttaItalia) Color.LightGray else androidx.compose.material3.MaterialTheme.colorScheme.primary,
                                         CircleShape
                                     )
                                     .border(2.dp, Color.White, CircleShape)
@@ -992,7 +1002,7 @@ fun WorkFilterPage(modifier: Modifier, filterData: WorkFilterData, onDismiss: ()
                                 modifier = Modifier.height(4.dp),
                                 sliderState = sliderState, // Passa sliderState qui
                                 colors = SliderDefaults.colors(
-                                    activeTrackColor = Color(0xFF388E3C),
+                                    activeTrackColor = androidx.compose.material3.MaterialTheme.colorScheme.primary,
                                     inactiveTrackColor = Color.LightGray.copy(alpha = 0.3f),
                                     disabledActiveTrackColor = Color.LightGray.copy(alpha = 0.5f),
                                     disabledInactiveTrackColor = Color.LightGray.copy(alpha = 0.2f)
@@ -1048,7 +1058,7 @@ fun WorkFilterPage(modifier: Modifier, filterData: WorkFilterData, onDismiss: ()
                                 onCheckedChange = { isChecked ->
                                     if (isChecked) filterData.ruoli.add(role) else filterData.ruoli.remove(role)
                                 },
-                                colors = CheckboxDefaults.colors(checkedColor = Color(0xFF388E3C))
+                                colors = CheckboxDefaults.colors(checkedColor = androidx.compose.material3.MaterialTheme.colorScheme.primary)
                             )
                             Text(role.nome, fontSize = 14.sp)
                         }
@@ -1064,7 +1074,7 @@ fun WorkFilterPage(modifier: Modifier, filterData: WorkFilterData, onDismiss: ()
                 onClick = onDismiss,
                 modifier = Modifier.fillMaxWidth().height(56.dp),
                 shape = CircleShape,
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF388E3C))
+                colors = ButtonDefaults.buttonColors(containerColor = androidx.compose.material3.MaterialTheme.colorScheme.primary)
             ) {
                 Text("Applica filtri", fontSize = 18.sp, fontWeight = FontWeight.Bold)
             }
@@ -1084,7 +1094,7 @@ fun FilterCheckboxRow(label: String, isChecked: Boolean, onCheckedChange: (Boole
         Checkbox(
             checked = isChecked,
             onCheckedChange = onCheckedChange,
-            colors = CheckboxDefaults.colors(checkedColor = Color(0xFF388E3C))
+            colors = CheckboxDefaults.colors(checkedColor = androidx.compose.material3.MaterialTheme.colorScheme.primary)
         )
         Text(label, fontSize = 14.sp)
     }

@@ -359,7 +359,7 @@ fun CustomAnimatedBottomBar(currentRoute: String, onNavigate: (String) -> Unit) 
                         modifier = Modifier
                             .fillMaxSize()
                             .clip(RoundedCornerShape(30.dp))
-                            .background(Color(0xFF388E3C).copy(alpha = 0.12f))
+                            .background(androidx.compose.material3.MaterialTheme.colorScheme.primary.copy(alpha = 0.12f))
                     )
                 }
 
@@ -389,7 +389,7 @@ fun CustomAnimatedBottomBar(currentRoute: String, onNavigate: (String) -> Unit) 
                                 Icon(
                                     imageVector = destination.icon ?: Icons.Default.Face,
                                     contentDescription = destination.label,
-                                    tint = if (isSelected) Color(0xFF388E3C) else Color.Gray,
+                                    tint = if (isSelected) androidx.compose.material3.MaterialTheme.colorScheme.primary else Color.Gray,
                                     modifier = Modifier.size(26.dp)
                                 )
                                 if (isSelected) {
@@ -397,7 +397,7 @@ fun CustomAnimatedBottomBar(currentRoute: String, onNavigate: (String) -> Unit) 
                                         text = destination.label,
                                         fontSize = 10.sp,
                                         fontWeight = FontWeight.ExtraBold,
-                                        color = Color(0xFF388E3C),
+                                        color = androidx.compose.material3.MaterialTheme.colorScheme.primary,
                                         maxLines = 1
                                     )
                                 }
