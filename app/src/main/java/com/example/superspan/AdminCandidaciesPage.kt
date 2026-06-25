@@ -176,6 +176,8 @@ fun CandidacyAdminCard(candidacy: Candidacy) {
     val isForwarded = candidacy.stato != "Inviata"
     val context = LocalContext.current
     var showDiscardDialog by remember { mutableStateOf(false) }
+    var showHRConfirm by remember { mutableStateOf(false) }
+    var showManagerConfirm by remember { mutableStateOf(false) }
 
     if (showDiscardDialog) {
         AlertDialog(
@@ -198,6 +200,52 @@ fun CandidacyAdminCard(candidacy: Candidacy) {
                 TextButton(onClick = { showDiscardDialog = false }) {
                     Text("Annulla")
                 }
+            }
+        )
+    }
+
+    if (showHRConfirm) {
+        AlertDialog(
+            onDismissRequest = { showHRConfirm = false },
+            title = { Text("Conferma Inoltro") },
+            text = { Text("Vuoi inoltrare la candidatura a HR?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showHRConfirm = false
+                    val index = AllCandidacies.indexOfFirst { it.id == candidacy.id }
+                    if (index != -1) {
+                        AllCandidacies[index] = candidacy.copy(stato = "Inoltrata a HR")
+                    }
+                    android.widget.Toast.makeText(context, "Candidatura inviata a HR con successo", android.widget.Toast.LENGTH_SHORT).show()
+                }) {
+                    Text("Inoltra", color = Color(0xFF1976D2))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showHRConfirm = false }) { Text("Annulla", color = Color.Gray) }
+            }
+        )
+    }
+
+    if (showManagerConfirm) {
+        AlertDialog(
+            onDismissRequest = { showManagerConfirm = false },
+            title = { Text("Conferma Inoltro") },
+            text = { Text("Vuoi inoltrare la candidatura al Responsabile?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showManagerConfirm = false
+                    val index = AllCandidacies.indexOfFirst { it.id == candidacy.id }
+                    if (index != -1) {
+                        AllCandidacies[index] = candidacy.copy(stato = "Inoltrata al Responsabile")
+                    }
+                    android.widget.Toast.makeText(context, "Candidatura inviata al Responsabile con successo", android.widget.Toast.LENGTH_SHORT).show()
+                }) {
+                    Text("Inoltra", color = Color(0xFF1976D2))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showManagerConfirm = false }) { Text("Annulla", color = Color.Gray) }
             }
         )
     }
@@ -353,13 +401,7 @@ fun CandidacyAdminCard(candidacy: Candidacy) {
                 Spacer(Modifier.height(12.dp))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(
-                        onClick = { 
-                            val index = AllCandidacies.indexOfFirst { it.id == candidacy.id }
-                            if (index != -1) {
-                                AllCandidacies[index] = candidacy.copy(stato = "Inoltrata a HR")
-                            }
-                            android.widget.Toast.makeText(context, "Candidatura inviata a HR con successo", android.widget.Toast.LENGTH_SHORT).show()
-                        },
+                        onClick = { showHRConfirm = true },
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE3F2FD), contentColor = Color(0xFF1976D2)),
                         contentPadding = PaddingValues(horizontal = 4.dp)
@@ -367,13 +409,7 @@ fun CandidacyAdminCard(candidacy: Candidacy) {
                         Text("Invia a HR", fontSize = 12.sp, textAlign = TextAlign.Center)
                     }
                     Button(
-                        onClick = { 
-                            val index = AllCandidacies.indexOfFirst { it.id == candidacy.id }
-                            if (index != -1) {
-                                AllCandidacies[index] = candidacy.copy(stato = "Inoltrata al Responsabile")
-                            }
-                            android.widget.Toast.makeText(context, "Candidatura inviata al Responsabile con successo", android.widget.Toast.LENGTH_SHORT).show()
-                        },
+                        onClick = { showManagerConfirm = true },
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE3F2FD), contentColor = Color(0xFF1976D2)),
                         contentPadding = PaddingValues(horizontal = 4.dp)

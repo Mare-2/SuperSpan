@@ -493,6 +493,7 @@ fun WorkSearchPage(
     }
     
     var highlightCurrentId by remember { mutableStateOf<Int?>(null) }
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     LaunchedEffect(highlightedWorkOfferId) {
         val targetId = highlightedWorkOfferId
@@ -503,7 +504,7 @@ fun WorkSearchPage(
                 // Scorriamo aggiungendo +2 per l'header e la barra di ricerca
                 listState.animateScrollToItem(index + 2)
             }
-            snackbarHostState.showSnackbar("Offerta inserita con successo!")
+            android.widget.Toast.makeText(context, "Offerta inserita con successo!", android.widget.Toast.LENGTH_SHORT).show()
             kotlinx.coroutines.delay(1500)
             highlightCurrentId = null
             highlightedWorkOfferId = null

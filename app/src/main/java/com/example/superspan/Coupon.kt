@@ -359,6 +359,13 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.Locale
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideOutHorizontally
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 // Classe per gestire lo stato della scadenza visivamente
 data class ExpirationStatus(val label: String, val color: Color)
@@ -371,6 +378,72 @@ fun CouponPageComplete(paddingValues: PaddingValues, navController: NavControlle
 
     // --- GESTIONE RITORNO IN ALTO ---
     val listState = rememberLazyListState()
+
+    val addedCouponCode = navController?.currentBackStackEntry?.savedStateHandle?.getStateFlow("added_coupon_code", "")?.collectAsState()?.value
+    val deletedCouponCode = navController?.currentBackStackEntry?.savedStateHandle?.getStateFlow("deleted_coupon_code", "")?.collectAsState()?.value
+
+    var highlightedCouponCode by remember { mutableStateOf<String?>(null) }
+    val deletingCouponCodes = remember { mutableStateListOf<String>() }
+    var couponToDelete by remember { mutableStateOf<Coupon?>(null) }
+    val scope = rememberCoroutineScope()
+    val context = androidx.compose.ui.platform.LocalContext.current
+
+    LaunchedEffect(addedCouponCode) {
+        if (!addedCouponCode.isNullOrEmpty()) {
+            val newCoupon = ListOfCoupon.find { it.code == addedCouponCode }
+            if (newCoupon != null) {
+                val correctTab = if (newCoupon.products.size == 3) 0 else 1
+                if (selectedTab != correctTab) {
+                    selectedTab = correctTab
+                    delay(100)
+                }
+                val currentFilteredList = if (selectedTab == 0) {
+                    ListOfCoupon.filter { it.products.size == 3 }
+                } else {
+                    ListOfCoupon.filter { it.products.size == 1 }
+                }
+                val index = currentFilteredList.indexOfFirst { it.code == addedCouponCode }
+                if (index >= 0) {
+                    delay(100)
+                    listState.animateScrollToItem(index + 2, scrollOffset = -250) // offset per non nasconderlo sotto l'header
+                    highlightedCouponCode = addedCouponCode
+                    delay(500)
+                    highlightedCouponCode = null
+                }
+            }
+            navController.currentBackStackEntry?.savedStateHandle?.set("added_coupon_code", "")
+        }
+    }
+
+    LaunchedEffect(deletedCouponCode) {
+        if (!deletedCouponCode.isNullOrEmpty()) {
+            val deletedCoupon = ListOfCoupon.find { it.code == deletedCouponCode }
+            if (deletedCoupon != null) {
+                val correctTab = if (deletedCoupon.products.size == 3) 0 else 1
+                if (selectedTab != correctTab) {
+                    selectedTab = correctTab
+                    delay(100)
+                }
+                val currentFilteredList = if (selectedTab == 0) {
+                    ListOfCoupon.filter { it.products.size == 3 }
+                } else {
+                    ListOfCoupon.filter { it.products.size == 1 }
+                }
+                val index = currentFilteredList.indexOfFirst { it.code == deletedCouponCode }
+                if (index >= 0) {
+                    delay(100)
+                    listState.animateScrollToItem(index + 2, scrollOffset = -250) // offset per non nasconderlo sotto l'header
+                    delay(100) // slight pause to let the user see it before it disappears
+                }
+            }
+
+            deletingCouponCodes.add(deletedCouponCode)
+            delay(400) // Duration of exit animation
+            ListOfCoupon.removeAll { it.code == deletedCouponCode }
+            deletingCouponCodes.remove(deletedCouponCode)
+            navController.currentBackStackEntry?.savedStateHandle?.set("deleted_coupon_code", "")
+        }
+    }
 
     LaunchedEffect(selectedTab) {
         listState.scrollToItem(0)
@@ -438,12 +511,21 @@ fun CouponPageComplete(paddingValues: PaddingValues, navController: NavControlle
                     ListOfCoupon.filter { it.products.size == 1 }
                 }
 
-                items(filteredList) { item ->
-                    Box(modifier = Modifier.padding(vertical = 6.dp)) {
-                        if (selectedTab == 0) {
-                            CouponTicketCard(item, navController) { selectedOffer = item }
-                        } else {
-                            OfferPromoCard(item, navController)
+                items(filteredList, key = { it.code }) { item ->
+                    val isDeleting = deletingCouponCodes.contains(item.code)
+                    val isHighlighted = highlightedCouponCode == item.code
+
+                    AnimatedVisibility(
+                        visible = !isDeleting,
+                        enter = fadeIn(),
+                        exit = slideOutHorizontally(targetOffsetX = { it }, animationSpec = tween(400)) + fadeOut(animationSpec = tween(400))
+                    ) {
+                        Box(modifier = Modifier.padding(vertical = 6.dp)) {
+                            if (selectedTab == 0) {
+                                CouponTicketCard(item, isHighlighted, navController, onDeleteClick = { couponToDelete = item }) { selectedOffer = item }
+                            } else {
+                                OfferPromoCard(item, isHighlighted, navController, onDeleteClick = { couponToDelete = item })
+                            }
                         }
                     }
                 }
@@ -454,13 +536,44 @@ fun CouponPageComplete(paddingValues: PaddingValues, navController: NavControlle
 
         if (actualUser.admin) {
             FloatingActionButton(
-                onClick = { navController?.navigate(Destination.ADD_COUPON.route) },
+                onClick = {
+                    navController?.currentBackStackEntry?.savedStateHandle?.set("add_type", selectedTab)
+                    navController?.navigate(Destination.ADD_COUPON.route)
+                },
                 containerColor = Color(0xFF388E3C),
                 contentColor = Color.White,
                 modifier = Modifier.align(Alignment.BottomEnd).padding(24.dp)
             ) {
                 Icon(Icons.Default.Add, "Aggiungi")
             }
+        }
+
+        if (couponToDelete != null) {
+            AlertDialog(
+                onDismissRequest = { couponToDelete = null },
+                title = { Text("Conferma Eliminazione") },
+                text = { Text("Sei sicuro di voler eliminare questo elemento?") },
+                confirmButton = {
+                    TextButton(onClick = {
+                        val code = couponToDelete!!.code
+                        couponToDelete = null
+                        scope.launch {
+                            deletingCouponCodes.add(code)
+                            kotlinx.coroutines.delay(400)
+                            ListOfCoupon.removeAll { it.code == code }
+                            deletingCouponCodes.remove(code)
+                            android.widget.Toast.makeText(context, "Eliminato con successo", android.widget.Toast.LENGTH_SHORT).show()
+                        }
+                    }) {
+                        Text("Elimina", color = Color.Red)
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { couponToDelete = null }) {
+                        Text("Annulla", color = Color.Gray)
+                    }
+                }
+            )
         }
     }
 }
@@ -504,83 +617,128 @@ fun TabButton(text: String, isSelected: Boolean, modifier: Modifier, onClick: ()
 }
 
 @Composable
-fun CouponTicketCard(coupon: Coupon, navController: NavController? = null, onClick: () -> Unit) {
+fun CouponTicketCard(coupon: Coupon, isHighlighted: Boolean = false, navController: NavController? = null, onDeleteClick: () -> Unit = {}, onClick: () -> Unit = {}) {
     val status = getExpirationStatus(coupon.dateOfExpiration)
 
     Card(
         modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth().clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = if (isHighlighted) Color(0xFFE0E0E0) else Color.White),
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
-        Row(modifier = Modifier.height(IntrinsicSize.Min)) {
-            Column(modifier = Modifier.weight(1f).padding(16.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Surface(color = status.color.copy(0.1f), shape = CircleShape) {
-                        Text(status.label, modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp), color = status.color, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+        Column {
+            Row(modifier = Modifier.height(IntrinsicSize.Min)) {
+                Column(modifier = Modifier.weight(1f).padding(16.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Surface(color = status.color.copy(0.1f), shape = CircleShape) {
+                            Text(status.label, modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp), color = status.color, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                        }
+                        Spacer(Modifier.width(8.dp))
+                        Text(text = "Scade: ${formatDisplayDate(coupon.dateOfExpiration)}", fontSize = 11.sp, color = Color.Gray)
                     }
-                    Spacer(Modifier.width(8.dp))
-                    Text(text = "Scade: ${formatDisplayDate(coupon.dateOfExpiration)}", fontSize = 11.sp, color = Color.Gray)
+                    Spacer(Modifier.height(8.dp))
+                    Text(coupon.description, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    Text("Valido su: ${coupon.products.joinToString(", ") { it.nome }}", fontSize = 12.sp, color = Color.Gray)
+                    Spacer(Modifier.height(12.dp))
+                    Surface(color = Color(0xFFF1F1F1), shape = RoundedCornerShape(8.dp), border = androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray.copy(0.5f))) {
+                        Text(coupon.code, modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp), fontWeight = FontWeight.ExtraBold, letterSpacing = 2.sp, color = Color.DarkGray)
+                    }
                 }
-                Spacer(Modifier.height(8.dp))
-                Text(coupon.description, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                Text("Valido su: ${coupon.products.joinToString(", ") { it.nome }}", fontSize = 12.sp, color = Color.Gray)
-                Spacer(Modifier.height(12.dp))
-                Surface(color = Color(0xFFF1F1F1), shape = RoundedCornerShape(8.dp), border = androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray.copy(0.5f))) {
-                    Text(coupon.code, modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp), fontWeight = FontWeight.ExtraBold, letterSpacing = 2.sp, color = Color.DarkGray)
+                Box(Modifier.fillMaxHeight().width(1.dp).background(Color.LightGray))
+                Column(
+                    modifier = Modifier.fillMaxHeight().width(90.dp).background(status.color.copy(0.05f)),
+                    horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center
+                ) {
+                    Text("SCONTO", fontSize = 10.sp, color = Color.Gray)
+                    Text("-${coupon.discount.toInt()}%", fontSize = 26.sp, fontWeight = FontWeight.Black, color = status.color)
                 }
             }
-            Box(Modifier.fillMaxHeight().width(1.dp).background(Color.LightGray))
-            Column(
-                modifier = Modifier.fillMaxHeight().width(90.dp).background(status.color.copy(0.05f)),
-                horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center
-            ) {
-                if (actualUser.admin) {
-                    IconButton(onClick = { navController?.navigate("${Destination.EDIT_COUPON.route}/${coupon.code}") }) {
-                        Icon(Icons.Default.Edit, contentDescription = "Modifica", tint = status.color)
+            if (actualUser.admin) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color(0xFFF9F9F9))
+                        .padding(horizontal = 8.dp, vertical = 2.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        TextButton(onClick = { navController?.navigate("${Destination.EDIT_COUPON.route}/${coupon.code}") }) {
+                            Icon(Icons.Default.Edit, contentDescription = "Modifica", modifier = Modifier.size(16.dp), tint = Color.DarkGray)
+                            Spacer(Modifier.width(6.dp))
+                            Text("Modifica", color = Color.DarkGray, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        }
+                        TextButton(onClick = onDeleteClick) {
+                            Icon(Icons.Default.Delete, contentDescription = "Elimina", modifier = Modifier.size(16.dp), tint = Color.Red.copy(0.8f))
+                            Spacer(Modifier.width(6.dp))
+                            Text("Elimina", color = Color.Red.copy(0.8f), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        }
                     }
-                    Spacer(Modifier.height(4.dp))
                 }
-                Text("SCONTO", fontSize = 10.sp, color = Color.Gray)
-                Text("-${coupon.discount.toInt()}%", fontSize = 26.sp, fontWeight = FontWeight.Black, color = status.color)
             }
         }
     }
 }
 
 @Composable
-fun OfferPromoCard(coupon: Coupon, navController: NavController? = null) {
+fun OfferPromoCard(coupon: Coupon, isHighlighted: Boolean = false, navController: NavController? = null, onDeleteClick: () -> Unit = {}) {
     val status = getExpirationStatus(coupon.dateOfExpiration)
     val product = coupon.products.firstOrNull() ?: return
 
     Card(
         modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = if (isHighlighted) Color(0xFFE0E0E0) else Color.White),
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
-        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(40.dp).background(Color(0xFFE8F5E9), CircleShape), contentAlignment = Alignment.Center) {
-                Icon(Icons.Default.LocalOffer, null, tint = Color(0xFF388E3C), modifier = Modifier.size(20.dp))
+        Column {
+            Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                Box(Modifier.size(40.dp).background(Color(0xFFE8F5E9), CircleShape), contentAlignment = Alignment.Center) {
+                    Icon(Icons.Default.LocalOffer, null, tint = Color(0xFF388E3C), modifier = Modifier.size(20.dp))
+                }
+                Spacer(Modifier.width(12.dp))
+                Column(Modifier.weight(1f)) {
+                    Text(product.nome, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    Text(coupon.description, fontSize = 12.sp, color = Color.Gray)
+                    Spacer(Modifier.height(4.dp))
+                    Text(text = "Scade: ${formatDisplayDate(coupon.dateOfExpiration)}", fontSize = 12.sp, color = Color(0xFFD32F2F), fontWeight = FontWeight.Medium)
+                }
+                Column(horizontalAlignment = Alignment.End) {
+                    Text("-${coupon.discount.toInt()}%", fontSize = 24.sp, fontWeight = FontWeight.Black, color = status.color)
+                }
             }
-            Spacer(Modifier.width(12.dp))
-            Column(Modifier.weight(1f)) {
-                Text(product.nome, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                Text(coupon.description, fontSize = 12.sp, color = Color.Gray)
-                Spacer(Modifier.height(4.dp))
-                Text(text = "Scade: ${formatDisplayDate(coupon.dateOfExpiration)}", fontSize = 12.sp, color = Color(0xFFD32F2F), fontWeight = FontWeight.Medium)
-            }
-            Column(horizontalAlignment = Alignment.End) {
-                if (actualUser.admin) {
-                    IconButton(onClick = { navController?.navigate("${Destination.EDIT_COUPON.route}/${coupon.code}") }) {
-                        Icon(Icons.Default.Edit, contentDescription = "Modifica", tint = status.color)
+            if (actualUser.admin) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color(0xFFF9F9F9))
+                        .padding(horizontal = 8.dp, vertical = 2.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        TextButton(onClick = { navController?.navigate("${Destination.EDIT_COUPON.route}/${coupon.code}") }) {
+                            Icon(Icons.Default.Edit, contentDescription = "Modifica", modifier = Modifier.size(16.dp), tint = Color.DarkGray)
+                            Spacer(Modifier.width(6.dp))
+                            Text("Modifica", color = Color.DarkGray, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        }
+                        TextButton(onClick = onDeleteClick) {
+                            Icon(Icons.Default.Delete, contentDescription = "Elimina", modifier = Modifier.size(16.dp), tint = Color.Red.copy(0.8f))
+                            Spacer(Modifier.width(6.dp))
+                            Text("Elimina", color = Color.Red.copy(0.8f), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        }
                     }
                 }
-                Text("-${coupon.discount.toInt()}%", fontSize = 24.sp, fontWeight = FontWeight.Black, color = status.color)
             }
         }
     }
 }
+
+
 
 @Composable
 fun OfferDetailPage(coupon: Coupon, navController: NavController? = null, onBack: () -> Unit) {

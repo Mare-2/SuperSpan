@@ -1602,6 +1602,7 @@ fun ApplyStep3(navController: NavController?, padding: PaddingValues) {
     var showPreviewVideo by remember { mutableStateOf(false) }
     var showPreviewCV by remember { mutableStateOf(false) }
     var showExitDialog by remember { mutableStateOf(false) }
+    var showSendConfirm by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
     val exoPlayer = remember {
@@ -1736,6 +1737,30 @@ fun ApplyStep3(navController: NavController?, padding: PaddingValues) {
             goToOfferPresentation(navController)
         })
 
+        if (showSendConfirm) {
+            AlertDialog(
+                onDismissRequest = { showSendConfirm = false },
+                title = { Text("Conferma Invio") },
+                text = { Text("Sei sicuro di voler inviare definitivamente la tua candidatura?") },
+                confirmButton = {
+                    TextButton(onClick = {
+                        showSendConfirm = false
+                        val c = Candidacy(id = AllCandidacies.size + 1, userEmail = actualUser.email, offerId = currentOfferIdApplying, nome = currentDraft.nome, cognome = currentDraft.cognome, emailContatto = currentDraft.emailLavoro, telefono = currentDraft.telefono, cvPath = currentDraft.cvPath, videoPath = currentDraft.videoPath)
+                        AllCandidacies.add(c)
+                        actualUser.candidacyDraftsByOfferId.remove(currentOfferIdApplying)
+                        currentDraft = CandidacyDraft()
+                        android.widget.Toast.makeText(context, "Candidatura inviata con successo", android.widget.Toast.LENGTH_SHORT).show()
+                        navController?.navigate(Destination.LAVORO.route) { popUpTo(Destination.LAVORO.route) { inclusive = true } }
+                    }) {
+                        Text("Invia", color = Color(0xFF388E3C))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showSendConfirm = false }) { Text("Annulla", color = Color.Gray) }
+                }
+            )
+        }
+
         Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text("Paolo, controlla un'ultima volta:", color = Color.Gray)
             SummaryInteractiveRow(Icons.Default.Person, "Candidato", "${currentDraft.nome} ${currentDraft.cognome}", { showEditConfirm = "Dati" }) { previewContent = "Nome: ${currentDraft.nome}\nCognome: ${currentDraft.cognome}" }
@@ -1745,13 +1770,7 @@ fun ApplyStep3(navController: NavController?, padding: PaddingValues) {
             SummaryInteractiveRow(Icons.Default.Videocam, "Video", if (currentDraft.videoPath != null) "Registrato correttamente" else "Nessun video", { showEditConfirm = "Video" }) { showPreviewVideo = true }
 
             Spacer(Modifier.weight(1f))
-            Button(onClick = {
-                val c = Candidacy(id = AllCandidacies.size + 1, userEmail = actualUser.email, offerId = currentOfferIdApplying, nome = currentDraft.nome, cognome = currentDraft.cognome, emailContatto = currentDraft.emailLavoro, telefono = currentDraft.telefono, cvPath = currentDraft.cvPath, videoPath = currentDraft.videoPath)
-                AllCandidacies.add(c)
-                actualUser.candidacyDraftsByOfferId.remove(currentOfferIdApplying)
-                currentDraft = CandidacyDraft()
-                navController?.navigate(Destination.LAVORO.route) { popUpTo(Destination.LAVORO.route) { inclusive = true } }
-            }, Modifier.fillMaxWidth().height(60.dp), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF388E3C)), shape = CircleShape) {
+            Button(onClick = { showSendConfirm = true }, Modifier.fillMaxWidth().height(60.dp), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF388E3C)), shape = CircleShape) {
                 Text("CONFERMA E INVIA", fontWeight = FontWeight.Bold)
             }
         }

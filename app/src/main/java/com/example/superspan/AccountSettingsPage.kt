@@ -37,9 +37,10 @@ fun AccountSettingsPage(user: User, navController: NavController?, paddingValues
     
     var oldPasswordVisible by remember { mutableStateOf(false) }
     var newPasswordVisible by remember { mutableStateOf(false) }
-
+    var showSaveConfirm by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     val isEmailValid = Patterns.EMAIL_ADDRESS.matcher(email).matches() || email.isEmpty()
     val isOldPasswordValid = oldPassword == user.password || oldPassword.isEmpty()
@@ -155,8 +156,27 @@ fun AccountSettingsPage(user: User, navController: NavController?, paddingValues
 
                 // TASTO SALVA
                 Button(
-                    onClick = {
-                        // Aggiorniamo i dati utente
+                    onClick = { showSaveConfirm = true },
+                    enabled = canSave,
+                    modifier = Modifier.fillMaxWidth().height(55.dp),
+                    shape = CircleShape,
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF388E3C))
+                ) {
+                    Text("Salva Modifiche", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                }
+                
+                Spacer(Modifier.height(40.dp))
+            }
+        }
+
+        if (showSaveConfirm) {
+            AlertDialog(
+                onDismissRequest = { showSaveConfirm = false },
+                title = { Text("Conferma Modifica") },
+                text = { Text("Vuoi salvare le modifiche apportate al tuo account?") },
+                confirmButton = {
+                    TextButton(onClick = {
+                        showSaveConfirm = false
                         user.nome = nome.trim()
                         user.cognome = cognome.trim()
                         
@@ -168,22 +188,17 @@ fun AccountSettingsPage(user: User, navController: NavController?, paddingValues
                             user.email = email.trim()
                         }
 
-                        // Mostriamo un feedback all'utente e poi torniamo indietro
                         coroutineScope.launch {
-                            snackbarHostState.showSnackbar("Dati salvati con successo!")
-                            // navController?.popBackStack() // Opzionale se si vuole uscire subito
+                            android.widget.Toast.makeText(context, "Dati salvati con successo!", android.widget.Toast.LENGTH_SHORT).show()
                         }
-                    },
-                    enabled = canSave,
-                    modifier = Modifier.fillMaxWidth().height(55.dp),
-                    shape = CircleShape,
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF388E3C))
-                ) {
-                    Text("Salva Modifiche", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    }) {
+                        Text("Salva", color = Color(0xFF388E3C))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showSaveConfirm = false }) { Text("Annulla", color = Color.Gray) }
                 }
-                
-                Spacer(Modifier.height(40.dp))
-            }
+            )
         }
     }
 }

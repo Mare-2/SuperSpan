@@ -2,9 +2,11 @@ package com.example.superspan
 
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -41,6 +43,7 @@ fun AdminCouponEditPage(
     val context = LocalContext.current
     var isSelectionOpen by remember { mutableStateOf(false) }
     var pendingProductSelection by remember { mutableStateOf<((Product) -> Unit)?>(null) }
+    var isMultiSelectionOpen by remember { mutableStateOf(false) }
 
     var showSaveConfirm by remember { mutableStateOf(false) }
     var showDeleteConfirm by remember { mutableStateOf(false) }
@@ -69,13 +72,46 @@ fun AdminCouponEditPage(
         discountVal in 0f..100f
 
     if (isSelectionOpen) {
-        ProductSelectionScreen(
-            onBack = { isSelectionOpen = false },
-            onSelected = { product ->
-                pendingProductSelection?.invoke(product)
-                isSelectionOpen = false
-            }
-        )
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = paddingValues.calculateBottomPadding())
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = {}
+                )
+        ) {
+            ProductSelectionScreen(
+                onBack = { isSelectionOpen = false },
+                onSelected = { product ->
+                    pendingProductSelection?.invoke(product)
+                    isSelectionOpen = false
+                }
+            )
+        }
+    } else if (isMultiSelectionOpen) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = paddingValues.calculateBottomPadding())
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = {}
+                )
+        ) {
+            MultiProductSelectionScreen(
+                initialSelection = selectedProducts.toList(),
+                maxSelection = requiredProductsCount,
+                onBack = { isMultiSelectionOpen = false },
+                onConfirm = { products ->
+                    selectedProducts.clear()
+                    selectedProducts.addAll(products)
+                    isMultiSelectionOpen = false
+                }
+            )
+        }
     } else {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
@@ -192,7 +228,7 @@ fun AdminCouponEditPage(
                     
                     selectedProducts.forEach { p ->
                         Card(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
                             colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9)),
                             elevation = CardDefaults.cardElevation(2.dp)
                         ) {
@@ -210,7 +246,17 @@ fun AdminCouponEditPage(
                         }
                     }
 
-                    if (selectedProducts.size < requiredProductsCount) {
+                    if (isCoupon) {
+                        OutlinedButton(
+                            onClick = { isMultiSelectionOpen = true },
+                            modifier = Modifier.fillMaxWidth().height(56.dp),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Icon(Icons.Default.ShoppingCart, contentDescription = null)
+                            Spacer(Modifier.width(8.dp))
+                            Text(if (selectedProducts.isEmpty()) "Seleziona Prodotti" else "Modifica Selezione")
+                        }
+                    } else if (selectedProducts.size < requiredProductsCount) {
                         OutlinedButton(
                             onClick = {
                                 pendingProductSelection = { product ->
@@ -225,7 +271,7 @@ fun AdminCouponEditPage(
                         ) {
                             Icon(Icons.Default.ShoppingCart, contentDescription = null)
                             Spacer(Modifier.width(8.dp))
-                            Text(if (isCoupon) "Aggiungi Prodotto" else "Seleziona Prodotto")
+                            Text("Seleziona Prodotto")
                         }
                     }
 
@@ -236,9 +282,21 @@ fun AdminCouponEditPage(
                         enabled = isFormValid,
                         modifier = Modifier.height(55.dp).width(220.dp),
                         shape = CircleShape,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF388E3C))
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                        contentPadding = PaddingValues()
                     ) {
-                        Text("Salva Modifiche", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(
+                                    if (isFormValid) Brush.horizontalGradient(listOf(Color(0xFF4CAF50), Color(0xFF2E7D32)))
+                                    else Brush.horizontalGradient(listOf(Color.Gray, Color.DarkGray)),
+                                    shape = CircleShape
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("Salva Modifiche", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                        }
                     }
                     
                     Spacer(modifier = Modifier.height(100.dp))
@@ -271,6 +329,7 @@ fun AdminCouponEditPage(
                                 ListOfCoupon.add(newCoupon)
                             }
                             Toast.makeText(context, "Salvato con successo", Toast.LENGTH_SHORT).show()
+                            navController?.previousBackStackEntry?.savedStateHandle?.set("added_coupon_code", newCoupon.code)
                             navController?.popBackStack()
                         }) {
                             Text("Salva", color = Color(0xFF388E3C))
@@ -290,7 +349,7 @@ fun AdminCouponEditPage(
                     confirmButton = {
                         TextButton(onClick = {
                             showDeleteConfirm = false
-                            ListOfCoupon.remove(existingCoupon)
+                            navController?.previousBackStackEntry?.savedStateHandle?.set("deleted_coupon_code", existingCoupon?.code ?: "")
                             Toast.makeText(context, "Eliminato con successo", Toast.LENGTH_SHORT).show()
                             navController?.popBackStack()
                         }) {

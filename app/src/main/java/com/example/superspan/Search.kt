@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -71,10 +72,11 @@ fun ProductCompose(product: Product, navController: NavController?) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(200.dp)
+            .height(205.dp)
             .clickable { navController?.navigate(Destination.PRODOTTO.route + "/${product.nome}") },
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF1F1F1))
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
     ) {
         val bestDiscount = ListOfCoupon.filter { it.products.contains(product) }.maxOfOrNull { it.discount }
         Column(
@@ -88,9 +90,9 @@ fun ProductCompose(product: Product, navController: NavController?) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(110.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(Color.White),
+                    .height(115.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Color(0xFFF8F9FA)),
                 contentAlignment = Alignment.Center
             ) {
                 if (product.image != null) {
@@ -114,10 +116,13 @@ fun ProductCompose(product: Product, navController: NavController?) {
                     Box(
                         modifier = Modifier
                             .align(Alignment.TopStart)
-                            .background(Color.Red, RoundedCornerShape(bottomEnd = 8.dp))
-                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                            .background(
+                                Brush.horizontalGradient(listOf(Color(0xFFFF5252), Color(0xFFD32F2F))),
+                                RoundedCornerShape(topStart = 16.dp, bottomEnd = 16.dp)
+                            )
+                            .padding(horizontal = 10.dp, vertical = 4.dp)
                     ) {
-                        Text("-${bestDiscount.toInt()}%", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                        Text("-${bestDiscount.toInt()}%", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -151,13 +156,13 @@ fun ProductCompose(product: Product, navController: NavController?) {
                 }
             } else {
                 Surface(
-                    color = Color(0xFF388E3C).copy(alpha = 0.12f),
-                    shape = CircleShape
+                    color = Color(0xFF388E3C).copy(alpha = 0.1f),
+                    shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(
                         text = "€ ${"%.2f".format(product.prezzo)}",
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp),
-                        fontSize = 12.sp,
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                        fontSize = 13.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF2E7D32)
                     )
@@ -178,13 +183,14 @@ fun CategoryChip(category: Category, isSelected: Boolean, onClick: () -> Unit) {
 
     Surface(
         modifier = Modifier.clickable { onClick() },
-        shape = RoundedCornerShape(999.dp),
-        color = bgColor
+        shape = RoundedCornerShape(12.dp),
+        color = bgColor,
+        shadowElevation = if (isSelected) 4.dp else 1.dp
     ) {
         Text(
             text = category.nome,
-            modifier = Modifier.padding(horizontal = 14.dp, vertical = 7.dp),
-            fontSize = 13.sp,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+            fontSize = 14.sp,
             fontWeight = FontWeight.SemiBold,
             color = textColor
         )
@@ -242,33 +248,42 @@ fun SearchPage(
                     .padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                OutlinedTextField(
-                    value = filterData.nome,
-                    onValueChange = { filterData.nome = it },
-                    placeholder = { Text("Cerca prodotto...") },
+                Surface(
                     modifier = Modifier
                         .weight(1f)
                         .height(56.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    leadingIcon = { Icon(Icons.Default.Search, null) },
-                    singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = Color(0xFFF7F7F7),
-                        unfocusedContainerColor = Color(0xFFF7F7F7)
-                    )
-                )
-
-                Spacer(Modifier.width(8.dp))
-
-                FilledIconButton(
-                    onClick = onOpenFilters,
-                    modifier = Modifier.size(56.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = IconButtonDefaults.filledIconButtonColors(
-                        containerColor = Color(0xFF388E3C)
-                    )
+                    shape = RoundedCornerShape(28.dp),
+                    shadowElevation = 6.dp,
+                    color = Color.White
                 ) {
-                    Icon(Icons.Default.Tune, contentDescription = "Filtri", tint = Color.White)
+                    TextField(
+                        value = filterData.nome,
+                        onValueChange = { filterData.nome = it },
+                        placeholder = { Text("Cerca prodotto...", color = Color.Gray) },
+                        modifier = Modifier.fillMaxSize(),
+                        leadingIcon = { Icon(Icons.Default.Search, null, tint = Color.Gray) },
+                        singleLine = true,
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            cursorColor = Color(0xFF388E3C)
+                        )
+                    )
+                }
+
+                Spacer(Modifier.width(12.dp))
+
+                Surface(
+                    modifier = Modifier.size(56.dp).clickable { onOpenFilters() },
+                    shape = RoundedCornerShape(16.dp),
+                    color = Color(0xFF388E3C),
+                    shadowElevation = 6.dp
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(Icons.Default.Tune, contentDescription = "Filtri", tint = Color.White)
+                    }
                 }
             }
         }
