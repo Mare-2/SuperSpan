@@ -576,9 +576,9 @@ fun CouponPageComplete(paddingValues: PaddingValues, navController: NavControlle
                     navController?.currentBackStackEntry?.savedStateHandle?.set("add_type", selectedTab)
                     navController?.navigate(Destination.ADD_COUPON.route)
                 },
-                containerColor = Color(0xFF388E3C),
+                containerColor = androidx.compose.material3.MaterialTheme.colorScheme.primary,
                 contentColor = Color.White,
-                modifier = Modifier.align(Alignment.BottomEnd).padding(24.dp)
+                modifier = Modifier.align(Alignment.BottomEnd).padding(end = 24.dp, bottom = paddingValues.calculateBottomPadding() + 24.dp)
             ) {
                 Icon(Icons.Default.Add, "Aggiungi")
             }

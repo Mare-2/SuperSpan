@@ -312,7 +312,8 @@ private fun CouponForm(
         selectedProducts.forEach { p ->
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9)),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                border = androidx.compose.foundation.BorderStroke(2.dp, Color(0xFF81C784)),
                 elevation = CardDefaults.cardElevation(2.dp)
             ) {
                 Row(Modifier.padding(16.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -337,7 +338,8 @@ private fun CouponForm(
                 }
             },
             modifier = Modifier.fillMaxWidth().height(56.dp),
-            shape = RoundedCornerShape(12.dp)
+            shape = RoundedCornerShape(12.dp),
+            colors = androidx.compose.material3.ButtonDefaults.outlinedButtonColors(containerColor = Color.White)
         ) {
             Icon(Icons.Default.ShoppingCart, contentDescription = null)
             Spacer(Modifier.width(8.dp))
@@ -495,7 +497,8 @@ private fun PromoForm(
                     }
                 },
                 modifier = Modifier.fillMaxWidth().height(56.dp),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(12.dp),
+                colors = androidx.compose.material3.ButtonDefaults.outlinedButtonColors(containerColor = Color.White)
             ) {
                 Icon(Icons.Default.ShoppingCart, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
@@ -509,7 +512,8 @@ private fun PromoForm(
                             selectedProduct = product
                         }
                     },
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9)),
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    border = androidx.compose.foundation.BorderStroke(2.dp, Color(0xFF81C784)),
                     elevation = CardDefaults.cardElevation(2.dp)
                 ) {
                     Row(Modifier.padding(16.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -577,11 +581,7 @@ fun CouponTextField(
     trailingIcon: @Composable (() -> Unit)? = null,
     onValueChange: (String) -> Unit
 ) {
-    val containerColor = when {
-        isError -> Color(0xFFFDECEA)
-        value.isEmpty() -> Color(0xFFFFF3E0)
-        else -> Color(0xFFE8F5E9)
-    }
+    val containerColor = Color.White
 
     val borderColor = when {
         isError -> Color.Red
@@ -602,10 +602,12 @@ fun CouponTextField(
             singleLine = singleLine,
             trailingIcon = trailingIcon,
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-            colors = OutlinedTextFieldDefaults.colors(
-                unfocusedBorderColor = borderColor,
+            colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = containerColor,
+                unfocusedContainerColor = containerColor,
                 focusedBorderColor = borderColor,
-                errorBorderColor = borderColor
+                unfocusedBorderColor = borderColor.copy(alpha = 0.5f),
+                errorBorderColor = Color.Red
             )
         )
         if (isError) {

@@ -226,7 +226,8 @@ fun AdminCouponEditPage(
                     selectedProducts.forEach { p ->
                         Card(
                             modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
-                            colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9)),
+                            colors = CardDefaults.cardColors(containerColor = Color.White),
+                            border = androidx.compose.foundation.BorderStroke(2.dp, Color(0xFF81C784)),
                             elevation = CardDefaults.cardElevation(2.dp)
                         ) {
                             Row(Modifier.padding(16.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -247,7 +248,8 @@ fun AdminCouponEditPage(
                         OutlinedButton(
                             onClick = { isMultiSelectionOpen = true },
                             modifier = Modifier.fillMaxWidth().height(56.dp),
-                            shape = RoundedCornerShape(12.dp)
+                            shape = RoundedCornerShape(12.dp),
+                            colors = androidx.compose.material3.ButtonDefaults.outlinedButtonColors(containerColor = Color.White)
                         ) {
                             Icon(Icons.Default.ShoppingCart, contentDescription = null)
                             Spacer(Modifier.width(8.dp))
@@ -264,7 +266,8 @@ fun AdminCouponEditPage(
                                 isSelectionOpen = true
                             },
                             modifier = Modifier.fillMaxWidth().height(56.dp),
-                            shape = RoundedCornerShape(12.dp)
+                            shape = RoundedCornerShape(12.dp),
+                            colors = androidx.compose.material3.ButtonDefaults.outlinedButtonColors(containerColor = Color.White)
                         ) {
                             Icon(Icons.Default.ShoppingCart, contentDescription = null)
                             Spacer(Modifier.width(8.dp))

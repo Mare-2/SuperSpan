@@ -62,34 +62,34 @@ fun AdminWorkOfferEditPage(
         )
     } else {
         Box(modifier = Modifier.fillMaxSize().background(com.example.superspan.ui.theme.AppBackgroundBrush)) {
-            Scaffold(
-                containerColor = Color.Transparent,
-                topBar = {
-                    @OptIn(ExperimentalMaterial3Api::class)
-                    TopAppBar(
-                        colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
-                        title = { Text(if (offer == null) "Aggiungi Offerta Lavoro" else "Modifica Offerta") },
-                        navigationIcon = {
-                            IconButton(onClick = { navController?.popBackStack() }) {
-                                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
-                            }
-                        },
-                        actions = {
-                            if (offer != null) {
-                                IconButton(onClick = { showDeleteConfirm = true }) {
-                                    Icon(Icons.Default.Delete, contentDescription = "Elimina", tint = Color.Red)
-                                }
-                            }
-                        }
+            Column(modifier = Modifier.fillMaxSize()) {
+                // HEADER
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 80.dp, bottom = 16.dp)
+                ) {
+                    IconButton(onClick = { navController?.popBackStack() }, modifier = Modifier.align(Alignment.CenterStart).padding(start = 8.dp)) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = Color.Black)
+                    }
+                    Text(
+                        text = if (offer == null) "Aggiungi Offerta" else "Modifica Offerta",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        modifier = Modifier.align(Alignment.Center)
                     )
-                },
-                modifier = Modifier.padding(paddingValues)
-            ) { innerPadding ->
+                    if (offer != null) {
+                        IconButton(onClick = { showDeleteConfirm = true }, modifier = Modifier.align(Alignment.CenterEnd).padding(end = 8.dp)) {
+                            Icon(Icons.Default.Delete, "Elimina", tint = Color.Red)
+                        }
+                    }
+                }
+
                 Column(
                     modifier = Modifier
-                        .padding(innerPadding)
                         .fillMaxSize()
-                        .padding(16.dp)
+                        .padding(horizontal = 16.dp)
+                        .padding(bottom = paddingValues.calculateBottomPadding() + 16.dp)
                         .verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
@@ -99,7 +99,8 @@ fun AdminWorkOfferEditPage(
                         OutlinedButton(
                             onClick = { isSelectionOpen = true },
                             modifier = Modifier.fillMaxWidth().height(56.dp),
-                            shape = RoundedCornerShape(12.dp)
+                            shape = RoundedCornerShape(12.dp),
+                            colors = androidx.compose.material3.ButtonDefaults.outlinedButtonColors(containerColor = Color.White)
                         ) {
                             Icon(Icons.Default.LocationOn, contentDescription = null)
                             Spacer(Modifier.width(8.dp))
@@ -109,7 +110,7 @@ fun AdminWorkOfferEditPage(
                         selectedSupermarket?.let { s ->
                             Card(
                                 modifier = Modifier.fillMaxWidth().clickable { isSelectionOpen = true },
-                                colors = CardDefaults.cardColors(containerColor = androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer),
+                                colors = CardDefaults.cardColors(containerColor = Color.White),
                                 elevation = CardDefaults.cardElevation(2.dp)
                             ) {
                                 Row(Modifier.padding(16.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -147,11 +148,17 @@ fun AdminWorkOfferEditPage(
                     // STEP 3: DETTAGLI
                     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                         Spacer(modifier = Modifier.height(8.dp))
-                        OutlinedTextField(value = titolo, onValueChange = { titolo = it }, label = { Text("Titolo Offerta") }, modifier = Modifier.fillMaxWidth())
+                        val tfColors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = Color.White,
+                            unfocusedContainerColor = Color.White,
+                            unfocusedBorderColor = Color.Transparent,
+                            focusedBorderColor = Color.Transparent
+                        )
+                        OutlinedTextField(value = titolo, onValueChange = { titolo = it }, label = { Text("Titolo Offerta") }, modifier = Modifier.fillMaxWidth(), colors = tfColors)
 
-                        OutlinedTextField(value = descrizioneBreve, onValueChange = { descrizioneBreve = it }, label = { Text("Descrizione Breve") }, modifier = Modifier.fillMaxWidth())
-                        OutlinedTextField(value = descrizioneEstesa, onValueChange = { descrizioneEstesa = it }, label = { Text("Descrizione Estesa") }, modifier = Modifier.fillMaxWidth(), minLines = 3)
-                        OutlinedTextField(value = requisiti, onValueChange = { requisiti = it }, label = { Text("Requisiti") }, modifier = Modifier.fillMaxWidth(), minLines = 2)
+                        OutlinedTextField(value = descrizioneBreve, onValueChange = { descrizioneBreve = it }, label = { Text("Descrizione Breve") }, modifier = Modifier.fillMaxWidth(), colors = tfColors)
+                        OutlinedTextField(value = descrizioneEstesa, onValueChange = { descrizioneEstesa = it }, label = { Text("Descrizione Estesa") }, modifier = Modifier.fillMaxWidth(), minLines = 3, colors = tfColors)
+                        OutlinedTextField(value = requisiti, onValueChange = { requisiti = it }, label = { Text("Requisiti") }, modifier = Modifier.fillMaxWidth(), minLines = 2, colors = tfColors)
 
                             Text("Tipo Contratto", fontWeight = FontWeight.Bold)
                             @OptIn(ExperimentalLayoutApi::class)
@@ -311,11 +318,21 @@ fun SupermarketSelectionScreen(
                     .fillMaxWidth()
                     .padding(16.dp),
                 placeholder = { Text("Cerca per città, via o nome...") },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = Color.Gray) },
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Search,
+                        contentDescription = null,
+                        tint = Color.Gray
+                    )
+                },
                 trailingIcon = {
                     if (query.isNotEmpty()) {
                         IconButton(onClick = { query = "" }) {
-                            Icon(Icons.Default.Close, contentDescription = "Cancella", tint = Color.Gray)
+                            Icon(
+                                Icons.Default.Close,
+                                contentDescription = "Cancella",
+                                tint = Color.Gray
+                            )
                         }
                     }
                 },
@@ -348,16 +365,32 @@ fun SupermarketSelectionScreen(
                             Box(
                                 modifier = Modifier
                                     .size(48.dp)
-                                    .background(androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant, shape = RoundedCornerShape(12.dp)),
+                                    .background(
+                                        androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant,
+                                        shape = RoundedCornerShape(12.dp)
+                                    ),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Icon(Icons.Default.LocationOn, contentDescription = null, tint = androidx.compose.material3.MaterialTheme.colorScheme.tertiary)
+                                Icon(
+                                    Icons.Default.LocationOn,
+                                    contentDescription = null,
+                                    tint = androidx.compose.material3.MaterialTheme.colorScheme.tertiary
+                                )
                             }
                             Spacer(Modifier.width(16.dp))
                             Column {
-                                Text(s.nome, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF1A1A1A))
+                                Text(
+                                    s.nome,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 16.sp,
+                                    color = Color(0xFF1A1A1A)
+                                )
                                 Spacer(Modifier.height(4.dp))
-                                Text("${s.indirizzo}, ${s.citta}", fontSize = 14.sp, color = Color.Gray)
+                                Text(
+                                    "${s.indirizzo}, ${s.citta}",
+                                    fontSize = 14.sp,
+                                    color = Color.Gray
+                                )
                             }
                         }
                     }
