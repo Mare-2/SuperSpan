@@ -1278,38 +1278,31 @@ fun ExitDraftDialog(visible: Boolean, onDismiss: () -> Unit, onSave: () -> Unit,
 
 @Composable
 fun ApplyHeader(step: String, title: String, onBack: () -> Unit, onClose: () -> Unit) {
-    androidx.compose.material3.Surface(
-        modifier = Modifier.fillMaxWidth(),
-        color = Color.White,
-        shadowElevation = 4.dp,
-        shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp)
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+        Row(
+            Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                Modifier.fillMaxWidth().padding(horizontal = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = androidx.compose.material3.MaterialTheme.colorScheme.primary)
-                }
-                androidx.compose.foundation.Image(
-                    painter = androidx.compose.ui.res.painterResource(id = R.drawable.logo_superspan),
-                    contentDescription = "Logo SuperSpan",
-                    modifier = Modifier.height(35.dp),
-                    contentScale = androidx.compose.ui.layout.ContentScale.Fit
-                )
-                IconButton(onClick = onClose) {
-                    Icon(Icons.Default.Close, null, tint = androidx.compose.material3.MaterialTheme.colorScheme.error)
-                }
+            IconButton(onClick = onBack) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = androidx.compose.material3.MaterialTheme.colorScheme.primary)
             }
-            Spacer(modifier = Modifier.height(12.dp))
-            Text("STEP $step DI 3", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.Gray)
-            Text(title, fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, color = androidx.compose.material3.MaterialTheme.colorScheme.primary)
+            androidx.compose.foundation.Image(
+                painter = androidx.compose.ui.res.painterResource(id = R.drawable.logo_superspan),
+                contentDescription = "Logo SuperSpan",
+                modifier = Modifier.height(35.dp),
+                contentScale = androidx.compose.ui.layout.ContentScale.Fit
+            )
+            IconButton(onClick = onClose) {
+                Icon(Icons.Default.Close, null, tint = androidx.compose.material3.MaterialTheme.colorScheme.error)
+            }
         }
+        Spacer(modifier = Modifier.height(12.dp))
+        Text("STEP $step DI 3", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.Gray)
+        Text(title, fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, color = androidx.compose.material3.MaterialTheme.colorScheme.primary)
     }
 }
 

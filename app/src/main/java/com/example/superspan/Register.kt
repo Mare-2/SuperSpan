@@ -101,7 +101,7 @@ fun Register(
                         }, 
                         enabled = check,
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .width(180.dp)
                             .height(56.dp),
                         shape = RoundedCornerShape(16.dp),
                         colors = androidx.compose.material3.ButtonDefaults.buttonColors(
@@ -196,7 +196,8 @@ fun FormDati(
             onClick = { onAdvance(true) }, 
             enabled = check, 
             modifier = Modifier
-                .fillMaxWidth()
+                .width(180.dp)
+                .align(Alignment.CenterHorizontally)
                 .padding(bottom = 15.dp)
                 .height(56.dp),
             shape = RoundedCornerShape(16.dp),

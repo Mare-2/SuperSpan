@@ -37,10 +37,12 @@ import androidx.navigation.NavController
 
 @Composable
 fun ProfilePage(user: User, navController: NavController?, paddingValues: PaddingValues) {
+    val scrollState = rememberScrollState()
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(com.example.superspan.ui.theme.AppBackgroundBrush)
+            .verticalScroll(scrollState)
     ) {
         // --- 1. HEADER (Solo Logo, senza sfondo bianco) ---
         Box(
@@ -73,7 +75,6 @@ fun ProfilePage(user: User, navController: NavController?, paddingValues: Paddin
 
         Column(
             modifier = Modifier
-                .weight(1f) // Prende lo spazio rimanente in modo corretto
                 .fillMaxWidth()
         ) {
             // --- 2. IMMAGINE PROFILO E NOME ---
@@ -114,7 +115,6 @@ fun ProfilePage(user: User, navController: NavController?, paddingValues: Paddin
             // --- SEZIONI CONTENUTO (TILES) ---
             Column(
                 modifier = Modifier
-                    .weight(1f) // Prende lo spazio rimanente per permettere al tasto esci di stare in basso
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp)
                     .padding(bottom = paddingValues.calculateBottomPadding() + 24.dp), 
@@ -147,7 +147,7 @@ fun ProfilePage(user: User, navController: NavController?, paddingValues: Paddin
                     ProfileMenuTile(Icons.Default.AssignmentTurnedIn, "Candidature in corso", "Stato delle tue domande") { navController?.navigate(Destination.DRAFTS.route) }
                 }
 
-                Spacer(modifier = Modifier.weight(1f)) // Spinge il bottone Esci verso il basso
+                Spacer(modifier = Modifier.height(40.dp)) // Spinge il bottone Esci verso il basso
 
                 // --- 3. TASTO ESCI ---
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
@@ -157,7 +157,7 @@ fun ProfilePage(user: User, navController: NavController?, paddingValues: Paddin
                                 popUpTo(0)
                             }
                         },
-                        modifier = Modifier.height(56.dp).fillMaxWidth(),
+                        modifier = Modifier.width(180.dp).height(56.dp),
                         shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = androidx.compose.material3.MaterialTheme.colorScheme.error)
                     ) {

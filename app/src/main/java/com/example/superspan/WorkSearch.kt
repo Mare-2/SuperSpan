@@ -451,7 +451,7 @@ fun WorkSearchPageComplete(
     val snackbarHostState = remember { SnackbarHostState() }
     val listState = rememberLazyListState()
 
-    Box(modifier = Modifier.fillMaxSize().background(com.example.superspan.ui.theme.AppBackgroundBrush)) {
+    Box(modifier = Modifier.fillMaxSize()) {
         if (!enabled) {
             WorkSearchPage(navController, filterData, listState, snackbarHostState, padding, hideHeader) {
                 enabled = true

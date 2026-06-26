@@ -72,9 +72,6 @@ fun WorkOfferPage(offer: WorkOffer?, navController: NavController?, paddingValue
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = 60.dp) // Spazio per la freccia in alto
-                // Usiamo angoli arrotondati invece della parabola
-                .clip(RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp))
-                .background(Color.White) // Sfondo bianco per massima leggibilità
                 .verticalScroll(scrollState)
                 .padding(horizontal = 24.dp)
         ) {
@@ -169,7 +166,6 @@ fun WorkOfferPage(offer: WorkOffer?, navController: NavController?, paddingValue
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
-                    .background(Color.White.copy(alpha = 0.9f)) // Effetto sfumato dietro il tasto
                     .padding(vertical = 20.dp),
                 contentAlignment = Alignment.Center
             ) {

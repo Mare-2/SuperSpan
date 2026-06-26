@@ -272,27 +272,30 @@ fun MainNavigation() {
             currentRoute != Destination.REGISTER.route &&
             !currentRoute.startsWith("apply")
 
-    Scaffold(
-        bottomBar = {
-            if (showBar) {
-                CustomAnimatedBottomBar(currentRoute) { route ->
-                    // --- NAVIGAZIONE CORRETTA ---
-                    navController.navigate(route) {
-                        // Pulisce tutto lo stack fino alla destinazione iniziale (Login)
-                        // Questo evita l'accumulo di pagine e risolve il tuo bug
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = false // NON salviamo lo stato "sporco"
+    Box(modifier = Modifier.fillMaxSize().background(com.example.superspan.ui.theme.AppBackgroundBrush)) {
+        Scaffold(
+            containerColor = Color.Transparent,
+            bottomBar = {
+                if (showBar) {
+                    CustomAnimatedBottomBar(currentRoute) { route ->
+                        // --- NAVIGAZIONE CORRETTA ---
+                        navController.navigate(route) {
+                            // Pulisce tutto lo stack fino alla destinazione iniziale (Login)
+                            // Questo evita l'accumulo di pagine e risolve il tuo bug
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = false // NON salviamo lo stato "sporco"
+                            }
+                            // Evita di creare più copie della stessa pagina
+                            launchSingleTop = true
+                            // NON ripristiniamo il vecchio stato (così torniamo puliti)
+                            restoreState = false
                         }
-                        // Evita di creare più copie della stessa pagina
-                        launchSingleTop = true
-                        // NON ripristiniamo il vecchio stato (così torniamo puliti)
-                        restoreState = false
                     }
                 }
             }
+        ) { contentPadding ->
+            Navigation(navController, Destination.HOME, contentPadding)
         }
-    ) { contentPadding ->
-        Navigation(navController, Destination.HOME, contentPadding)
     }
 }
 

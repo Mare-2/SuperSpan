@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
 @Composable
@@ -27,41 +28,50 @@ fun AdminWorkMainPage(paddingValues: PaddingValues, navController: NavController
     var selectedTabIndex by remember { mutableStateOf(initialTab) }
     val tabs = listOf("Posizioni Aperte", "Candidature")
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        topBar = {
-            Surface(
-                modifier = Modifier.fillMaxWidth().background(Color(0xFFF8F9FA)),
-                color = Color.Transparent
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 12.dp)
-                        .background(Color(0xFFE0E0E0), CircleShape)
-                        .padding(4.dp)
-                ) {
-                    TabButton("Posizioni Aperte", selectedTabIndex == 0, Modifier.weight(1f)) { selectedTabIndex = 0 }
-                    TabButton("Candidature", selectedTabIndex == 1, Modifier.weight(1f)) { selectedTabIndex = 1 }
-                }
-            }
-        }
-    ) { innerPadding ->
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)
+    ) {
+        // Header in comune
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .background(Color(0xFFF8F9FA))
+                .fillMaxWidth()
+                .padding(top = 24.dp, bottom = 12.dp),
+            horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
         ) {
-            when (selectedTabIndex) {
-                0 -> {
-                    // Posizioni Aperte (Stessa vista degli utenti, con il tasto + se admin)
-                    WorkSearchPageComplete(padding = paddingValues, navController = navController)
-                }
-                1 -> {
-                    // Candidature
-                    AdminCandidaciesPage(navController = navController, paddingValues = paddingValues)
-                }
+            Text(
+                text = "Lavora con noi!",
+                fontSize = 32.sp,
+                fontWeight = FontWeight.ExtraBold
+            )
+            Text(
+                text = "Trova la posizione adatta a te",
+                fontSize = 16.sp,
+                color = Color.Gray
+            )
+        }
+
+        // Switch
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 12.dp)
+                .background(Color(0xFFE0E0E0), CircleShape)
+                .padding(4.dp)
+        ) {
+            TabButton("Posizioni Aperte", selectedTabIndex == 0, Modifier.weight(1f)) { selectedTabIndex = 0 }
+            TabButton("Candidature", selectedTabIndex == 1, Modifier.weight(1f)) { selectedTabIndex = 1 }
+        }
+
+        when (selectedTabIndex) {
+            0 -> {
+                // Posizioni Aperte
+                WorkSearchPageComplete(padding = PaddingValues(0.dp), navController = navController, hideHeader = true)
+            }
+            1 -> {
+                // Candidature
+                AdminCandidaciesPage(navController = navController, paddingValues = PaddingValues(0.dp))
             }
         }
     }

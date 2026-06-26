@@ -521,7 +521,7 @@ fun CouponPageComplete(paddingValues: PaddingValues, navController: NavControlle
                 stickyHeader {
                     Surface(
                         modifier = Modifier.fillMaxWidth(),
-                        color = Color(0xFFF8F9FA).copy(alpha = 0.95f)
+                        color = Color.Transparent
                     ) {
                         Row(
                             modifier = Modifier

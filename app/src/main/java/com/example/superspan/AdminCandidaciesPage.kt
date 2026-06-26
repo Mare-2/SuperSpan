@@ -67,7 +67,6 @@ fun AdminCandidaciesPage(navController: NavController?, paddingValues: PaddingVa
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(com.example.superspan.ui.theme.AppBackgroundBrush)
         ) {
             // --- SEZIONE FILTRI ---
             Card(
