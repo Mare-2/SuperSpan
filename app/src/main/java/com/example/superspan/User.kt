@@ -76,7 +76,8 @@ data class User(
     private var _cvFileName: String? = null,
     private var _cvPath: String? = null,
     // Mappa delle bozze: ID Offerta -> Bozza
-    private var _candidacyDraftsByOfferId: MutableMap<Int, CandidacyDraft> = mutableStateMapOf()
+    private var _candidacyDraftsByOfferId: MutableMap<Int, CandidacyDraft> = mutableStateMapOf(),
+    private var _viewedOffers: MutableList<Int> = mutableStateListOf()
 ) {
     var nome get() = _nome; set(v) { _nome = v }
     var cognome get() = _cognome; set(v) { _cognome = v }
@@ -88,6 +89,7 @@ data class User(
     var cvFileName get() = _cvFileName; set(v) { _cvFileName = v }
     var cvPath get() = _cvPath; set(v) { _cvPath = v }
     var candidacyDraftsByOfferId get() = _candidacyDraftsByOfferId; set(v) { _candidacyDraftsByOfferId = v }
+    var viewedOffers get() = _viewedOffers; set(v) { _viewedOffers = v }
 }
 
 val MapOfUser = mutableMapOf<String, User>(
