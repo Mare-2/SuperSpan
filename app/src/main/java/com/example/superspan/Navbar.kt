@@ -282,6 +282,7 @@ fun MainNavigation() {
 
     Box(modifier = Modifier.fillMaxSize().background(com.example.superspan.ui.theme.AppBackgroundBrush)) {
         Scaffold(
+            modifier = Modifier.imePadding(),
             containerColor = Color.Transparent,
             bottomBar = {
                 if (showBar) {
