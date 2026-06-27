@@ -43,11 +43,10 @@ fun AccountSettingsPage(user: User, navController: NavController?, paddingValues
     val coroutineScope = rememberCoroutineScope()
     val context = androidx.compose.ui.platform.LocalContext.current
 
-    val isEmailValid = Patterns.EMAIL_ADDRESS.matcher(email).matches() || email.isEmpty()
     val isOldPasswordValid = oldPassword == user.password || oldPassword.isEmpty()
 
     // Controllo abilitazione tasto salva
-    val canSave = nome.isNotBlank() && cognome.isNotBlank() && isEmailValid && 
+    val canSave = nome.isNotBlank() && cognome.isNotBlank() && 
                   (oldPassword.isEmpty() || oldPassword == user.password)
 
     Scaffold(
@@ -87,33 +86,6 @@ fun AccountSettingsPage(user: User, navController: NavController?, paddingValues
 
                 EditTextField("Nome", nome, KeyboardType.Text) { nome = it }
                 EditTextField("Cognome", cognome, KeyboardType.Text) { cognome = it }
-
-                // Email
-                if (user.admin) {
-                    // Admin non può modificare la mail
-                    EditTextField(
-                        label = "Email di accesso",
-                        value = email,
-                        keyboardType = KeyboardType.Email,
-                        onValueChange = {}, // Ignora l'input
-                    )
-                    Text(
-                        text = "L'indirizzo email dell'amministratore non può essere modificato.",
-                        fontSize = 12.sp,
-                        color = Color.Gray,
-                        modifier = Modifier.padding(start = 4.dp, top = 2.dp, bottom = 8.dp)
-                    )
-                } else {
-                    // Utente normale
-                    EditTextField(
-                        label = "Email di accesso",
-                        value = email,
-                        keyboardType = KeyboardType.Email,
-                        isError = !isEmailValid && email.isNotEmpty(),
-                        errorMessage = "Formato email non valido",
-                        onValueChange = { email = it }
-                    )
-                }
 
                 Spacer(Modifier.height(16.dp))
                 Text("Modifica Password", Modifier.fillMaxWidth(), fontWeight = FontWeight.Bold, color = Color.Gray, fontSize = 14.sp)
@@ -181,10 +153,6 @@ fun AccountSettingsPage(user: User, navController: NavController?, paddingValues
                         
                         if (oldPassword == user.password && newPassword.isNotBlank()) {
                             user.password = newPassword.trim()
-                        }
-
-                        if (!user.admin) {
-                            user.email = email.trim()
                         }
 
                         coroutineScope.launch {
