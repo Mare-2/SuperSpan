@@ -451,15 +451,24 @@ fun WorkSearchPageComplete(
     val snackbarHostState = remember { SnackbarHostState() }
     val listState = rememberLazyListState()
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize().background(com.example.superspan.ui.theme.AppBackgroundBrush)) {
         if (!enabled) {
-            WorkSearchPage(navController, filterData, listState, snackbarHostState, padding, hideHeader) {
-                enabled = true
-            }
+            WorkSearchPage(
+                navController = navController,
+                filterData = filterData,
+                listState = listState,
+                snackbarHostState = snackbarHostState,
+                padding = padding,
+                hideHeader = hideHeader,
+                onOpenFilters = { enabled = true }
+            )
         } else {
-            WorkFilterPage(Modifier.fillMaxSize(), filterData) {
-                enabled = false
-            }
+            WorkFilterPage(
+                modifier = Modifier.fillMaxSize(),
+                filterData = filterData,
+                padding = padding,
+                onDismiss = { enabled = false }
+            )
         }
         
         SnackbarHost(
@@ -570,28 +579,20 @@ fun WorkSearchPage(
                         placeholder = { Text("Cerca ruolo o città...", color = Color.Gray) },
                         modifier = Modifier.fillMaxSize(),
                         leadingIcon = { Icon(Icons.Default.Search, null, tint = Color.Gray) },
+                        trailingIcon = {
+                            IconButton(onClick = onOpenFilters) {
+                                Icon(Icons.Default.Tune, contentDescription = "Filtri", tint = com.example.superspan.ui.theme.LogoLeft)
+                            }
+                        },
                         singleLine = true,
                         colors = androidx.compose.material3.TextFieldDefaults.colors(
                             focusedContainerColor = Color.Transparent,
                             unfocusedContainerColor = Color.Transparent,
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
-                            cursorColor = androidx.compose.material3.MaterialTheme.colorScheme.primary
+                            cursorColor = com.example.superspan.ui.theme.LogoLeft
                         )
                     )
-                }
-
-                Spacer(Modifier.width(8.dp))
-
-                FilledIconButton(
-                    onClick = onOpenFilters,
-                    modifier = Modifier.size(56.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = IconButtonDefaults.filledIconButtonColors(
-                        containerColor = androidx.compose.material3.MaterialTheme.colorScheme.primary
-                    )
-                ) {
-                    Icon(Icons.Default.Tune, contentDescription = "Filtri", tint = Color.White)
                 }
             }
         }
@@ -888,50 +889,62 @@ fun WorkFilterPage(modifier: Modifier, filterData: WorkFilterData, onDismiss: ()
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WorkFilterPage(modifier: Modifier, filterData: WorkFilterData, onDismiss: () -> Unit) {
+fun WorkFilterPage(modifier: Modifier, filterData: WorkFilterData, padding: PaddingValues, onDismiss: () -> Unit) {
     val scrollState = rememberScrollState()
 
     // Stato locale per gestire lo switch "Tutta Italia"
     var tuttaItalia by remember { mutableStateOf(filterData.distanzaMax >= 1000f) }
 
-    Column(
-        modifier = modifier
-            .background(Color(0xFFF8F9FA)) // Sfondo grigio chiarissimo
-            .verticalScroll(scrollState)
-    ) {
-        // --- 1. HEADER FISSO ---
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            color = Color.White,
-            shadowElevation = 2.dp
-        ) {
-            Row(
-                Modifier.fillMaxWidth().padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically
+    Scaffold(
+        modifier = modifier,
+        containerColor = com.example.superspan.ui.theme.LogoCenter.copy(alpha = 0.15f),
+        topBar = {
+            Surface(
+                modifier = Modifier.fillMaxWidth().padding(top = padding.calculateTopPadding() + 8.dp),
+                color = Color.Transparent,
+                shadowElevation = 0.dp
             ) {
-                IconButton(onClick = onDismiss) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
-                }
-                Text(
-                    "Filtri di ricerca",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(start = 8.dp)
-                )
-                Spacer(Modifier.weight(1f))
-                TextButton(onClick = {
-                    filterData.ruoli.clear()
-                    filterData.tipiContratto.clear()
-                    filterData.orari.clear()
-                    filterData.distanzaMax = 50f
-                    tuttaItalia = false
-                }) {
-                    Text("Reset", color = Color.Red, fontWeight = FontWeight.SemiBold)
+                Row(
+                    Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(
+                        onClick = onDismiss,
+                        modifier = Modifier.background(Color.White, CircleShape)
+                    ) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
+                    }
+                    Text(
+                        "Filtri",
+                        fontSize = 26.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        modifier = Modifier.padding(start = 12.dp)
+                    )
+                    Spacer(Modifier.weight(1f))
+                    TextButton(
+                        onClick = {
+                            filterData.ruoli.clear()
+                            filterData.tipiContratto.clear()
+                            filterData.orari.clear()
+                            filterData.distanzaMax = 50f
+                            tuttaItalia = false
+                        },
+                        modifier = Modifier.background(Color.White.copy(alpha = 0.7f), CircleShape)
+                    ) {
+                        Text("Reset", color = Color.Red, fontWeight = FontWeight.SemiBold)
+                    }
                 }
             }
         }
-
-        Column(Modifier.padding(24.dp)) {
+    ) { innerPadding ->
+        Box(Modifier.fillMaxSize()) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(top = innerPadding.calculateTopPadding())
+                .verticalScroll(scrollState)
+                .padding(horizontal = 24.dp, vertical = 16.dp)
+        ) {
 
             // --- 2. SEZIONE DISTANZA (CARD MODERNA) ---
             Text("Dove vuoi lavorare?", fontSize = 18.sp, fontWeight = FontWeight.Bold)
@@ -941,7 +954,8 @@ fun WorkFilterPage(modifier: Modifier, filterData: WorkFilterData, onDismiss: ()
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = Color.White),
                 shape = RoundedCornerShape(20.dp),
-                border = BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.4f))
+                border = BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.4f)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Column(Modifier.padding(20.dp)) {
                     // Switch Tutta Italia
@@ -960,7 +974,10 @@ fun WorkFilterPage(modifier: Modifier, filterData: WorkFilterData, onDismiss: ()
                                 tuttaItalia = it
                                 if (it) filterData.distanzaMax = 1000f else filterData.distanzaMax = 50f
                             },
-                            colors = SwitchDefaults.colors(checkedThumbColor = androidx.compose.material3.MaterialTheme.colorScheme.primary)
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = com.example.superspan.ui.theme.LogoLeft,
+                                checkedTrackColor = com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.5f)
+                            )
                         )
                     }
 
@@ -971,7 +988,7 @@ fun WorkFilterPage(modifier: Modifier, filterData: WorkFilterData, onDismiss: ()
                     // Testo dinamico Distanza
                     Text(
                         text = if (tuttaItalia) "Distanza: Senza limiti" else "Entro ${filterData.distanzaMax.toInt()} km da te",
-                        color = if (tuttaItalia) Color.Gray else androidx.compose.material3.MaterialTheme.colorScheme.primary,
+                        color = if (tuttaItalia) Color.Gray else com.example.superspan.ui.theme.LogoLeft,
                         fontWeight = FontWeight.ExtraBold,
                         fontSize = 15.sp
                     )
@@ -990,19 +1007,19 @@ fun WorkFilterPage(modifier: Modifier, filterData: WorkFilterData, onDismiss: ()
                                 modifier = Modifier
                                     .size(22.dp)
                                     .background(
-                                        if (tuttaItalia) Color.LightGray else androidx.compose.material3.MaterialTheme.colorScheme.primary,
+                                        if (tuttaItalia) Color.LightGray else com.example.superspan.ui.theme.LogoLeft,
                                         CircleShape
                                     )
                                     .border(2.dp, Color.White, CircleShape)
                             )
                         },
                         // La Barra (Track)
-                        track = { sliderState -> // Cambia il nome in sliderState
+                        track = { sliderState ->
                             SliderDefaults.Track(
                                 modifier = Modifier.height(4.dp),
-                                sliderState = sliderState, // Passa sliderState qui
+                                sliderState = sliderState,
                                 colors = SliderDefaults.colors(
-                                    activeTrackColor = androidx.compose.material3.MaterialTheme.colorScheme.primary,
+                                    activeTrackColor = com.example.superspan.ui.theme.LogoLeft,
                                     inactiveTrackColor = Color.LightGray.copy(alpha = 0.3f),
                                     disabledActiveTrackColor = Color.LightGray.copy(alpha = 0.5f),
                                     disabledInactiveTrackColor = Color.LightGray.copy(alpha = 0.2f)
@@ -1024,20 +1041,30 @@ fun WorkFilterPage(modifier: Modifier, filterData: WorkFilterData, onDismiss: ()
             Text("Tipologia di impiego", fontSize = 18.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(16.dp))
 
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                Column(Modifier.weight(1f)) {
-                    Text("Contratto", fontSize = 13.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
-                    TipoContratto.entries.forEach { tipo ->
-                        FilterCheckboxRow(tipo.nome, filterData.tipiContratto.contains(tipo)) {
-                            if (it) filterData.tipiContratto.add(tipo) else filterData.tipiContratto.remove(tipo)
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                shape = RoundedCornerShape(20.dp),
+                border = BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.4f)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Column(Modifier.padding(20.dp)) {
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Column(Modifier.weight(1f)) {
+                            Text("Contratto", fontSize = 13.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
+                            TipoContratto.entries.forEach { tipo ->
+                                FilterCheckboxRow(tipo.nome, filterData.tipiContratto.contains(tipo)) {
+                                    if (it) filterData.tipiContratto.add(tipo) else filterData.tipiContratto.remove(tipo)
+                                }
+                            }
                         }
-                    }
-                }
-                Column(Modifier.weight(1f)) {
-                    Text("Orario", fontSize = 13.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
-                    OrarioLavoro.entries.forEach { orario ->
-                        FilterCheckboxRow(orario.nome, filterData.orari.contains(orario)) {
-                            if (it) filterData.orari.add(orario) else filterData.orari.remove(orario)
+                        Column(Modifier.weight(1f)) {
+                            Text("Orario", fontSize = 13.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
+                            OrarioLavoro.entries.forEach { orario ->
+                                FilterCheckboxRow(orario.nome, filterData.orari.contains(orario)) {
+                                    if (it) filterData.orari.add(orario) else filterData.orari.remove(orario)
+                                }
+                            }
                         }
                     }
                 }
@@ -1049,38 +1076,54 @@ fun WorkFilterPage(modifier: Modifier, filterData: WorkFilterData, onDismiss: ()
             Text("Ruoli di interesse", fontSize = 18.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(12.dp))
 
-            Role.entries.chunked(2).forEach { pair ->
-                Row(Modifier.fillMaxWidth()) {
-                    pair.forEach { role ->
-                        Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
-                            Checkbox(
-                                checked = filterData.ruoli.contains(role),
-                                onCheckedChange = { isChecked ->
-                                    if (isChecked) filterData.ruoli.add(role) else filterData.ruoli.remove(role)
-                                },
-                                colors = CheckboxDefaults.colors(checkedColor = androidx.compose.material3.MaterialTheme.colorScheme.primary)
-                            )
-                            Text(role.nome, fontSize = 14.sp)
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                shape = RoundedCornerShape(20.dp),
+                border = BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.4f)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Column(Modifier.padding(20.dp)) {
+                    Role.entries.chunked(2).forEach { pair ->
+                        Row(Modifier.fillMaxWidth()) {
+                            pair.forEach { role ->
+                                Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
+                                    Checkbox(
+                                        checked = filterData.ruoli.contains(role),
+                                        onCheckedChange = { isChecked ->
+                                            if (isChecked) filterData.ruoli.add(role) else filterData.ruoli.remove(role)
+                                        },
+                                        colors = CheckboxDefaults.colors(checkedColor = com.example.superspan.ui.theme.LogoLeft)
+                                    )
+                                    Text(role.nome, fontSize = 14.sp)
+                                }
+                            }
+                            if (pair.size == 1) Spacer(Modifier.weight(1f))
                         }
                     }
-                    if (pair.size == 1) Spacer(Modifier.weight(1f))
                 }
             }
 
-            Spacer(Modifier.height(48.dp))
+            Spacer(Modifier.height(100.dp + padding.calculateBottomPadding()))
+        }
 
-            // --- 5. TASTO APPLICA ---
-            Button(
-                onClick = onDismiss,
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-                shape = CircleShape,
-                colors = ButtonDefaults.buttonColors(containerColor = androidx.compose.material3.MaterialTheme.colorScheme.primary)
-            ) {
-                Text("Applica filtri", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-            }
-            Spacer(Modifier.height(32.dp))
+        Button(
+            onClick = onDismiss,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = padding.calculateBottomPadding() + 16.dp),
+            shape = CircleShape,
+            colors = ButtonDefaults.buttonColors(containerColor = com.example.superspan.ui.theme.LogoLeft)
+        ) {
+            Text(
+                text = "Applica filtri",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
+            )
         }
     }
+}
 }
 
 @Composable
@@ -1089,12 +1132,12 @@ fun FilterCheckboxRow(label: String, isChecked: Boolean, onCheckedChange: (Boole
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onCheckedChange(!isChecked) } // Rende cliccabile anche il testo per Paolo
+            .clickable { onCheckedChange(!isChecked) }
     ) {
         Checkbox(
             checked = isChecked,
             onCheckedChange = onCheckedChange,
-            colors = CheckboxDefaults.colors(checkedColor = androidx.compose.material3.MaterialTheme.colorScheme.primary)
+            colors = CheckboxDefaults.colors(checkedColor = com.example.superspan.ui.theme.LogoLeft)
         )
         Text(label, fontSize = 14.sp)
     }

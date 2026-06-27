@@ -412,6 +412,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -419,10 +420,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -431,33 +430,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-
-// --- MODELLO DATI PER LE CARD ---
-enum class CardSize { LARGE, MEDIUM, SMALL }
-
-data class HomeCardData(
-    val id: String,
-    val title: String,
-    val description: String,
-    val icon: ImageVector,
-    val accent: Color,
-    val background: Color,
-    val size: CardSize = CardSize.MEDIUM,
-    val tag: String? = null,
-    val actionLabel: String = "Apri",
-    val route: String? = null
-)
+import com.example.superspan.ui.theme.LogoLeft
+import com.example.superspan.ui.theme.LogoCenter
+import com.example.superspan.ui.theme.LogoRight
 
 @Composable
 fun Home(paddingValues: PaddingValues, navController: NavController?) {
-    // Generiamo le card in base a chi è loggato (Daniela o Paolo)
-    val cards = remember(actualUser.admin) { getHomeCards(actualUser.admin) }
-
-    // LazyColumn principale: permette a TUTTA la pagina di scorrere insieme
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(com.example.superspan.ui.theme.AppBackgroundBrush), // Sfondo sfumato basato sul logo
+            .background(com.example.superspan.ui.theme.AppBackgroundBrush), // Sfondo sfumato
         contentPadding = PaddingValues(bottom = paddingValues.calculateBottomPadding() + 32.dp)
     ) {
         // 1. HEADER (Scorre via con il resto)
@@ -465,30 +447,221 @@ fun Home(paddingValues: PaddingValues, navController: NavController?) {
             Header()
         }
 
-        // 2. SEZIONE AZIONI RAPIDE (Interazione Uomo-Macchina mirata)
+        // 2. SEZIONE AZIONI RAPIDE (Fissa come da richiesta)
         item {
             QuickActionsSection(actualUser.admin, navController)
         }
 
-        // 3. TITOLO FEED NOTIZIE
-        item {
+        // 3. DASHBOARD DINAMICA
+        if (actualUser.admin) {
+            item {
+                AdminDashboard(navController)
+            }
+        } else {
+            item {
+                UserDashboard(navController)
+            }
+        }
+    }
+}
+
+@Composable
+fun UserDashboard(navController: NavController?) {
+    Column(Modifier.padding(vertical = 16.dp)) {
+        // Ultima Candidatura
+        val myCandidacies = AllCandidacies.filter { it.userEmail == actualUser.email }
+        val lastCandidacy = myCandidacies.lastOrNull()
+        if (lastCandidacy != null) {
             Text(
-                text = "Ultime dal mondo SuperSpan",
+                text = "La tua ultima candidatura",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.ExtraBold,
-                modifier = Modifier.padding(start = 20.dp, top = 24.dp, bottom = 12.dp)
+                modifier = Modifier.padding(start = 20.dp, bottom = 12.dp)
             )
-        }
-
-        // 4. LISTA DELLE CARD DINAMICHE
-        items(cards) { card ->
-            Box(Modifier.padding(horizontal = 20.dp, vertical = 8.dp)) {
-                when (card.size) {
-                    CardSize.LARGE -> HomeFeatureCard(card, navController)
-                    CardSize.MEDIUM -> HomeMediumCard(card, navController)
-                    CardSize.SMALL -> HomeSmallCard(card, navController)
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+                    .clickable { navController?.navigateTopLevel(Destination.DRAFTS.route) },
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(2.dp)
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(Icons.Default.AssignmentTurnedIn, contentDescription = null, tint = LogoCenter, modifier = Modifier.size(32.dp))
+                    Spacer(Modifier.width(16.dp))
+                    Column {
+                        val offer = WorkOfferSearchList.find { it.id == lastCandidacy.offerId }
+                        Text(offer?.titolo ?: "Candidatura", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                        Text("Stato: ${lastCandidacy.stato}", color = Color.Gray, fontSize = 14.sp)
+                    }
                 }
             }
+            Spacer(Modifier.height(24.dp))
+        }
+
+        // Offerte Reali in Vetrina
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(start = 20.dp, bottom = 12.dp, end = 20.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Offerte in vetrina",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.ExtraBold
+            )
+            Text(
+                text = "Vedi tutte",
+                color = LogoLeft,
+                fontWeight = FontWeight.Bold,
+                fontSize = 14.sp,
+                modifier = Modifier.clickable { navController?.navigateTopLevel(Destination.OFFERTE.route) }
+            )
+        }
+        val topOffers = ListOfCoupon.sortedByDescending { it.discount }.take(5)
+        LazyRow(
+            contentPadding = PaddingValues(horizontal = 20.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            items(topOffers) { coupon ->
+                Card(
+                    modifier = Modifier
+                        .width(220.dp)
+                        .height(140.dp)
+                        .clickable { navController?.navigateTopLevel(Destination.OFFERTE.route) },
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    elevation = CardDefaults.cardElevation(3.dp)
+                ) {
+                    Column(Modifier.padding(16.dp)) {
+                        TagChip("Sconto ${coupon.discount.toInt()}%", LogoRight)
+                        Spacer(Modifier.height(8.dp))
+                        Text(coupon.code, fontWeight = FontWeight.Bold, fontSize = 16.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                        Spacer(Modifier.height(4.dp))
+                        Text(coupon.description, color = Color.Gray, fontSize = 12.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                    }
+                }
+            }
+        }
+
+        Spacer(Modifier.height(24.dp))
+
+        Text(
+            text = "Ultime dal mondo SuperSpan",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.ExtraBold,
+            modifier = Modifier.padding(start = 20.dp, bottom = 12.dp)
+        )
+
+        val newsList = listOf(
+            Triple("Nuova Apertura Roma", "SuperSpan arriva a Roma Viale Marconi! Cerchiamo 15 nuovi collaboratori.", Icons.Default.NewReleases),
+            Triple("Eco-Sostenibilità", "SuperSpan riduce la plastica: scopri i nuovi sacchetti bio nel tuo negozio.", Icons.Default.Eco),
+            Triple("Prodotti a Km 0", "Sosteniamo l'agricoltura locale: nuova sezione dedicata ai produttori sardi.", Icons.Default.ShoppingCart),
+            Triple("SuperSpan App", "Abbiamo rinnovato l'app! Nuova grafica e navigazione più semplice per i tuoi acquisti.", Icons.Default.PhoneAndroid),
+            Triple("Raccolta Punti 2026", "Al via la nuova raccolta punti! Scopri il catalogo premi dedicato alla casa e al tempo libero.", Icons.Default.Star)
+        )
+
+        LazyRow(
+            contentPadding = PaddingValues(horizontal = 20.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            items(newsList) { news ->
+                Card(
+                    modifier = Modifier
+                        .width(260.dp)
+                        .height(140.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    elevation = CardDefaults.cardElevation(3.dp)
+                ) {
+                    Column(Modifier.padding(16.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(news.third, null, tint = LogoCenter, modifier = Modifier.size(24.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Text(news.first, fontWeight = FontWeight.Bold, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        }
+                        Spacer(Modifier.height(12.dp))
+                        Text(news.second, color = Color.Gray, fontSize = 13.sp, maxLines = 3, overflow = TextOverflow.Ellipsis)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun AdminDashboard(navController: NavController?) {
+    Column(Modifier.padding(vertical = 16.dp)) {
+        val pendingCandidacies = AllCandidacies.count { it.stato == "Inviata" || it.stato == "In Valutazione" }
+        val activeCoupons = ListOfCoupon.size
+        val activeJobs = WorkOfferSearchList.size
+        
+        if (pendingCandidacies > 0) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 8.dp)
+                    .clickable { navController?.navigateTopLevel(Destination.ADMIN_CANDIDACIES.route) },
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFFFEBEE)),
+                elevation = CardDefaults.cardElevation(2.dp)
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(Icons.Default.Warning, contentDescription = null, tint = Color(0xFFD32F2F), modifier = Modifier.size(32.dp))
+                    Spacer(Modifier.width(16.dp))
+                    Column {
+                        Text("Attenzione Richiesta", color = Color(0xFFD32F2F), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                        Text("Hai $pendingCandidacies candidature in sospeso da visionare.", color = Color(0xFFB71C1C), fontSize = 14.sp)
+                    }
+                }
+            }
+            Spacer(Modifier.height(16.dp))
+        }
+
+        Text(
+            text = "Riepilogo Negozio",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.ExtraBold,
+            modifier = Modifier.padding(start = 20.dp, bottom = 12.dp)
+        )
+        Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            AdminStatCard(Modifier.weight(1f), activeJobs.toString(), "Annunci Lavoro", Icons.Default.Work, LogoLeft) {
+                navController?.navigateTopLevel(Destination.LAVORO.route)
+            }
+            AdminStatCard(Modifier.weight(1f), activeCoupons.toString(), "Promo Attive", Icons.Default.LocalOffer, LogoRight) {
+                navController?.navigateTopLevel(Destination.OFFERTE.route)
+            }
+        }
+    }
+}
+
+@Composable
+fun AdminStatCard(modifier: Modifier, value: String, label: String, icon: ImageVector, color: Color, onClick: () -> Unit) {
+    Card(
+        modifier = modifier.height(100.dp).clickable { onClick() },
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(2.dp)
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize().padding(12.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(icon, null, tint = color, modifier = Modifier.size(24.dp))
+                Spacer(Modifier.width(8.dp))
+                Text(value, fontWeight = FontWeight.ExtraBold, fontSize = 24.sp, color = color)
+            }
+            Spacer(Modifier.height(4.dp))
+            Text(label, fontSize = 12.sp, color = Color.Gray, textAlign = TextAlign.Center)
         }
     }
 }
@@ -508,20 +681,18 @@ fun QuickActionsSection(isAdmin: Boolean, navController: NavController?) {
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             if (isAdmin) {
-                // Azioni Daniela: Efficienza e Caricamento
-                QuickActionItem(Modifier.weight(1f), "Nuova Promo", Icons.Default.AddCard, Color(0xFF388E3C)) {
-                    navController?.navigate(Destination.ADD_COUPON.route)
+                QuickActionItem(Modifier.weight(1f), "Nuova Promo", Icons.Default.AddCard, LogoLeft) {
+                    navController?.navigateTopLevel(Destination.ADD_COUPON.route)
                 }
-                QuickActionItem(Modifier.weight(1f), "Candidature", Icons.Default.Badge, Color(0xFF1565C0)) {
-                    navController?.navigate(Destination.ADMIN_CANDIDACIES.route)
+                QuickActionItem(Modifier.weight(1f), "Candidature", Icons.Default.Badge, LogoCenter) {
+                    navController?.navigateTopLevel(Destination.ADMIN_CANDIDACIES.route)
                 }
             } else {
-                // Azioni Paolo: Semplicità e Lavoro vicino casa
-                QuickActionItem(Modifier.weight(1f), "Lavoro Cagliari", Icons.Default.LocationOn, Color(0xFF388E3C)) {
-                    navController?.navigate(Destination.LAVORO.route)
+                QuickActionItem(Modifier.weight(1f), "Lavora con noi", Icons.Default.Work, LogoLeft) {
+                    navController?.navigateTopLevel(Destination.LAVORO.route)
                 }
-                QuickActionItem(Modifier.weight(1f), "I miei Coupon", Icons.Default.LocalOffer, Color(0xFFF57C00)) {
-                    navController?.navigate(Destination.OFFERTE.route)
+                QuickActionItem(Modifier.weight(1f), "I miei Coupon", Icons.Default.LocalOffer, LogoRight) {
+                    navController?.navigateTopLevel(Destination.OFFERTE.route)
                 }
             }
         }
@@ -548,101 +719,9 @@ fun QuickActionItem(modifier: Modifier, label: String, icon: ImageVector, color:
     }
 }
 
-// --- COMPONENTI DELLE CARD (Feature, Medium, Small) ---
-
-@Composable
-fun HomeFeatureCard(card: HomeCardData, navController: NavController?) {
-    Card(
-        modifier = Modifier.fillMaxWidth().height(180.dp),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(4.dp)
-    ) {
-        Row(Modifier.fillMaxSize()) {
-            Box(Modifier.width(8.dp).fillMaxHeight().background(card.accent))
-            Column(Modifier.padding(20.dp).fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
-                Column {
-                    if (card.tag != null) TagChip(card.tag, card.accent)
-                    Spacer(Modifier.height(10.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(card.icon, null, tint = card.accent, modifier = Modifier.size(28.dp))
-                        Spacer(Modifier.width(10.dp))
-                        Text(card.title, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                    }
-                    Text(card.description, fontSize = 14.sp, maxLines = 2, overflow = TextOverflow.Ellipsis, color = Color.DarkGray)
-                }
-                Button(
-                    onClick = { card.route?.let { navController?.navigate(it) } },
-                    colors = ButtonDefaults.buttonColors(containerColor = card.accent),
-                    modifier = Modifier.align(Alignment.End),
-                    contentPadding = PaddingValues(horizontal = 20.dp)
-                ) {
-                    Text(card.actionLabel)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun HomeMediumCard(card: HomeCardData, navController: NavController?) {
-    Card(
-        modifier = Modifier.fillMaxWidth().height(110.dp).clickable { card.route?.let { navController?.navigate(it) } },
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(2.dp)
-    ) {
-        Row(Modifier.padding(16.dp).fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(50.dp).background(card.accent.copy(0.1f), CircleShape), contentAlignment = Alignment.Center) {
-                Icon(card.icon, null, tint = card.accent, modifier = Modifier.size(26.dp))
-            }
-            Spacer(Modifier.width(16.dp))
-            Column(Modifier.weight(1f)) {
-                Text(card.title, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                Text(card.description, fontSize = 13.sp, color = Color.Gray, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            }
-            Icon(Icons.Default.ChevronRight, null, tint = Color.LightGray)
-        }
-    }
-}
-
-@Composable
-fun HomeSmallCard(card: HomeCardData, navController: NavController?) {
-    Card(
-        modifier = Modifier.fillMaxWidth().clickable { card.route?.let { navController?.navigate(it) } },
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(2.dp)
-    ) {
-        Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-            Icon(card.icon, null, tint = card.accent, modifier = Modifier.size(20.dp))
-            Spacer(Modifier.width(12.dp))
-            Text(card.title, fontWeight = FontWeight.Bold, fontSize = 14.sp, modifier = Modifier.weight(1f))
-            if (card.tag != null) TagChip(card.tag, card.accent)
-        }
-    }
-}
-
 @Composable
 private fun TagChip(text: String, accent: Color) {
     Surface(color = accent.copy(alpha = 0.15f), shape = CircleShape) {
         Text(text, modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp), color = accent, fontSize = 11.sp, fontWeight = FontWeight.Bold)
     }
-}
-
-// --- LOGICA GENERAZIONE CARD ---
-fun getHomeCards(isAdmin: Boolean): List<HomeCardData> {
-    val list = mutableListOf<HomeCardData>()
-    if (isAdmin) {
-        list.add(HomeCardData("adm_1", "Gestione Promozioni", "Controlla, modifica o aggiungi nuovi coupon e offerte per i clienti.", Icons.Default.LocalOffer, Color(0xFFD32F2F), Color(0xFFFFEBEE), CardSize.LARGE, "Urgente", "Gestisci", Destination.OFFERTE.route))
-        list.add(HomeCardData("adm_2", "Revisione Candidature", "Ci sono nuovi video CV e candidature da revisionare per i punti vendita.", Icons.Default.VideoCameraFront, Color(0xFF1565C0), Color(0xFFE8F1FB), CardSize.MEDIUM, "HR", "Vedi", Destination.ADMIN_CANDIDACIES.route))
-        list.add(HomeCardData("adm_3", "Posizioni Aperte", "Gestisci gli annunci di lavoro attivi, aggiungine di nuovi o modificali.", Icons.Default.Work, Color(0xFF388E3C), Color(0xFFEAF5EC), CardSize.MEDIUM, "Annunci", "Gestisci", Destination.LAVORO.route))
-    } else {
-        list.add(HomeCardData("usr_1", "Lavora con noi", "Trova le posizioni aperte a Cagliari e dintorni. Invia il tuo CV video.", Icons.Default.Work, Color(0xFF2E7D32), Color(0xFFEAF5EC), CardSize.LARGE, "Per Te", "Candidati", Destination.LAVORO.route))
-        list.add(HomeCardData("usr_2", "Le tue Offerte", "Scopri i coupon e gli sconti esclusivi pensati per te questa settimana.", Icons.Default.LocalOffer, Color(0xFFF57C00), Color(0xFFFFF4E6), CardSize.MEDIUM, "Risparmio", "Vedi Sconti", Destination.OFFERTE.route))
-        list.add(HomeCardData("usr_3", "Ricerca Prodotti", "Sfoglia il nostro catalogo e trova quello di cui hai bisogno nel supermercato più vicino.", Icons.Default.Search, Color(0xFF1565C0), Color(0xFFE8F1FB), CardSize.MEDIUM, "Catalogo", "Cerca", Destination.SEARCH.route))
-    }
-    list.add(HomeCardData("news_1", "Nuova Apertura Roma", "SuperSpan arriva a Roma Viale Marconi! Cerchiamo 15 nuovi collaboratori.", Icons.Default.NewReleases, Color(0xFF6A1B9A), Color(0xFFF3E5F5), CardSize.MEDIUM, "News", "Vedi posizioni", Destination.LAVORO.route))
-    list.add(HomeCardData("news_2", "Eco-Sostenibilità", "SuperSpan riduce la plastica: scopri i nuovi sacchetti bio nel tuo negozio.", Icons.Default.Eco, Color(0xFF00897B), Color(0xFFE8F7F4), CardSize.SMALL, "Ambiente", "Scopri", Destination.HOME.route))
-    return list
 }

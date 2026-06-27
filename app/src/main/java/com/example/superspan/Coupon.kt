@@ -469,7 +469,8 @@ fun CouponPageComplete(paddingValues: PaddingValues, navController: NavControlle
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 70.dp, start = 20.dp, end = 20.dp, bottom = 16.dp)
+                            .padding(top = 70.dp, start = 20.dp, end = 20.dp, bottom = 16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
                             text = "Offerte e Coupon",

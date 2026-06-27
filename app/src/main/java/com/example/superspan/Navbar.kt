@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -94,7 +95,14 @@ enum class Destination (
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Navigation(navController: NavHostController, startDestination: Destination, paddingValues: PaddingValues) {
-    NavHost(navController = navController, startDestination = startDestination.route) {
+    NavHost(
+        navController = navController, 
+        startDestination = startDestination.route,
+        enterTransition = { androidx.compose.animation.EnterTransition.None },
+        exitTransition = { androidx.compose.animation.ExitTransition.None },
+        popEnterTransition = { androidx.compose.animation.EnterTransition.None },
+        popExitTransition = { androidx.compose.animation.ExitTransition.None }
+    ) {
         Destination.entries.forEach { destination ->
             composable(destination.route) {
                 when(destination) {
@@ -278,17 +286,16 @@ fun MainNavigation() {
             bottomBar = {
                 if (showBar) {
                     CustomAnimatedBottomBar(currentRoute) { route ->
-                        // --- NAVIGAZIONE CORRETTA ---
+                        // --- NAVIGAZIONE OTTIMIZZATA ---
                         navController.navigate(route) {
-                            // Pulisce tutto lo stack fino alla destinazione iniziale (Login)
-                            // Questo evita l'accumulo di pagine e risolve il tuo bug
+                            // Pulisce lo stack ma salva lo stato delle pagine
+                            // per evitare di ricaricarle da zero ogni volta (causa della lentezza)
                             popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = false // NON salviamo lo stato "sporco"
+                                saveState = true
                             }
-                            // Evita di creare più copie della stessa pagina
                             launchSingleTop = true
-                            // NON ripristiniamo il vecchio stato (così torniamo puliti)
-                            restoreState = false
+                            // Ripristina lo stato precedente per un caricamento istantaneo
+                            restoreState = true
                         }
                     }
                 }
@@ -309,18 +316,20 @@ fun CustomAnimatedBottomBar(currentRoute: String, onNavigate: (String) -> Unit) 
         Destination.PROFILO
     )
 
-    // Logica per mantenere la bolla verde sull'icona giusta anche nelle sottopagine
-    val selectedIndex = items.indexOfFirst { it.route == currentRoute }.let { index ->
-        if (index == -1) {
-            // Se siamo in una sottopagina, cerchiamo di capire a quale macro-area appartiene
-            when {
-                currentRoute.contains("apply") || currentRoute.contains("offerta") || currentRoute.contains("work_offer") || currentRoute == Destination.ADMIN_CANDIDACIES.route -> 3 // Icona Lavoro
-                currentRoute.contains("product") -> 1 // Icona Ricerca
-                currentRoute.contains("coupon") -> 2 // Icona Offerte
-                currentRoute.contains("data") || currentRoute.contains("account") || currentRoute.contains("drafts") -> 4 // Icona Profilo
-                else -> 0 // Torna a Home se non sa dove andare
-            }
-        } else index
+    // Ottimizzazione: calcoliamo il selectedIndex solo quando cambia la route
+    val selectedIndex = remember(currentRoute) {
+        items.indexOfFirst { it.route == currentRoute }.let { index ->
+            if (index == -1) {
+                // Se siamo in una sottopagina, cerchiamo di capire a quale macro-area appartiene
+                when {
+                    currentRoute.contains("apply") || currentRoute.contains("offerta") || currentRoute.contains("work_offer") || currentRoute == Destination.ADMIN_CANDIDACIES.route -> 3 // Icona Lavoro
+                    currentRoute.contains("product") -> 1 // Icona Ricerca
+                    currentRoute.contains("coupon") -> 2 // Icona Offerte
+                    currentRoute.contains("data") || currentRoute.contains("account") || currentRoute.contains("drafts") -> 4 // Icona Profilo
+                    else -> 0 // Torna a Home se non sa dove andare
+                }
+            } else index
+        }
     }
 
     val configuration = LocalConfiguration.current
@@ -362,7 +371,7 @@ fun CustomAnimatedBottomBar(currentRoute: String, onNavigate: (String) -> Unit) 
                         modifier = Modifier
                             .fillMaxSize()
                             .clip(RoundedCornerShape(30.dp))
-                            .background(androidx.compose.material3.MaterialTheme.colorScheme.primary.copy(alpha = 0.12f))
+                            .background(com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.15f))
                     )
                 }
 
@@ -392,7 +401,7 @@ fun CustomAnimatedBottomBar(currentRoute: String, onNavigate: (String) -> Unit) 
                                 Icon(
                                     imageVector = destination.icon ?: Icons.Default.Face,
                                     contentDescription = destination.label,
-                                    tint = if (isSelected) androidx.compose.material3.MaterialTheme.colorScheme.primary else Color.Gray,
+                                    tint = if (isSelected) com.example.superspan.ui.theme.LogoLeft else Color.Gray,
                                     modifier = Modifier.size(26.dp)
                                 )
                                 if (isSelected) {
@@ -400,7 +409,7 @@ fun CustomAnimatedBottomBar(currentRoute: String, onNavigate: (String) -> Unit) 
                                         text = destination.label,
                                         fontSize = 10.sp,
                                         fontWeight = FontWeight.ExtraBold,
-                                        color = androidx.compose.material3.MaterialTheme.colorScheme.primary,
+                                        color = com.example.superspan.ui.theme.LogoLeft,
                                         maxLines = 1
                                     )
                                 }
@@ -410,5 +419,15 @@ fun CustomAnimatedBottomBar(currentRoute: String, onNavigate: (String) -> Unit) 
                 }
             }
         }
+    }
+}
+
+fun NavController.navigateTopLevel(route: String) {
+    navigate(route) {
+        popUpTo(graph.findStartDestination().id) {
+            saveState = true
+        }
+        launchSingleTop = true
+        restoreState = true
     }
 }

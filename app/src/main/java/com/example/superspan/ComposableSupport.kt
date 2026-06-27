@@ -93,10 +93,10 @@ fun Header(modifier: Modifier = Modifier) {
                 .padding(top = 8.dp, start = 24.dp, end = 24.dp, bottom = 8.dp)
         ) {
             Text(
-                text = "Ciao ${actualUser.nome}",
+                text = "Ciao ${actualUser.nome}!",
                 fontSize = 32.sp,
                 fontWeight = FontWeight.ExtraBold,
-                color = androidx.compose.material3.MaterialTheme.colorScheme.primary
+                color = com.example.superspan.ui.theme.LogoLeft
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
@@ -279,7 +279,7 @@ fun HeaderHomeAlt(modifier: Modifier, navController: NavController?) {
                 
                 // Profilo a destra
                 IconButton(
-                    onClick = { navController?.navigate(Destination.PROFILO.route) },
+                    onClick = { navController?.navigateTopLevel(Destination.PROFILO.route) },
                     modifier = Modifier
                         .size(45.dp)
                         .align(Alignment.CenterEnd)
@@ -302,10 +302,10 @@ fun HeaderHomeAlt(modifier: Modifier, navController: NavController?) {
                 .padding(top = 28.dp, start = 24.dp, end = 24.dp, bottom = 8.dp)
         ) {
             Text(
-                text = "Ciao ${actualUser?.nome ?: "Ospite"}",
+                text = "Ciao ${actualUser?.nome ?: "Ospite"}!",
                 fontSize = 32.sp,
                 fontWeight = FontWeight.ExtraBold,
-                color = androidx.compose.material3.MaterialTheme.colorScheme.primary
+                color = com.example.superspan.ui.theme.LogoLeft
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(

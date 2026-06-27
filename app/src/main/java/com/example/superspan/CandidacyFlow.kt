@@ -1022,7 +1022,7 @@ fun ApplyStep3(navController: NavController?, padding: PaddingValues) {
                         stato = "Inviata")
                     AllCandidacies.add(nuovaCandidatura)
                     currentDraft = CandidacyDraft()
-                    navController?.navigate(Destination.LAVORO.route) { popUpTo(Destination.LAVORO.route) { inclusive = true } }
+                    navController?.navigateTopLevel(Destination.LAVORO.route)
                 },
                 modifier = Modifier.fillMaxWidth().height(60.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF388E3C)),
@@ -1151,9 +1151,7 @@ fun ApplyStep3(navController: NavController?, padding: PaddingValues) {
                     currentDraft = CandidacyDraft()
                     actualUser.candidacyDraftsByOfferId.remove(currentOfferIdApplying)
 
-                    navController?.navigate(Destination.LAVORO.route) {
-                        popUpTo(Destination.LAVORO.route) { inclusive = true }
-                    }
+                    navController?.navigateTopLevel(Destination.LAVORO.route)
                 },
                 modifier = Modifier.fillMaxWidth().height(60.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF388E3C)),

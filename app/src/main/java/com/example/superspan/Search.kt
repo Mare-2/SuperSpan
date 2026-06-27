@@ -59,7 +59,7 @@ fun SearchPageComplete(
         if (!showFilters) {
             SearchPage(navController, filterData, padding) { showFilters = true }
         } else {
-            FilterPage(Modifier.fillMaxSize(), filterData) { showFilters = false }
+            FilterPage(Modifier.fillMaxSize(), filterData, padding) { showFilters = false }
         }
     }
 }
@@ -267,28 +267,20 @@ fun SearchPage(
                         placeholder = { Text("Cerca prodotto...", color = Color.Gray) },
                         modifier = Modifier.fillMaxSize(),
                         leadingIcon = { Icon(Icons.Default.Search, null, tint = Color.Gray) },
+                        trailingIcon = {
+                            IconButton(onClick = onOpenFilters) {
+                                Icon(Icons.Default.Tune, contentDescription = "Filtri", tint = com.example.superspan.ui.theme.LogoLeft)
+                            }
+                        },
                         singleLine = true,
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = Color.Transparent,
                             unfocusedContainerColor = Color.Transparent,
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
-                            cursorColor = androidx.compose.material3.MaterialTheme.colorScheme.primary
+                            cursorColor = com.example.superspan.ui.theme.LogoLeft
                         )
                     )
-                }
-
-                Spacer(Modifier.width(12.dp))
-
-                Surface(
-                    modifier = Modifier.size(56.dp).clickable { onOpenFilters() },
-                    shape = RoundedCornerShape(16.dp),
-                    color = androidx.compose.material3.MaterialTheme.colorScheme.primary,
-                    shadowElevation = 6.dp
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(Icons.Default.Tune, contentDescription = "Filtri", tint = Color.White)
-                    }
                 }
             }
         }
@@ -707,7 +699,7 @@ fun FilterPage(modifier: Modifier, filterData: FilterData, onDismiss: () -> Unit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FilterPage(modifier: Modifier, filterData: FilterData, onDismiss: () -> Unit) {
+fun FilterPage(modifier: Modifier, filterData: FilterData, padding: PaddingValues, onDismiss: () -> Unit) {
     val scrollState = rememberScrollState()
     val absoluteMax = filterData.maxPossiblePrice()
 
@@ -722,44 +714,55 @@ fun FilterPage(modifier: Modifier, filterData: FilterData, onDismiss: () -> Unit
     filterData.minPrice = sliderPosition.start.toDouble()
     filterData.maxPrice = sliderPosition.endInclusive.toDouble()
 
-    Column(
-        modifier = modifier
-            .background(Color(0xFFF8F9FA)) // Sfondo grigio chiarissimo
-            .verticalScroll(scrollState)
-    ) {
-        // --- 1. HEADER FISSO CON OMBRA ---
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            color = Color.White,
-            shadowElevation = 2.dp
-        ) {
-            Row(
-                Modifier.fillMaxWidth().padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically
+    Scaffold(
+        modifier = modifier,
+        containerColor = com.example.superspan.ui.theme.LogoCenter.copy(alpha = 0.15f),
+        topBar = {
+            Surface(
+                modifier = Modifier.fillMaxWidth().padding(top = padding.calculateTopPadding() + 8.dp),
+                color = Color.Transparent,
+                shadowElevation = 0.dp
             ) {
-                IconButton(onClick = onDismiss) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
-                }
-                Text(
-                    "Filtri prodotti",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(start = 8.dp)
-                )
-                Spacer(Modifier.weight(1f))
-                TextButton(onClick = {
-                    filterData.categorie.clear()
-                    sliderPosition = 0f..absoluteMax
-                    minPriceText = "0.00"
-                    maxPriceText = "%.2f".format(absoluteMax)
-                }) {
-                    Text("Reset", color = Color.Red, fontWeight = FontWeight.SemiBold)
+                Row(
+                    Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(
+                        onClick = onDismiss,
+                        modifier = Modifier.background(Color.White, CircleShape)
+                    ) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
+                    }
+                    Text(
+                        "Filtri",
+                        fontSize = 26.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        modifier = Modifier.padding(start = 12.dp)
+                    )
+                    Spacer(Modifier.weight(1f))
+                    TextButton(
+                        onClick = {
+                            filterData.categorie.clear()
+                            sliderPosition = 0f..absoluteMax
+                            minPriceText = "0.00"
+                            maxPriceText = "%.2f".format(absoluteMax)
+                        },
+                        modifier = Modifier.background(Color.White.copy(alpha = 0.7f), CircleShape)
+                    ) {
+                        Text("Reset", color = Color.Red, fontWeight = FontWeight.SemiBold)
+                    }
                 }
             }
         }
-
-        Column(Modifier.padding(24.dp)) {
-
+    ) { innerPadding ->
+        Box(Modifier.fillMaxSize()) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(top = innerPadding.calculateTopPadding())
+                .verticalScroll(scrollState)
+                .padding(horizontal = 24.dp, vertical = 16.dp)
+        ) {
             // --- 2. SEZIONE PREZZO (CARD MODERNA) ---
             Text("Fascia di prezzo", fontSize = 18.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(16.dp))
@@ -768,12 +771,13 @@ fun FilterPage(modifier: Modifier, filterData: FilterData, onDismiss: () -> Unit
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = Color.White),
                 shape = RoundedCornerShape(20.dp),
-                border = BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.4f))
+                border = BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.4f)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Column(Modifier.padding(20.dp)) {
                     Text(
                         text = "Da €${"%.2f".format(sliderPosition.start)} a €${"%.2f".format(sliderPosition.endInclusive)}",
-                        color = androidx.compose.material3.MaterialTheme.colorScheme.primary,
+                        color = com.example.superspan.ui.theme.LogoLeft,
                         fontWeight = FontWeight.ExtraBold,
                         fontSize = 15.sp
                     )
@@ -794,7 +798,7 @@ fun FilterPage(modifier: Modifier, filterData: FilterData, onDismiss: () -> Unit
                             Box(
                                 modifier = Modifier
                                     .size(22.dp)
-                                    .background(androidx.compose.material3.MaterialTheme.colorScheme.primary, CircleShape)
+                                    .background(com.example.superspan.ui.theme.LogoLeft, CircleShape)
                                     .border(2.dp, Color.White, CircleShape)
                             )
                         },
@@ -802,7 +806,7 @@ fun FilterPage(modifier: Modifier, filterData: FilterData, onDismiss: () -> Unit
                             Box(
                                 modifier = Modifier
                                     .size(22.dp)
-                                    .background(androidx.compose.material3.MaterialTheme.colorScheme.primary, CircleShape)
+                                    .background(com.example.superspan.ui.theme.LogoLeft, CircleShape)
                                     .border(2.dp, Color.White, CircleShape)
                             )
                         },
@@ -812,7 +816,7 @@ fun FilterPage(modifier: Modifier, filterData: FilterData, onDismiss: () -> Unit
                                 modifier = Modifier.height(4.dp),
                                 rangeSliderState = rangeSliderState,
                                 colors = SliderDefaults.colors(
-                                    activeTrackColor = androidx.compose.material3.MaterialTheme.colorScheme.primary,
+                                    activeTrackColor = com.example.superspan.ui.theme.LogoLeft,
                                     inactiveTrackColor = Color.LightGray.copy(alpha = 0.3f)
                                 )
                             )
@@ -858,40 +862,54 @@ fun FilterPage(modifier: Modifier, filterData: FilterData, onDismiss: () -> Unit
             Text("Categorie prodotti", fontSize = 18.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(16.dp))
 
-            Category.entries.chunked(2).forEach { pair ->
-                Row(Modifier.fillMaxWidth()) {
-                    pair.forEach { category ->
-                        Row(Modifier.weight(1f)) {
-                            FilterCheckboxRow(
-                                label = category.nome,
-                                isChecked = filterData.categorie.contains(category),
-                                onCheckedChange = { isChecked ->
-                                    if (isChecked) filterData.categorie.add(category)
-                                    else filterData.categorie.remove(category)
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                shape = RoundedCornerShape(20.dp),
+                border = BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.4f)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Column(Modifier.padding(20.dp)) {
+                    Category.entries.chunked(2).forEach { pair ->
+                        Row(Modifier.fillMaxWidth()) {
+                            pair.forEach { category ->
+                                Row(Modifier.weight(1f)) {
+                                    FilterCheckboxRow(
+                                        label = category.nome,
+                                        isChecked = filterData.categorie.contains(category),
+                                        onCheckedChange = { isChecked ->
+                                            if (isChecked) filterData.categorie.add(category)
+                                            else filterData.categorie.remove(category)
+                                        }
+                                    )
                                 }
-                            )
+                            }
+                            if (pair.size == 1) Spacer(Modifier.weight(1f))
                         }
                     }
-                    if (pair.size == 1) Spacer(Modifier.weight(1f))
                 }
             }
 
-            Spacer(Modifier.height(48.dp))
+            Spacer(Modifier.height(100.dp + padding.calculateBottomPadding()))
+        }
 
-            // --- 4. TASTO APPLICA (STILE PILLOLA VERDE) ---
-            Button(
-                onClick = onDismiss,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                shape = CircleShape,
-                colors = ButtonDefaults.buttonColors(containerColor = androidx.compose.material3.MaterialTheme.colorScheme.primary)
-            ) {
-                Text("Applica filtri", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-            }
-            Spacer(Modifier.height(32.dp))
+        Button(
+            onClick = onDismiss,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = padding.calculateBottomPadding() + 16.dp),
+            shape = CircleShape,
+            colors = ButtonDefaults.buttonColors(containerColor = com.example.superspan.ui.theme.LogoLeft)
+        ) {
+            Text(
+                text = "Applica filtri",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
+            )
         }
     }
+}
 }
 
 

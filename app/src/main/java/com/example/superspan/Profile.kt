@@ -132,9 +132,9 @@ fun ProfilePage(user: User, navController: NavController?, paddingValues: Paddin
 
                 if (user.admin) {
                     ProfileSectionTitle("Gestione Negozio")
-                    ProfileMenuTile(Icons.Default.LocalOffer, "Gestione Offerte e Coupon", "Crea o modifica le promozioni") { navController?.navigate(Destination.OFFERTE.route) }
+                    ProfileMenuTile(Icons.Default.LocalOffer, "Gestione Offerte e Coupon", "Crea o modifica le promozioni") { navController?.navigateTopLevel(Destination.OFFERTE.route) }
                     Spacer(modifier = Modifier.height(12.dp))
-                    ProfileMenuTile(Icons.Default.Badge, "Revisione Candidature", "Vedi i CV ricevuti") { navController?.navigate(Destination.ADMIN_CANDIDACIES.route) }
+                    ProfileMenuTile(Icons.Default.Badge, "Revisione Candidature", "Vedi i CV ricevuti") { navController?.navigateTopLevel(Destination.ADMIN_CANDIDACIES.route) }
                 } else {
                     ProfileSectionTitle("Candidature")
                     ProfileMenuTile(
