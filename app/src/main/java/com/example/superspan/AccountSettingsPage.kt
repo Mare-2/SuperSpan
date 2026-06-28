@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
@@ -177,30 +178,27 @@ fun AccountSettingsPage(user: User, navController: NavController?, paddingValues
         }
 
         if (showSaveConfirm) {
-            AlertDialog(
+            ModernAlertDialog(
                 onDismissRequest = { showSaveConfirm = false },
-                title = { Text("Conferma Modifica") },
-                text = { Text("Vuoi salvare le modifiche apportate al tuo account?") },
-                confirmButton = {
-                    TextButton(onClick = {
-                        showSaveConfirm = false
-                        user.nome = nome.trim()
-                        user.cognome = cognome.trim()
-                        
-                        if (oldPassword == user.password && newPassword.isNotBlank()) {
-                            user.password = newPassword.trim()
-                        }
+                title = "Conferma Modifica",
+                text = "Vuoi salvare le modifiche apportate al tuo account?",
+                icon = Icons.Default.Save,
+                confirmText = "Salva",
+                onConfirm = {
+                    showSaveConfirm = false
+                    user.nome = nome.trim()
+                    user.cognome = cognome.trim()
+                    
+                    if (oldPassword == user.password && newPassword.isNotBlank()) {
+                        user.password = newPassword.trim()
+                    }
 
-                        coroutineScope.launch {
-                            android.widget.Toast.makeText(context, "Dati salvati con successo!", android.widget.Toast.LENGTH_SHORT).show()
-                        }
-                    }) {
-                        Text("Salva", color = com.example.superspan.ui.theme.LogoLeft)
+                    coroutineScope.launch {
+                        android.widget.Toast.makeText(context, "Dati salvati con successo!", android.widget.Toast.LENGTH_SHORT).show()
                     }
                 },
-                dismissButton = {
-                    TextButton(onClick = { showSaveConfirm = false }) { Text("Annulla", color = Color.Gray) }
-                }
+                dismissText = "Annulla",
+                onDismiss = { showSaveConfirm = false }
             )
         }
     }

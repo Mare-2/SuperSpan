@@ -155,17 +155,19 @@ fun DraftsPage(navController: NavController?, padding: PaddingValues) {
 
         if (showDeleteConfirmFor != null) {
             val idToDelete = showDeleteConfirmFor!!
-            AlertDialog(
+            ModernAlertDialog(
                 onDismissRequest = { showDeleteConfirmFor = null },
-                title = { Text("Elimina bozza") },
-                text = { Text("Sei sicuro di eliminare la bozza per l'offerta #$idToDelete ?") },
-                confirmButton = {
-                    TextButton(onClick = {
-                        clearCandidacyDraftForOffer(actualUser, idToDelete)
-                        showDeleteConfirmFor = null
-                    }) { Text("Elimina", color = com.example.superspan.ui.theme.AppError) }
+                title = "Elimina bozza",
+                text = "Sei sicuro di eliminare la bozza per l'offerta #$idToDelete ?",
+                icon = Icons.Default.Delete,
+                isDestructive = true,
+                confirmText = "Elimina",
+                onConfirm = {
+                    clearCandidacyDraftForOffer(actualUser, idToDelete)
+                    showDeleteConfirmFor = null
                 },
-                dismissButton = { TextButton(onClick = { showDeleteConfirmFor = null }) { Text("Annulla") } }
+                dismissText = "Annulla",
+                onDismiss = { showDeleteConfirmFor = null }
             )
         }
     }

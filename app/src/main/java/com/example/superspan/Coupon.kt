@@ -587,30 +587,26 @@ fun CouponPageComplete(paddingValues: PaddingValues, navController: NavControlle
         }
 
         if (couponToDelete != null) {
-            AlertDialog(
+            ModernAlertDialog(
                 onDismissRequest = { couponToDelete = null },
-                title = { Text("Conferma Eliminazione") },
-                text = { Text("Sei sicuro di voler eliminare questo elemento?") },
-                confirmButton = {
-                    TextButton(onClick = {
-                        val code = couponToDelete!!.code
-                        couponToDelete = null
-                        scope.launch {
-                            deletingCouponCodes.add(code)
-                            kotlinx.coroutines.delay(400)
-                            ListOfCoupon.removeAll { it.code == code }
-                            deletingCouponCodes.remove(code)
-                            android.widget.Toast.makeText(context, "Eliminato con successo", android.widget.Toast.LENGTH_SHORT).show()
-                        }
-                    }) {
-                        Text("Elimina", color = com.example.superspan.ui.theme.AppError)
+                title = "Conferma Eliminazione",
+                text = "Sei sicuro di voler eliminare questo elemento?",
+                icon = Icons.Default.Delete,
+                isDestructive = true,
+                confirmText = "Elimina",
+                onConfirm = {
+                    val code = couponToDelete!!.code
+                    couponToDelete = null
+                    scope.launch {
+                        deletingCouponCodes.add(code)
+                        kotlinx.coroutines.delay(400)
+                        ListOfCoupon.removeAll { it.code == code }
+                        deletingCouponCodes.remove(code)
+                        android.widget.Toast.makeText(context, "Eliminato con successo", android.widget.Toast.LENGTH_SHORT).show()
                     }
                 },
-                dismissButton = {
-                    TextButton(onClick = { couponToDelete = null }) {
-                        Text("Annulla", color = Color.Gray)
-                    }
-                }
+                dismissText = "Annulla",
+                onDismiss = { couponToDelete = null }
             )
         }
     }

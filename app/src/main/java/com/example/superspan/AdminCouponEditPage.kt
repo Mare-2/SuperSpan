@@ -310,61 +310,56 @@ fun AdminCouponEditPage(
             }
 
             if (showSaveConfirm) {
-                AlertDialog(
+                ModernAlertDialog(
                     onDismissRequest = { showSaveConfirm = false },
-                    title = { Text(if (existingCoupon != null) "Conferma Modifica" else "Conferma Creazione") },
-                    text = { Text(if (existingCoupon != null) "Vuoi salvare le modifiche apportate?" else "Vuoi salvare il nuovo elemento?") },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            showSaveConfirm = false
-                            val finalDiscount = discountVal ?: 0f
-                            val newCoupon = Coupon(
-                                _code = code,
-                                _discount = finalDiscount,
-                                _description = description,
-                                _dateOfExpiration = dateOfExpiration,
-                                *selectedProducts.toTypedArray()
-                            )
-    
-                            if (existingCoupon != null) {
-                                val index = ListOfCoupon.indexOfFirst { it.code == existingCoupon.code }
-                                if (index != -1) {
-                                    ListOfCoupon[index] = newCoupon
-                                }
-                            } else {
-                                ListOfCoupon.add(newCoupon)
+                    title = if (existingCoupon != null) "Conferma Modifica" else "Conferma Creazione",
+                    text = if (existingCoupon != null) "Vuoi salvare le modifiche apportate?" else "Vuoi salvare il nuovo elemento?",
+                    icon = Icons.Default.Save,
+                    confirmText = "Salva",
+                    onConfirm = {
+                        showSaveConfirm = false
+                        val finalDiscount = discountVal ?: 0f
+                        val newCoupon = Coupon(
+                            _code = code,
+                            _discount = finalDiscount,
+                            _description = description,
+                            _dateOfExpiration = dateOfExpiration,
+                            *selectedProducts.toTypedArray()
+                        )
+
+                        if (existingCoupon != null) {
+                            val index = ListOfCoupon.indexOfFirst { it.code == existingCoupon.code }
+                            if (index != -1) {
+                                ListOfCoupon[index] = newCoupon
                             }
-                            Toast.makeText(context, "Salvato con successo", Toast.LENGTH_SHORT).show()
-                            navController?.previousBackStackEntry?.savedStateHandle?.set("added_coupon_code", newCoupon.code)
-                            navController?.popBackStack()
-                        }) {
-                            Text("Salva", color = Color(0xFF388E3C))
+                        } else {
+                            ListOfCoupon.add(newCoupon)
                         }
+                        Toast.makeText(context, "Salvato con successo", Toast.LENGTH_SHORT).show()
+                        navController?.previousBackStackEntry?.savedStateHandle?.set("added_coupon_code", newCoupon.code)
+                        navController?.popBackStack()
                     },
-                    dismissButton = {
-                        TextButton(onClick = { showSaveConfirm = false }) { Text("Annulla", color = Color.Gray) }
-                    }
+                    dismissText = "Annulla",
+                    onDismiss = { showSaveConfirm = false }
                 )
             }
 
             if (showDeleteConfirm) {
-                AlertDialog(
+                ModernAlertDialog(
                     onDismissRequest = { showDeleteConfirm = false },
-                    title = { Text("Conferma Eliminazione") },
-                    text = { Text("Sei sicuro di voler eliminare questo elemento?") },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            showDeleteConfirm = false
-                            navController?.previousBackStackEntry?.savedStateHandle?.set("deleted_coupon_code", existingCoupon?.code ?: "")
-                            Toast.makeText(context, "Eliminato con successo", Toast.LENGTH_SHORT).show()
-                            navController?.popBackStack()
-                        }) {
-                            Text("Elimina", color = com.example.superspan.ui.theme.AppError)
-                        }
+                    title = "Conferma Eliminazione",
+                    text = "Sei sicuro di voler eliminare questo elemento?",
+                    icon = Icons.Default.Delete,
+                    isDestructive = true,
+                    confirmText = "Elimina",
+                    onConfirm = {
+                        showDeleteConfirm = false
+                        navController?.previousBackStackEntry?.savedStateHandle?.set("deleted_coupon_code", existingCoupon?.code ?: "")
+                        Toast.makeText(context, "Eliminato con successo", Toast.LENGTH_SHORT).show()
+                        navController?.popBackStack()
                     },
-                    dismissButton = {
-                        TextButton(onClick = { showDeleteConfirm = false }) { Text("Annulla", color = Color.Gray) }
-                    }
+                    dismissText = "Annulla",
+                    onDismiss = { showDeleteConfirm = false }
                 )
             }
         }

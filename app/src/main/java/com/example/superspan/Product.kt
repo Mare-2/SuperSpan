@@ -300,27 +300,22 @@ fun ProductPage(product: Product?, navController: NavController?, paddingValues:
     }
 
     if (showNutritionalInfo) {
-        androidx.compose.material3.AlertDialog(
+        ModernAlertDialog(
             onDismissRequest = { showNutritionalInfo = false },
-            title = { Text("Valori Nutrizionali", fontWeight = androidx.compose.ui.text.font.FontWeight.Bold) },
-            text = {
-                Column {
+            title = "Valori Nutrizionali",
+            content = {
+                Column(horizontalAlignment = Alignment.Start, modifier = Modifier.fillMaxWidth()) {
                     Text("Valori medi per 100g:")
-                    Spacer(Modifier.height(12.dp))
+                    Spacer(Modifier.height(8.dp))
                     Text("Energia: 250 kcal")
                     Text("Grassi: 5 g")
                     Text("Carboidrati: 40 g")
                     Text("Proteine: 10 g")
                     Text("Sale: 0.5 g")
-                    Spacer(Modifier.height(16.dp))
-                    Text("I valori mostrati sono puramente indicativi a scopo dimostrativo.", fontSize = 12.sp, color = Color.Gray)
                 }
             },
-            confirmButton = {
-                androidx.compose.material3.TextButton(onClick = { showNutritionalInfo = false }) {
-                    Text("Chiudi")
-                }
-            }
+            confirmText = "Chiudi",
+            onConfirm = { showNutritionalInfo = false }
         )
     }
 }
