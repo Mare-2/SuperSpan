@@ -172,7 +172,7 @@ fun ApplyStep1(navController: NavController?, padding: PaddingValues) {
         )
     }
 
-    Column(Modifier.fillMaxSize().padding(padding).background(com.example.superspan.ui.theme.AppBackgroundBrush)) {
+    Column(Modifier.fillMaxSize().padding(padding)) {
         ApplyHeader("1", "I tuoi dati e CV", onBack = { navController?.popBackStack() }, onClose = { showExitDialog = true })
 
         ExitDraftDialog(
@@ -339,7 +339,7 @@ fun ApplyStep1(navController: NavController?, padding: PaddingValues) {
         )
     }
 
-    Column(Modifier.fillMaxSize().padding(padding).background(com.example.superspan.ui.theme.AppBackgroundBrush)) {
+    Column(Modifier.fillMaxSize().padding(padding)) {
         // Header con tasto chiudi per la bozza
         ApplyHeader(
             step = "1",
@@ -476,7 +476,7 @@ fun ApplyStep1(navController: NavController?, padding: PaddingValues) {
 fun ApplyStep2Intro(navController: NavController?, padding: PaddingValues) {
     var showExitDialog by remember { mutableStateOf(false) }
 
-    Column(Modifier.fillMaxSize().padding(padding).background(com.example.superspan.ui.theme.AppBackgroundBrush)) {
+    Column(Modifier.fillMaxSize().padding(padding)) {
         ApplyHeader("2", "Preparati al Video", onBack = { navController?.popBackStack() }, onClose = { showExitDialog = true })
 
         ExitDraftDialog(
@@ -531,7 +531,7 @@ fun ApplyStep2Intro(navController: NavController?, padding: PaddingValues) {
 fun ApplyStep2Intro(navController: NavController?, padding: PaddingValues) {
     var showExitDialog by remember { mutableStateOf(false) }
 
-    Column(Modifier.fillMaxSize().padding(padding).background(com.example.superspan.ui.theme.AppBackgroundBrush)) {
+    Column(Modifier.fillMaxSize().padding(padding)) {
         ApplyHeader(
             step = "2",
             title = "Preparati al Video",
@@ -828,7 +828,7 @@ fun ApplyStep2Record(navController: NavController?, padding: PaddingValues) {
 /*@Composable
 fun ApplyStep2Review(navController: NavController?, padding: PaddingValues) {
     Column(
-        Modifier.fillMaxSize().padding(padding).background(com.example.superspan.ui.theme.AppBackgroundBrush),
+        Modifier.fillMaxSize().padding(padding),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Freccia per tornare semplicemente indietro, senza conferma
@@ -898,7 +898,7 @@ fun ApplyStep2Review(navController: NavController?, padding: PaddingValues) {
         onDispose { exoPlayer.release() }
     }
 
-    Column(Modifier.fillMaxSize().padding(padding).background(com.example.superspan.ui.theme.AppBackgroundBrush), horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(Modifier.fillMaxSize().padding(padding), horizontalAlignment = Alignment.CenterHorizontally) {
         Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = { navController?.popBackStack() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null) }
             Text("Riprova", Modifier.clickable { navController?.popBackStack() }, color = Color.Gray)
@@ -957,7 +957,7 @@ fun ApplyStep3(navController: NavController?, padding: PaddingValues) {
 
     // [Dialog Anteprima uguale a prima...]
 
-    Column(Modifier.fillMaxSize().padding(padding).background(com.example.superspan.ui.theme.AppBackgroundBrush)) {
+    Column(Modifier.fillMaxSize().padding(padding)) {
         ApplyHeader("3", "Riepilogo e Invio", onBack = { navController?.popBackStack() }, onClose = { showExitDialog = true })
 
         ExitDraftDialog(
@@ -1078,7 +1078,7 @@ fun ApplyStep3(navController: NavController?, padding: PaddingValues) {
         )
     }
 
-    Column(Modifier.fillMaxSize().padding(padding).background(com.example.superspan.ui.theme.AppBackgroundBrush)) {
+    Column(Modifier.fillMaxSize().padding(padding)) {
         ApplyHeader(
             step = "3",
             title = "Riepilogo e Invio",
@@ -1351,7 +1351,7 @@ fun ApplyStep1(navController: NavController?, padding: PaddingValues) {
         )
     }
 
-    Column(Modifier.fillMaxSize().padding(padding).background(com.example.superspan.ui.theme.AppBackgroundBrush)) {
+    Column(Modifier.fillMaxSize().padding(padding)) {
         BackHandler { showExitDialog = true }
         ApplyHeader("1", "I tuoi dati e CV", { showExitDialog = true }, { showExitDialog = true })
 
@@ -1445,7 +1445,7 @@ fun ApplyStep2Intro(navController: NavController?, padding: PaddingValues) {
         }
     }
 
-    Column(Modifier.fillMaxSize().padding(padding).background(com.example.superspan.ui.theme.AppBackgroundBrush), horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(Modifier.fillMaxSize().padding(padding), horizontalAlignment = Alignment.CenterHorizontally) {
         ApplyHeader("2", if (hasVideo) "Rivedi il tuo video" else "Preparati al Video", { navController?.popBackStack() }, { showExitDialog = true })
         ExitDraftDialog(showExitDialog, { showExitDialog = false }, {
             saveCandidacyDraftForOffer(actualUser, currentOfferIdApplying, currentDraft.copy(lastStepRoute = Destination.APPLY_STEP_2_INTRO.route))
@@ -1738,7 +1738,7 @@ fun ApplyStep3(navController: NavController?, padding: PaddingValues) {
         )
     }
 
-    Column(Modifier.fillMaxSize().padding(padding).background(com.example.superspan.ui.theme.AppBackgroundBrush)) {
+    Column(Modifier.fillMaxSize().padding(padding)) {
         ApplyHeader("3", "Riepilogo e Invio", { navController?.popBackStack() }, { showExitDialog = true })
         ExitDraftDialog(showExitDialog, { showExitDialog = false }, {
             saveCandidacyDraftForOffer(actualUser, currentOfferIdApplying, currentDraft.copy(lastStepRoute = Destination.APPLY_STEP_3.route))

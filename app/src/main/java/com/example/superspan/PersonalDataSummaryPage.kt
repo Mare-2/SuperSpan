@@ -21,111 +21,112 @@ import androidx.navigation.NavController
 
 @Composable
 fun PersonalDataSummaryPage(navController: NavController?, padding: PaddingValues) {
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(padding)
-            .background(com.example.superspan.ui.theme.AppBackgroundBrush)
     ) {
-        // --- NUOVO HEADER ---
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
+        Column(
+            modifier = Modifier.fillMaxSize()
         ) {
-            // 1. TASTO INDIETRO (A sinistra)
-            IconButton(
-                onClick = { navController?.popBackStack() },
+            // --- NUOVO HEADER ---
+            Box(
                 modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .background(Color.White.copy(alpha = 0.7f), CircleShape)
+                    .fillMaxWidth()
+                    .padding(16.dp)
             ) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
+                // TASTO INDIETRO (A sinistra)
+                IconButton(
+                    onClick = { navController?.popBackStack() },
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .background(Color.White.copy(alpha = 0.7f), CircleShape)
+                ) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
+                }
             }
 
-            // 2. TITOLI CENTRATI
+            // TITOLI CENTRATI
             Column(
-                modifier = Modifier.align(Alignment.Center),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                     text = "I tuoi dati",
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color(0xFF1A1A1A)
                 )
                 Text(
                     text = "Velocizza le tue candidature",
-                    fontSize = 13.sp,
-                    color = Color.Gray,
-                    fontWeight = FontWeight.Medium
+                    fontSize = 16.sp,
+                    color = Color.Gray
                 )
             }
 
-            // 3. TASTO MODIFICA EVIDENTE (A destra)
-            // Usiamo una Surface circolare colorata per farlo risaltare
-            Surface(
-                onClick = { navController?.navigate(Destination.PERSONAL_DATA_EDIT.route) },
-                shape = CircleShape,
-                color = Color(0xFF388E3C), // Il verde del tuo brand
+            // --- CONTENUTO ---
+            Column(
                 modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .size(42.dp),
-                shadowElevation = 4.dp // Aggiunge un po' di profondità
+                    .padding(24.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = "Modifica",
-                        tint = Color.White,
-                        modifier = Modifier.size(20.dp)
-                    )
+                // Sezione Informazioni
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                        SummarySectionTitle("Informazioni Personali")
+                        SummaryDataRow(Icons.Default.Person, "Nome", actualUser.nome)
+                        SummaryDataRow(Icons.Default.Badge, "Cognome", actualUser.cognome)
+                        SummaryDataRow(Icons.Default.Email, "Email (può essere diversa da quella del profilo)", actualUser.emailLavoro ?: "Non inserita")
+                        SummaryDataRow(
+                            icon = Icons.Default.Phone,
+                            label = "Telefono",
+                            value = if (!actualUser.telefono.isNullOrBlank()) {
+                                formatPhone(actualUser.telefono!!)
+                            } else {
+                                "Non inserito"
+                            }
+                        )
+                    }
+                }
+
+                // Sezione Documenti
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                        SummarySectionTitle("Documenti")
+                        SummaryDataRow(
+                            icon = Icons.Default.Description,
+                            label = "Curriculum Vitae (PDF)",
+                            value = actualUser.cvFileName ?: "Nessun file caricato"
+                        )
+                    }
                 }
             }
         }
 
-        // --- CONTENUTO ---
-        Column(
+        // TASTO MODIFICA FAB (In basso a destra, align nel root Box)
+        FloatingActionButton(
+            onClick = { navController?.navigate(Destination.PERSONAL_DATA_EDIT.route) },
             modifier = Modifier
-                .padding(24.dp)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+                .align(Alignment.BottomEnd)
+                .padding(24.dp),
+            containerColor = com.example.superspan.ui.theme.LogoLeft,
+            contentColor = Color.White,
+            shape = CircleShape
         ) {
-            // Sezione Informazioni
-            SummarySectionTitle("Informazioni Personali")
-
-            SummaryDataRow(Icons.Default.Person, "Nome", actualUser.nome)
-            SummaryDataRow(Icons.Default.Badge, "Cognome", actualUser.cognome)
-            SummaryDataRow(Icons.Default.Email, "Email (può essere diversa da quella del profilo)", actualUser.emailLavoro ?: "Non inserita")
-            SummaryDataRow(
-                icon = Icons.Default.Phone,
-                label = "Telefono",
-                value = if (!actualUser.telefono.isNullOrBlank()) {
-                    formatPhone(actualUser.telefono!!)
-                } else {
-                    "Non inserito"
-                }
-            )
-
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), thickness = 0.5.dp)
-
-            // Sezione Documenti
-            SummarySectionTitle("Documenti")
-            if (actualUser.cvFileName == null) {
-                Text(
-                    "Carica qui il tuo CV!",
-                    fontSize = 13.sp,
-                    color = Color.Gray,
-                    //modifier = Modifier.padding(start = 40.dp)
-                )
-            }
-            SummaryDataRow(
-                icon = Icons.Default.Description,
-                label = "Curriculum Vitae (PDF)",
-                value = actualUser.cvFileName ?: "Nessun file caricato"
-            )
-
-
+            Icon(Icons.Default.Edit, contentDescription = "Modifica Dati")
         }
     }
 }
@@ -136,7 +137,7 @@ fun SummarySectionTitle(title: String) {
         text = title,
         fontSize = 14.sp,
         fontWeight = FontWeight.Bold,
-        color = Color(0xFF388E3C),
+        color = com.example.superspan.ui.theme.LogoLeft,
         modifier = Modifier.padding(bottom = 8.dp)
     )
 }
@@ -144,12 +145,20 @@ fun SummarySectionTitle(title: String) {
 @Composable
 fun SummaryDataRow(icon: ImageVector, label: String, value: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            modifier = Modifier.size(24.dp),
-            tint = Color.Gray
-        )
+        Surface(
+            shape = CircleShape,
+            color = com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.1f),
+            modifier = Modifier.size(36.dp)
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp),
+                    tint = com.example.superspan.ui.theme.LogoLeft
+                )
+            }
+        }
         Spacer(Modifier.width(16.dp))
         Column {
             Text(text = label, fontSize = 12.sp, color = Color.Gray)

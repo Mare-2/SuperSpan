@@ -64,7 +64,6 @@ fun WorkOfferPage(offer: WorkOffer?, navController: NavController?, paddingValue
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(com.example.superspan.ui.theme.AppBackgroundBrush) // Sfondo basato sul logo
             .padding(paddingValues)
     ) {
         // --- CONTENUTO ---

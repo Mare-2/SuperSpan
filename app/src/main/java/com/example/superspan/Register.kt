@@ -46,7 +46,6 @@ fun Register(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(com.example.superspan.ui.theme.AppBackgroundBrush)
             .padding(padding)
     ) {
         Column(
@@ -90,28 +89,33 @@ fun Register(
                     .padding(horizontal = 24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                if (!formPass) FormDati(email, nome, cognome, {email = it}, {nome = it}, {cognome = it}, {formPass = it})
-                else FormPassword({password = it}, {check = it})
-                
-                if (formPass) {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Button(
-                        onClick = {
-                            val newUser = User(nome, cognome, email, password)
-                            MapOfUser.put(email, newUser)
-                            actualUser = newUser
-                            navController?.navigate(Destination.HOME.route)
-                        }, 
-                        enabled = check,
-                        modifier = Modifier
-                            .width(180.dp)
-                            .height(56.dp),
-                        shape = androidx.compose.foundation.shape.CircleShape,
-                        colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                            containerColor = com.example.superspan.ui.theme.LogoLeft
-                        )
-                    ) { 
-                        Text("Registrati", fontSize = 18.sp, fontWeight = FontWeight.Bold) 
+                androidx.compose.animation.AnimatedContent(targetState = formPass, label = "formAnimation") { isPassStep ->
+                    if (!isPassStep) {
+                        FormDati(email, nome, cognome, {email = it}, {nome = it}, {cognome = it}, {formPass = it})
+                    } else {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            FormPassword({password = it}, {check = it})
+                            
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Button(
+                                onClick = {
+                                    val newUser = User(nome, cognome, email, password)
+                                    MapOfUser.put(email, newUser)
+                                    actualUser = newUser
+                                    navController?.navigate(Destination.HOME.route)
+                                }, 
+                                enabled = check,
+                                modifier = Modifier
+                                    .width(180.dp)
+                                    .height(56.dp),
+                                shape = androidx.compose.foundation.shape.CircleShape,
+                                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                                    containerColor = com.example.superspan.ui.theme.LogoLeft
+                                )
+                            ) { 
+                                Text("Registrati", fontSize = 18.sp, fontWeight = FontWeight.Bold) 
+                            }
+                        }
                     }
                 }
             }
