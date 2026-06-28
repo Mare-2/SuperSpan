@@ -205,7 +205,7 @@ fun EditTextField(
         if (isError) {
             Text(
                 text = errorMessage,
-                color = Color.Red,
+                color = com.example.superspan.ui.theme.AppError,
                 fontSize = 12.sp,
                 modifier = Modifier.padding(start = 12.dp, top = 4.dp)
             )
@@ -438,7 +438,7 @@ fun EditTextField(
     }
 
     val borderColor = when {
-        isError -> Color.Red
+        isError -> com.example.superspan.ui.theme.AppError
         value.isEmpty() -> Color(0xFFFFB74D)
         else -> Color(0xFF81C784)
     }
@@ -462,7 +462,7 @@ fun EditTextField(
             )
         )
         if (isError) {
-            Text(errorMessage, color = Color.Red, fontSize = 12.sp, modifier = Modifier.padding(start = 12.dp))
+            Text(errorMessage, color = com.example.superspan.ui.theme.AppError, fontSize = 12.sp, modifier = Modifier.padding(start = 12.dp))
         }
     }
 }

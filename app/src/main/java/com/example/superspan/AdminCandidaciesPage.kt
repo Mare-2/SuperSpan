@@ -88,7 +88,7 @@ fun AdminCandidaciesPage(navController: NavController?, paddingValues: PaddingVa
                                 selectedRole = null
                                 selectedSupermarket = null
                             }, contentPadding = PaddingValues(0.dp)) {
-                                Text("Azzera", color = Color.Red)
+                                Text("Azzera", color = com.example.superspan.ui.theme.AppError)
                             }
                         }
                     }
@@ -191,7 +191,7 @@ fun CandidacyAdminCard(candidacy: Candidacy) {
                     }
                     android.widget.Toast.makeText(context, "Candidatura scartata", android.widget.Toast.LENGTH_SHORT).show()
                 }) {
-                    Text("Sì, scarta", color = Color.Red)
+                    Text("Sì, scarta", color = com.example.superspan.ui.theme.AppError)
                 }
             },
             dismissButton = {
@@ -266,7 +266,7 @@ fun CandidacyAdminCard(candidacy: Candidacy) {
                 )
                 if (!isForwarded) {
                     IconButton(onClick = { showDiscardDialog = true }, modifier = Modifier.size(24.dp)) {
-                        Icon(Icons.Default.Delete, contentDescription = "Scarta", tint = Color.Red, modifier = Modifier.size(20.dp))
+                        Icon(Icons.Default.Delete, contentDescription = "Scarta", tint = com.example.superspan.ui.theme.AppError, modifier = Modifier.size(20.dp))
                     }
                 }
             }

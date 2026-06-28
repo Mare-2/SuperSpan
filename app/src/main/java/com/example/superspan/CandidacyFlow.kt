@@ -86,7 +86,7 @@ fun ExitDraftDialog(
             confirmButton = { TextButton(onClick = onSave) { Text("Salva") } },
             dismissButton = {
                 Row {
-                    TextButton(onClick = onDiscard) { Text("Scarta", color = Color.Red) }
+                    TextButton(onClick = onDiscard) { Text("Scarta", color = com.example.superspan.ui.theme.AppError) }
                     TextButton(onClick = onDismiss) { Text("Annulla") }
                 }
             }
@@ -106,7 +106,7 @@ fun ApplyHeader(step: String, title: String, onBack: () -> Unit, onClose: () -> 
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
             }
             IconButton(onClick = onClose) {
-                Icon(Icons.Default.Close, null, tint = Color.Red)
+                Icon(Icons.Default.Close, null, tint = com.example.superspan.ui.theme.AppError)
             }
         }
         Box(
@@ -167,7 +167,7 @@ fun ApplyStep1(navController: NavController?, padding: PaddingValues) {
                 TextButton(onClick = {
                     nome = actualUser.nome; cognome = actualUser.cognome; emailLavoro = actualUser.emailLavoro ?: ""; telefonoDigits = ""; cvName = ""
                     showResetDialog = false
-                }) { Text("Sì, svuota", color = Color.Red) }
+                }) { Text("Sì, svuota", color = com.example.superspan.ui.theme.AppError) }
             },
             dismissButton = { TextButton(onClick = { showResetDialog = false }) { Text("Annulla") } }
         )
@@ -334,7 +334,7 @@ fun ApplyStep1(navController: NavController?, padding: PaddingValues) {
                 TextButton(onClick = {
                     nome = ""; cognome = ""; emailLavoro = ""; telefonoDigits = ""; cvName = ""; cvPath = ""
                     showResetDialog = false
-                }) { Text("Sì, svuota", color = Color.Red) }
+                }) { Text("Sì, svuota", color = com.example.superspan.ui.theme.AppError) }
             },
             dismissButton = { TextButton(onClick = { showResetDialog = false }) { Text("Annulla") } }
         )
@@ -508,7 +508,7 @@ fun ApplyStep2Intro(navController: NavController?, padding: PaddingValues) {
                     Spacer(Modifier.height(10.dp))
                     Text("• Presentati (Nome e città)\n• Breve esperienza lavorativa\n• Perché SuperSpan?", lineHeight = 24.sp)
                     Spacer(Modifier.height(15.dp))
-                    Text("Hai 30 secondi di tempo.", fontWeight = FontWeight.Bold, color = Color.Red)
+                    Text("Hai 30 secondi di tempo.", fontWeight = FontWeight.Bold, color = com.example.superspan.ui.theme.AppError)
                 }
             }
 
@@ -567,7 +567,7 @@ fun ApplyStep2Intro(navController: NavController?, padding: PaddingValues) {
                     Spacer(Modifier.height(10.dp))
                     Text("• Presentati (Nome e città)\n• Breve esperienza lavorativa\n• Perché SuperSpan?", lineHeight = 24.sp)
                     Spacer(Modifier.height(15.dp))
-                    Text("Hai 30 secondi di tempo.", fontWeight = FontWeight.Bold, color = Color.Red)
+                    Text("Hai 30 secondi di tempo.", fontWeight = FontWeight.Bold, color = com.example.superspan.ui.theme.AppError)
                 }
             }
 
@@ -639,9 +639,9 @@ fun ApplyStep2Record(navController: NavController?, padding: PaddingValues) {
                 Text(countdown.toString(), fontSize = 120.sp, color = Color.White, fontWeight = FontWeight.ExtraBold)
             } else {
                 Column(Modifier.fillMaxSize()) {
-                    LinearProgressIndicator(progress = { seconds / 30f }, modifier = Modifier.fillMaxWidth().height(8.dp), color = Color.Red, trackColor = Color.White.copy(0.2f))
+                    LinearProgressIndicator(progress = { seconds / 30f }, modifier = Modifier.fillMaxWidth().height(8.dp), color = com.example.superspan.ui.theme.AppError, trackColor = Color.White.copy(0.2f))
                     Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Surface(Modifier.size(12.dp), shape = CircleShape, color = Color.Red) {}
+                        Surface(Modifier.size(12.dp), shape = CircleShape, color = com.example.superspan.ui.theme.AppError) {}
                         Spacer(Modifier.width(8.dp))
                         Text("REC 00:${seconds.toString().padStart(2, '0')} / 00:30", color = Color.White, fontWeight = FontWeight.Bold)
                     }
@@ -654,7 +654,7 @@ fun ApplyStep2Record(navController: NavController?, padding: PaddingValues) {
 
         Box(Modifier.fillMaxWidth().height(120.dp).background(Color.Black), contentAlignment = Alignment.Center) {
             if (isRecording) {
-                Box(Modifier.size(70.dp).clip(CircleShape).background(Color.White).padding(4.dp).clip(CircleShape).background(Color.Red).clickable {
+                Box(Modifier.size(70.dp).clip(CircleShape).background(Color.White).padding(4.dp).clip(CircleShape).background(com.example.superspan.ui.theme.AppError).clickable {
                     if (seconds < 15) {
                         errorMsg = "Video troppo corto! Registra almeno 15 secondi."
                     } else {
@@ -798,13 +798,13 @@ fun ApplyStep2Record(navController: NavController?, padding: PaddingValues) {
             LinearProgressIndicator(
                 progress = { seconds / 30f },
                 modifier = Modifier.fillMaxWidth().height(8.dp).padding(top = 10.dp),
-                color = Color.Red,
+                color = com.example.superspan.ui.theme.AppError,
                 trackColor = Color.White.copy(0.2f)
             )
             Text(
                 "REC 00:${seconds.toString().padStart(2, '0')}",
                 Modifier.padding(20.dp).align(Alignment.TopStart),
-                color = Color.Red, fontWeight = FontWeight.Bold
+                color = com.example.superspan.ui.theme.AppError, fontWeight = FontWeight.Bold
             )
         }
 
@@ -813,7 +813,7 @@ fun ApplyStep2Record(navController: NavController?, padding: PaddingValues) {
             Box(
                 Modifier.align(Alignment.BottomCenter).padding(bottom = 60.dp).size(80.dp)
                     .border(4.dp, Color.White, CircleShape).padding(8.dp)
-                    .clip(CircleShape).background(Color.Red)
+                    .clip(CircleShape).background(com.example.superspan.ui.theme.AppError)
                     .clickable {
                         activeRecording.value?.stop()
                         activeRecording.value = null
@@ -1266,7 +1266,7 @@ fun ExitDraftDialog(visible: Boolean, onDismiss: () -> Unit, onSave: () -> Unit,
             confirmButton = { TextButton(onClick = onSave) { Text("Salva") } },
             dismissButton = {
                 Row {
-                    TextButton(onClick = onDiscard) { Text("Scarta", color = Color.Red) }
+                    TextButton(onClick = onDiscard) { Text("Scarta", color = com.example.superspan.ui.theme.AppError) }
                     TextButton(onClick = onDismiss) { Text("Annulla") }
                 }
             }
@@ -1347,7 +1347,7 @@ fun ApplyStep1(navController: NavController?, padding: PaddingValues) {
                 TextButton(onClick = {
                     nome = ""; cognome = ""; emailLavoro = ""; telefonoDigits = ""; cvName = ""; cvPath = ""
                     showResetDialog = false
-                }) { Text("Sì, svuota", color = Color.Red) }
+                }) { Text("Sì, svuota", color = com.example.superspan.ui.theme.AppError) }
             },
             dismissButton = { TextButton(onClick = { showResetDialog = false }) { Text("Annulla") } }
         )
@@ -1488,7 +1488,7 @@ fun ApplyStep2Intro(navController: NavController?, padding: PaddingValues) {
                     Column {
                         Text("${actualUser.nome}, ecco cosa dire:", fontWeight = FontWeight.Bold, fontSize = 18.sp)
                         Text("• Presentati\n• Esperienze lavorative\n• Perché SuperSpan?", Modifier.padding(vertical = 10.dp), lineHeight = 24.sp)
-                        Text("Hai 30 secondi.", fontWeight = FontWeight.Bold, color = Color.Red)
+                        Text("Hai 30 secondi.", fontWeight = FontWeight.Bold, color = com.example.superspan.ui.theme.AppError)
                     }
                 }
                 Spacer(Modifier.weight(1f))
@@ -1585,14 +1585,14 @@ fun ApplyStep2Record(navController: NavController?, padding: PaddingValues) {
             LinearProgressIndicator(
                 progress = { seconds / 30f },
                 modifier = Modifier.fillMaxWidth().height(12.dp).padding(top = 10.dp),
-                color = Color.Red,
+                color = com.example.superspan.ui.theme.AppError,
                 trackColor = Color.White.copy(0.2f)
             )
-            Text("REC 00:${seconds.toString().padStart(2, '0')}", Modifier.padding(25.dp).align(Alignment.TopStart), color = Color.Red, fontWeight = FontWeight.Bold)
+            Text("REC 00:${seconds.toString().padStart(2, '0')}", Modifier.padding(25.dp).align(Alignment.TopStart), color = com.example.superspan.ui.theme.AppError, fontWeight = FontWeight.Bold)
         }
 
         if (isRecording) {
-            Box(Modifier.align(Alignment.BottomCenter).padding(bottom = 60.dp).size(80.dp).border(4.dp, Color.White, CircleShape).padding(8.dp).clip(CircleShape).background(Color.Red).clickable {
+            Box(Modifier.align(Alignment.BottomCenter).padding(bottom = 60.dp).size(80.dp).border(4.dp, Color.White, CircleShape).padding(8.dp).clip(CircleShape).background(com.example.superspan.ui.theme.AppError).clickable {
                 if (seconds < 15) { errorMsg = "Video troppo corto! (Min 15s)" }
                 else {
                     activeRecording.value?.stop()

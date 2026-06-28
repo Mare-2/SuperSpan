@@ -80,7 +80,7 @@ fun AdminWorkOfferEditPage(
                     )
                     if (offer != null) {
                         IconButton(onClick = { showDeleteConfirm = true }, modifier = Modifier.align(Alignment.CenterEnd).padding(end = 8.dp)) {
-                            Icon(Icons.Default.Delete, "Elimina", tint = Color.Red)
+                            Icon(Icons.Default.Delete, "Elimina", tint = com.example.superspan.ui.theme.AppError)
                         }
                     }
                 }
@@ -263,7 +263,7 @@ fun AdminWorkOfferEditPage(
                             Toast.makeText(context, "Eliminato con successo", Toast.LENGTH_SHORT).show()
                             navController?.popBackStack()
                         }) {
-                            Text("Elimina", color = Color.Red)
+                            Text("Elimina", color = com.example.superspan.ui.theme.AppError)
                         }
                     },
                     dismissButton = {

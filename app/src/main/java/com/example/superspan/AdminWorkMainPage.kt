@@ -17,6 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -57,7 +58,8 @@ fun AdminWorkMainPage(paddingValues: PaddingValues, navController: NavController
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 12.dp)
-                .background(Color(0xFFE0E0E0), CircleShape)
+                .shadow(4.dp, CircleShape)
+                .background(Color(0xFFEDF7E7), CircleShape)
                 .padding(4.dp)
         ) {
             TabButton("Posizioni Aperte", selectedTabIndex == 0, Modifier.weight(1f)) { selectedTabIndex = 0 }

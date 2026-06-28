@@ -238,7 +238,7 @@ fun AdminCouponEditPage(
                                     Text("Prezzo originario: €${p.prezzo}", fontSize = 14.sp, color = Color(0xFF2E7D32))
                                 }
                                 IconButton(onClick = { selectedProducts.remove(p) }) {
-                                    Icon(Icons.Default.Close, "Rimuovi", tint = Color.Red)
+                                    Icon(Icons.Default.Close, "Rimuovi", tint = com.example.superspan.ui.theme.AppError)
                                 }
                             }
                         }
@@ -353,7 +353,7 @@ fun AdminCouponEditPage(
                             Toast.makeText(context, "Eliminato con successo", Toast.LENGTH_SHORT).show()
                             navController?.popBackStack()
                         }) {
-                            Text("Elimina", color = Color.Red)
+                            Text("Elimina", color = com.example.superspan.ui.theme.AppError)
                         }
                     },
                     dismissButton = {

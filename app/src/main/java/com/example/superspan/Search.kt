@@ -119,7 +119,7 @@ fun ProductCompose(product: Product, navController: NavController?) {
                         modifier = Modifier
                             .align(Alignment.TopStart)
                             .background(
-                                Brush.horizontalGradient(listOf(Color(0xFFFF5252), Color(0xFFD32F2F))),
+                                Brush.horizontalGradient(listOf(Color(0xFF4CAF50), Color(0xFF2E7D32))),
                                 RoundedCornerShape(topStart = 16.dp, bottomEnd = 16.dp)
                             )
                             .padding(horizontal = 10.dp, vertical = 4.dp)
@@ -148,11 +148,11 @@ fun ProductCompose(product: Product, navController: NavController?) {
                         color = Color.Gray,
                         textDecoration = androidx.compose.ui.text.style.TextDecoration.LineThrough
                     )
-                    Surface(color = Color(0xFFD32F2F).copy(alpha = 0.12f), shape = CircleShape) {
+                    Surface(color = Color(0xFF2E7D32).copy(alpha = 0.12f), shape = CircleShape) {
                         Text(
                             text = "€ ${"%.2f".format(discountedPrice)}",
                             modifier = Modifier.padding(horizontal = 10.dp, vertical = 2.dp),
-                            fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color(0xFFD32F2F)
+                            fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32)
                         )
                     }
                 }
@@ -405,21 +405,20 @@ fun SearchPage(
                         }
                     },
                     modifier = Modifier
-                        .height(44.dp) // Leggermente più grande (da 40 a 44)
+                        .height(44.dp)
                         .wrapContentWidth(),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (nomeAttivo) androidx.compose.material3.MaterialTheme.colorScheme.primary else Color.Transparent,
-                        contentColor = if (nomeAttivo) Color.White else Color.DarkGray
+                        containerColor = if (nomeAttivo) com.example.superspan.ui.theme.LogoLeft else Color.White,
+                        contentColor = if (nomeAttivo) Color.White else Color.Gray
                     ),
-                    border = if (!nomeAttivo) BorderStroke(1.dp, Color.LightGray) else null,
+                    border = null,
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 6.dp, pressedElevation = 2.dp),
                     shape = CircleShape,
-                    // Aumentiamo il padding orizzontale per rendere il tasto più "importante"
                     contentPadding = PaddingValues(horizontal = 20.dp)
                 ) {
-                    // Rimosso Row e Spacer: il testo ora si centra automaticamente
                     Text(
                         text = if (nomeAttivo && filterData.ordinamentoNomeCrescente == false) "Z-A" else "A-Z",
-                        fontSize = 13.sp, // Leggermente più grande per Paolo
+                        fontSize = 13.sp,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center
                     )
@@ -441,13 +440,14 @@ fun SearchPage(
                         }
                     },
                     modifier = Modifier
-                        .height(44.dp) // Stessa altezza dell'altro
+                        .height(44.dp)
                         .wrapContentWidth(),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (prezzoAttivo) androidx.compose.material3.MaterialTheme.colorScheme.primary else Color.Transparent,
-                        contentColor = if (prezzoAttivo) Color.White else Color.DarkGray
+                        containerColor = if (prezzoAttivo) com.example.superspan.ui.theme.LogoLeft else Color.White,
+                        contentColor = if (prezzoAttivo) Color.White else Color.Gray
                     ),
-                    border = if (!prezzoAttivo) BorderStroke(1.dp, Color.LightGray) else null,
+                    border = null,
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 6.dp, pressedElevation = 2.dp),
                     shape = CircleShape,
                     contentPadding = PaddingValues(horizontal = 16.dp)
                 ) {
@@ -458,7 +458,7 @@ fun SearchPage(
                         Icon(
                             imageVector = Icons.Default.Payments,
                             contentDescription = null,
-                            modifier = Modifier.size(20.dp) // Icona leggermente più grande
+                            modifier = Modifier.size(20.dp)
                         )
                         Spacer(Modifier.width(8.dp))
                         Text(
@@ -530,7 +530,7 @@ fun FilterPage(modifier: Modifier, filterData: FilterData, onDismiss: () -> Unit
 
     Column(
         modifier = modifier
-            .background(Color(0xFFF8F9FA))
+            .background(com.example.superspan.ui.theme.LogoRight.copy(alpha = 0.03f))
             .verticalScroll(scrollState)
     ) {
         // ── HEADER ──────────────────────────────────────────────────────────
@@ -563,7 +563,7 @@ fun FilterPage(modifier: Modifier, filterData: FilterData, onDismiss: () -> Unit
                     filterData.ordinamento = "Nome"
                     filterData.ordinamentoCrescente = true
                 }) {
-                    Text("Reset", color = Color.Red, fontWeight = FontWeight.SemiBold)
+                    Text("Reset", color = com.example.superspan.ui.theme.AppError, fontWeight = FontWeight.SemiBold)
                 }
             }
         }
@@ -747,55 +747,27 @@ fun FilterPage(modifier: Modifier, filterData: FilterData, padding: PaddingValue
     filterData.minPrice = sliderPosition.start.toDouble()
     filterData.maxPrice = sliderPosition.endInclusive.toDouble()
 
-    Scaffold(
-        modifier = modifier,
-        containerColor = com.example.superspan.ui.theme.LogoCenter.copy(alpha = 0.15f),
-        topBar = {
-            Surface(
-                modifier = Modifier.fillMaxWidth().padding(top = padding.calculateTopPadding() + 8.dp),
-                color = Color.Transparent,
-                shadowElevation = 0.dp
-            ) {
-                Row(
-                    Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(
-                        onClick = onDismiss,
-                        modifier = Modifier.background(Color.White, CircleShape)
-                    ) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
-                    }
-                    Text(
-                        "Filtri",
-                        fontSize = 26.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        modifier = Modifier.padding(start = 12.dp)
-                    )
-                    Spacer(Modifier.weight(1f))
-                    TextButton(
-                        onClick = {
-                            filterData.categorie.clear()
-                            sliderPosition = 0f..absoluteMax
-                            minPriceText = "0.00"
-                            maxPriceText = "%.2f".format(absoluteMax)
-                        },
-                        modifier = Modifier.background(Color.White.copy(alpha = 0.7f), CircleShape)
-                    ) {
-                        Text("Reset", color = Color.Red, fontWeight = FontWeight.SemiBold)
-                    }
-                }
-            }
-        }
-    ) { innerPadding ->
-        Box(Modifier.fillMaxSize()) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color.White)
+            .background(com.example.superspan.ui.theme.LogoRight.copy(alpha = 0.03f))
+    ) {
         Column(
             Modifier
                 .fillMaxSize()
-                .padding(top = innerPadding.calculateTopPadding())
                 .verticalScroll(scrollState)
                 .padding(horizontal = 24.dp, vertical = 16.dp)
         ) {
+            Spacer(Modifier.height(padding.calculateTopPadding() + 64.dp))
+            
+            Text(
+                "Filtri",
+                fontSize = 32.sp,
+                fontWeight = FontWeight.ExtraBold,
+                modifier = Modifier.padding(bottom = 24.dp)
+            )
+
             // --- 2. SEZIONE PREZZO (CARD MODERNA) ---
             Text("Fascia di prezzo", fontSize = 18.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(16.dp))
@@ -941,9 +913,36 @@ fun FilterPage(modifier: Modifier, filterData: FilterData, padding: PaddingValue
                 modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
             )
         }
+
+        // Tasti fissi in alto
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = padding.calculateTopPadding() + 16.dp, start = 16.dp, end = 16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(
+                onClick = onDismiss,
+                modifier = Modifier.background(Color.White.copy(alpha = 0.7f), CircleShape)
+            ) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
+            }
+            TextButton(
+                onClick = {
+                    filterData.categorie.clear()
+                    sliderPosition = 0f..absoluteMax
+                    minPriceText = "0.00"
+                    maxPriceText = "%.2f".format(absoluteMax)
+                },
+                modifier = Modifier.background(Color.White.copy(alpha = 0.7f), CircleShape)
+            ) {
+                Text("Reset", color = com.example.superspan.ui.theme.AppError, fontWeight = FontWeight.SemiBold)
+            }
+        }
     }
 }
-}
+
 
 
 @Preview(showBackground = true)

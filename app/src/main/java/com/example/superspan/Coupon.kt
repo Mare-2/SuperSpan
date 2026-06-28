@@ -521,14 +521,14 @@ fun CouponPageComplete(paddingValues: PaddingValues, navController: NavControlle
                 // 2. STICKY TABS
                 stickyHeader {
                     Surface(
-                        modifier = Modifier.fillMaxWidth(),
-                        color = Color.Transparent
+                        modifier = Modifier.padding(16.dp).height(48.dp),
+                        shape = CircleShape,
+                        color = Color(0xFFEDF7E7),
+                        shadowElevation = 4.dp
                     ) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 20.dp, vertical = 12.dp)
-                                .background(Color(0xFFE0E0E0), CircleShape)
                                 .padding(4.dp)
                         ) {
                             TabButton("I tuoi Coupon", selectedTab == 0, Modifier.weight(1f)) { selectedTab = 0 }
@@ -602,7 +602,7 @@ fun CouponPageComplete(paddingValues: PaddingValues, navController: NavControlle
                             android.widget.Toast.makeText(context, "Eliminato con successo", android.widget.Toast.LENGTH_SHORT).show()
                         }
                     }) {
-                        Text("Elimina", color = Color.Red)
+                        Text("Elimina", color = com.example.superspan.ui.theme.AppError)
                     }
                 },
                 dismissButton = {
@@ -640,14 +640,14 @@ fun TabButton(text: String, isSelected: Boolean, modifier: Modifier, onClick: ()
         ) { onClick() },
         color = if (isSelected) Color.White else Color.Transparent,
         shape = CircleShape,
-        shadowElevation = if (isSelected) 4.dp else 0.dp
+        shadowElevation = if (isSelected) 2.dp else 0.dp
     ) {
         Box(modifier = Modifier.height(40.dp), contentAlignment = Alignment.Center) {
             Text(
                 text = text,
-                fontSize = 14.sp,
-                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                color = if (isSelected) Color.Black else Color.DarkGray
+                fontSize = 15.sp,
+                fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.SemiBold,
+                color = if (isSelected) com.example.superspan.ui.theme.LogoLeft else Color.DarkGray
             )
         }
     }
@@ -708,9 +708,9 @@ fun CouponTicketCard(coupon: Coupon, isHighlighted: Boolean = false, navControll
                             Text("Modifica", color = Color.DarkGray, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                         }
                         TextButton(onClick = onDeleteClick) {
-                            Icon(Icons.Default.Delete, contentDescription = "Elimina", modifier = Modifier.size(16.dp), tint = Color.Red.copy(0.8f))
+                            Icon(Icons.Default.Delete, contentDescription = "Elimina", modifier = Modifier.size(16.dp), tint = com.example.superspan.ui.theme.AppError.copy(0.8f))
                             Spacer(Modifier.width(6.dp))
-                            Text("Elimina", color = Color.Red.copy(0.8f), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            Text("Elimina", color = com.example.superspan.ui.theme.AppError.copy(0.8f), fontSize = 12.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -764,9 +764,9 @@ fun OfferPromoCard(coupon: Coupon, isHighlighted: Boolean = false, navController
                             Text("Modifica", color = Color.DarkGray, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                         }
                         TextButton(onClick = onDeleteClick) {
-                            Icon(Icons.Default.Delete, contentDescription = "Elimina", modifier = Modifier.size(16.dp), tint = Color.Red.copy(0.8f))
+                            Icon(Icons.Default.Delete, contentDescription = "Elimina", modifier = Modifier.size(16.dp), tint = com.example.superspan.ui.theme.AppError.copy(0.8f))
                             Spacer(Modifier.width(6.dp))
-                            Text("Elimina", color = Color.Red.copy(0.8f), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            Text("Elimina", color = com.example.superspan.ui.theme.AppError.copy(0.8f), fontSize = 12.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 }

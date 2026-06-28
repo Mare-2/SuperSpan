@@ -7,6 +7,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Logout
@@ -77,37 +78,27 @@ fun ProfilePage(user: User, navController: NavController?, paddingValues: Paddin
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-            // --- 2. IMMAGINE PROFILO E NOME ---
+            // --- 2. NOME UTENTE ---
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 8.dp), 
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(100.dp)
-                        .clip(CircleShape)
-                        .background(androidx.compose.material3.MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
-                    contentAlignment = Alignment.Center
+                Text("${user.nome} ${user.cognome}", fontSize = 28.sp, fontWeight = FontWeight.ExtraBold)
+                Spacer(modifier = Modifier.height(4.dp))
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.15f)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = null,
-                        modifier = Modifier.size(50.dp),
-                        tint = androidx.compose.material3.MaterialTheme.colorScheme.primary
+                    Text(
+                        text = if (user.admin) "Amministratore" else "Cliente SuperSpan",
+                        color = com.example.superspan.ui.theme.LogoLeft,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 13.sp,
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
                     )
                 }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Text("${user.nome} ${user.cognome}", fontSize = 28.sp, fontWeight = FontWeight.ExtraBold)
-                Text(
-                    text = if (user.admin) "Amministratore" else "Cliente SuperSpan",
-                    color = Color.Gray,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 16.sp
-                )
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -121,30 +112,36 @@ fun ProfilePage(user: User, navController: NavController?, paddingValues: Paddin
                 verticalArrangement = Arrangement.Top
             ) {
                 // Sezione Comune
-                ProfileMenuTile(
-                    icon = Icons.Default.AccountCircle,
-                    title = "Il mio account",
-                    subtitle = "Email e password",
-                    onClick = { navController?.navigate(Destination.ACCOUNT_SUMMARY.route) }
-                )
+                ProfileMenuGroup {
+                    ProfileMenuTile(
+                        icon = Icons.Default.AccountCircle,
+                        title = "Il mio account",
+                        subtitle = "Email e password",
+                        onClick = { navController?.navigate(Destination.ACCOUNT_SUMMARY.route) },
+                        showDivider = false
+                    )
+                }
                 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 if (user.admin) {
                     ProfileSectionTitle("Gestione Negozio")
-                    ProfileMenuTile(Icons.Default.LocalOffer, "Gestione Offerte e Coupon", "Crea o modifica le promozioni") { navController?.navigateTopLevel(Destination.OFFERTE.route) }
-                    Spacer(modifier = Modifier.height(12.dp))
-                    ProfileMenuTile(Icons.Default.Badge, "Revisione Candidature", "Vedi i CV ricevuti") { navController?.navigateTopLevel(Destination.ADMIN_CANDIDACIES.route) }
+                    ProfileMenuGroup {
+                        ProfileMenuTile(Icons.Default.LocalOffer, "Gestione Offerte e Coupon", "Crea o modifica le promozioni", onClick = { navController?.navigateTopLevel(Destination.OFFERTE.route) }, showDivider = true)
+                        ProfileMenuTile(Icons.Default.Badge, "Revisione Candidature", "Vedi i CV ricevuti", onClick = { navController?.navigateTopLevel(Destination.ADMIN_CANDIDACIES.route) }, showDivider = false)
+                    }
                 } else {
                     ProfileSectionTitle("Candidature")
-                    ProfileMenuTile(
-                        icon = Icons.Default.Description,
-                        title = "Dati personali",
-                        subtitle = "Contatti e Curriculum Vitae",
-                        onClick = { navController?.navigate(Destination.PERSONAL_DATA_SUMMARY.route) }
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    ProfileMenuTile(Icons.Default.AssignmentTurnedIn, "Candidature in corso", "Stato delle tue domande") { navController?.navigate(Destination.DRAFTS.route) }
+                    ProfileMenuGroup {
+                        ProfileMenuTile(
+                            icon = Icons.Default.Description,
+                            title = "Dati personali",
+                            subtitle = "Contatti e Curriculum Vitae",
+                            onClick = { navController?.navigate(Destination.PERSONAL_DATA_SUMMARY.route) },
+                            showDivider = true
+                        )
+                        ProfileMenuTile(Icons.Default.AssignmentTurnedIn, "Candidature in corso", "Stato delle tue domande", onClick = { navController?.navigate(Destination.DRAFTS.route) }, showDivider = false)
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(40.dp)) // Spinge il bottone Esci verso il basso
@@ -159,7 +156,11 @@ fun ProfilePage(user: User, navController: NavController?, paddingValues: Paddin
                         },
                         modifier = Modifier.width(180.dp).height(56.dp),
                         shape = RoundedCornerShape(16.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = androidx.compose.material3.MaterialTheme.colorScheme.error)
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = com.example.superspan.ui.theme.AppError.copy(alpha = 0.2f),
+                            contentColor = com.example.superspan.ui.theme.AppError
+                        ),
+                        elevation = ButtonDefaults.buttonElevation(0.dp)
                     ) {
                         Icon(Icons.AutoMirrored.Filled.Logout, null, modifier = Modifier.size(20.dp))
                         Spacer(Modifier.width(8.dp))
@@ -177,7 +178,7 @@ fun ProfileSectionTitle(title: String) {
         text = title,
         fontSize = 18.sp,
         fontWeight = FontWeight.Bold,
-        color = androidx.compose.material3.MaterialTheme.colorScheme.primary,
+        color = com.example.superspan.ui.theme.LogoLeft,
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 8.dp, top = 12.dp, bottom = 4.dp),
@@ -186,25 +187,36 @@ fun ProfileSectionTitle(title: String) {
 }
 
 @Composable
-fun ProfileMenuTile(icon: ImageVector, title: String, subtitle: String, onClick: () -> Unit) {
+fun ProfileMenuGroup(content: @Composable ColumnScope.() -> Unit) {
     Surface(
-        onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         color = Color.White,
         shadowElevation = 2.dp
     ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            content()
+        }
+    }
+}
+
+@Composable
+fun ProfileMenuTile(icon: ImageVector, title: String, subtitle: String, onClick: () -> Unit, showDivider: Boolean = false) {
+    Column {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
                 modifier = Modifier
                     .size(44.dp)
-                    .background(androidx.compose.material3.MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), CircleShape),
+                    .background(com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.1f), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(icon, null, modifier = Modifier.size(24.dp), tint = androidx.compose.material3.MaterialTheme.colorScheme.primary)
+                Icon(icon, null, modifier = Modifier.size(24.dp), tint = com.example.superspan.ui.theme.LogoLeft)
             }
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
@@ -212,6 +224,9 @@ fun ProfileMenuTile(icon: ImageVector, title: String, subtitle: String, onClick:
                 Text(subtitle, fontSize = 13.sp, color = Color.Gray)
             }
             Icon(Icons.Default.ChevronRight, null, tint = Color.LightGray)
+        }
+        if (showDivider) {
+            HorizontalDivider(modifier = Modifier.padding(start = 76.dp, end = 16.dp), color = Color.LightGray.copy(alpha = 0.3f))
         }
     }
 }

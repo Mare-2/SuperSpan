@@ -324,7 +324,7 @@ private fun CouponForm(
                         Text("Prezzo originario: €${p.prezzo}", fontSize = 14.sp, color = Color(0xFF2E7D32))
                     }
                     IconButton(onClick = { selectedProducts.remove(p) }) {
-                        Icon(Icons.Default.Close, "Rimuovi", tint = Color.Red)
+                        Icon(Icons.Default.Close, "Rimuovi", tint = com.example.superspan.ui.theme.AppError)
                     }
                 }
             }
@@ -584,7 +584,7 @@ fun CouponTextField(
     val containerColor = Color.White
 
     val borderColor = when {
-        isError -> Color.Red
+        isError -> com.example.superspan.ui.theme.AppError
         value.isEmpty() -> Color(0xFFFFB74D)
         else -> Color(0xFF81C784)
     }
@@ -607,11 +607,11 @@ fun CouponTextField(
                 unfocusedContainerColor = containerColor,
                 focusedBorderColor = borderColor,
                 unfocusedBorderColor = borderColor.copy(alpha = 0.5f),
-                errorBorderColor = Color.Red
+                errorBorderColor = com.example.superspan.ui.theme.AppError
             )
         )
         if (isError) {
-            Text(errorMessage, color = Color.Red, fontSize = 12.sp, modifier = Modifier.padding(start = 12.dp, top = 4.dp))
+            Text(errorMessage, color = com.example.superspan.ui.theme.AppError, fontSize = 12.sp, modifier = Modifier.padding(start = 12.dp, top = 4.dp))
         }
     }
 }

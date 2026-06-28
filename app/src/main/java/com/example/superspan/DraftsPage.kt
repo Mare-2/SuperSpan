@@ -18,6 +18,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -58,7 +59,8 @@ fun DraftsPage(navController: NavController?, padding: PaddingValues) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 20.dp, vertical = 12.dp)
-                        .background(Color(0xFFE0E0E0), CircleShape)
+                        .shadow(4.dp, CircleShape)
+                        .background(Color(0xFFEDF7E7), CircleShape)
                         .padding(4.dp)
                 ) {
                     TabButton("Bozze", selectedTabIndex == 0, Modifier.weight(1f)) { selectedTabIndex = 0 }
@@ -116,10 +118,10 @@ fun DraftsPage(navController: NavController?, padding: PaddingValues) {
                                             Text("Continua")
                                         }
                                         Spacer(Modifier.width(8.dp))
-                                        OutlinedButton(onClick = { showDeleteConfirmFor = offerId }, colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red)) {
-                                            Icon(Icons.Default.Delete, null, tint = Color.Red)
+                                        OutlinedButton(onClick = { showDeleteConfirmFor = offerId }, colors = ButtonDefaults.outlinedButtonColors(contentColor = com.example.superspan.ui.theme.AppError)) {
+                                            Icon(Icons.Default.Delete, null, tint = com.example.superspan.ui.theme.AppError)
                                             Spacer(Modifier.width(6.dp))
-                                            Text("Elimina", color = Color.Red)
+                                            Text("Elimina", color = com.example.superspan.ui.theme.AppError)
                                         }
                                     }
                                 }
@@ -153,7 +155,7 @@ fun DraftsPage(navController: NavController?, padding: PaddingValues) {
                     TextButton(onClick = {
                         clearCandidacyDraftForOffer(actualUser, idToDelete)
                         showDeleteConfirmFor = null
-                    }) { Text("Elimina", color = Color.Red) }
+                    }) { Text("Elimina", color = com.example.superspan.ui.theme.AppError) }
                 },
                 dismissButton = { TextButton(onClick = { showDeleteConfirmFor = null }) { Text("Annulla") } }
             )

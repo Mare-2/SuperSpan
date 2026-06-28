@@ -6,6 +6,7 @@ import androidx.compose.ui.graphics.Brush
 val LogoLeft = Color(0xFF559CA7)
 val LogoCenter = Color(0xFF72BA8C)
 val LogoRight = Color(0xFF8CD06A)
+val AppError = Color(0xFFE63946)
 
 val AppBackgroundBrush = Brush.verticalGradient(
     colors = listOf(

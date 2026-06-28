@@ -218,7 +218,7 @@ fun IconFail() {
     Icon(
         Icons.Filled.Clear,
         "",
-        tint = Color.Red,
+        tint = com.example.superspan.ui.theme.AppError,
         modifier = Modifier.padding(end = 5.dp)
     )
 }
