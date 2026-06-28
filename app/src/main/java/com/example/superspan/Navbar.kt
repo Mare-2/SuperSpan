@@ -98,7 +98,6 @@ fun Navigation(navController: NavHostController, startDestination: Destination, 
     NavHost(
         navController = navController, 
         startDestination = startDestination.route,
-        modifier = Modifier.imePadding(),
         enterTransition = { androidx.compose.animation.EnterTransition.None },
         exitTransition = { androidx.compose.animation.ExitTransition.None },
         popEnterTransition = { androidx.compose.animation.EnterTransition.None },
@@ -294,6 +293,7 @@ fun MainNavigation() {
     Box(modifier = Modifier.fillMaxSize().background(com.example.superspan.ui.theme.AppBackgroundBrush)) {
         Scaffold(
             containerColor = Color.Transparent,
+            contentWindowInsets = WindowInsets.safeDrawing,
             bottomBar = {
                 if (showBar) {
                     CustomAnimatedBottomBar(currentRoute) { route, isAlreadySelected ->

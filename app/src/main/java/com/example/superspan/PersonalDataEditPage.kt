@@ -61,7 +61,6 @@ fun PersonalDataEditPage(navController: NavController?, padding: PaddingValues) 
         modifier = Modifier
             .fillMaxSize()
             .padding(padding)
-            .background(com.example.superspan.ui.theme.AppBackgroundBrush)
     ) {
         // --- HEADER ---
         Box(
@@ -71,14 +70,17 @@ fun PersonalDataEditPage(navController: NavController?, padding: PaddingValues) 
         ) {
             IconButton(
                 onClick = { navController?.popBackStack() },
-                modifier = Modifier.padding(8.dp)
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .padding(start = 8.dp)
+                    .background(Color.White.copy(alpha = 0.7f), CircleShape)
             ) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = Color.White)
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = Color.Black)
             }
             Text(
                 text = "Modifica Dati",
-                color = Color.White,
-                fontSize = 26.sp,
+                color = Color.Black,
+                fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.align(Alignment.Center)
             )
@@ -153,7 +155,7 @@ fun PersonalDataEditPage(navController: NavController?, padding: PaddingValues) 
                 Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.FileUpload, null, tint = Color.DarkGray)
                     Spacer(Modifier.width(12.dp))
-                    Text(cvName, color = if (cvName.contains("Seleziona")) Color.Gray else Color.Black, fontSize = 15.sp)
+                    Text(cvName.ifEmpty { "Seleziona file PDF" }, color = if (cvName.contains("Seleziona")) Color.Gray else Color.Black, fontSize = 15.sp)
                 }
             }
 
@@ -289,7 +291,6 @@ fun PersonalDataEditPage(navController: NavController?, padding: PaddingValues) 
         modifier = Modifier
             .fillMaxSize()
             .padding(padding)
-            .background(com.example.superspan.ui.theme.AppBackgroundBrush)
     ) {
         // --- HEADER (Senza rettangolo bianco, testo scuro) ---
         Box(
@@ -405,7 +406,7 @@ fun PersonalDataEditPage(navController: NavController?, padding: PaddingValues) 
                 enabled = nome.isNotEmpty() && cognome.isNotEmpty() && isEmailValid && isPhoneValid && telefonoDigits.isNotEmpty(),
                 modifier = Modifier.height(55.dp).width(220.dp),
                 shape = CircleShape,
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF388E3C))
+                colors = ButtonDefaults.buttonColors(containerColor = com.example.superspan.ui.theme.LogoLeft)
             ) {
                 Text("Conferma e Salva", fontSize = 18.sp, fontWeight = FontWeight.Bold)
             }
@@ -427,20 +428,20 @@ fun EditTextField(
     trailingIcon: @Composable (() -> Unit)? = null,
     onValueChange: (String) -> Unit
 ) {
-    // Logica colori per Paolo:
-    // Errore -> Rosso chiarissimo
-    // Vuoto -> Arancione chiarissimo (Attenzione)
-    // Pieno -> Verde chiarissimo (Confermato)
+    // Logica colori:
+    // Errore -> Rosso
+    // Pieno (senza errore) -> Verde
+    // Vuoto -> Grigio (Neutro e moderno)
     val containerColor = when {
         isError -> Color(0xFFFDECEA)
-        value.isEmpty() -> Color(0xFFFFF3E0)
-        else -> Color(0xFFE8F5E9)
+        value.isNotEmpty() -> Color(0xFFF0F9F0)
+        else -> Color(0xFFF5F5F5)
     }
 
     val borderColor = when {
         isError -> com.example.superspan.ui.theme.AppError
-        value.isEmpty() -> Color(0xFFFFB74D)
-        else -> Color(0xFF81C784)
+        value.isNotEmpty() -> Color(0xFF81C784)
+        else -> Color.LightGray
     }
 
     Column(modifier = modifier.padding(vertical = 4.dp)) {

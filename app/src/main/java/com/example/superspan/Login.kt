@@ -56,7 +56,6 @@ fun Login(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(com.example.superspan.ui.theme.AppBackgroundBrush)
             .padding(padding)
     ) {
         Column(

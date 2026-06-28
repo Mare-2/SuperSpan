@@ -20,86 +20,100 @@ import androidx.navigation.NavController
 
 @Composable
 fun AccountSummaryPage(user: User, navController: NavController?, padding: PaddingValues) {
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(padding)
-            .background(com.example.superspan.ui.theme.AppBackgroundBrush)
     ) {
-        // --- HEADER ---
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
+        Column(
+            modifier = Modifier.fillMaxSize()
         ) {
-            // TASTO INDIETRO (A sinistra)
-            IconButton(
-                onClick = { navController?.popBackStack() },
+
+            // --- HEADER (Solo tasto indietro) ---
+            Box(
                 modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .background(Color.White.copy(alpha = 0.7f), CircleShape)
+                    .fillMaxWidth()
+                    .padding(16.dp)
             ) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
+                // TASTO INDIETRO (A sinistra)
+                IconButton(
+                    onClick = { navController?.popBackStack() },
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .background(Color.White.copy(alpha = 0.7f), CircleShape)
+                ) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
+                }
             }
 
             // TITOLI CENTRATI
             Column(
-                modifier = Modifier.align(Alignment.Center),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                     text = "Il mio account",
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color(0xFF1A1A1A)
                 )
                 Text(
                     text = "Credenziali e accessi",
-                    fontSize = 13.sp,
-                    color = Color.Gray,
-                    fontWeight = FontWeight.Medium
+                    fontSize = 16.sp,
+                    color = Color.Gray
                 )
             }
 
-            // TASTO MODIFICA (A destra)
-            Surface(
-                onClick = { navController?.navigate(Destination.ACCOUNT_EDIT.route) },
-                shape = CircleShape,
-                color = Color(0xFF388E3C), // Verde del brand
+            // --- CONTENUTO ---
+            Column(
                 modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .size(42.dp),
-                shadowElevation = 4.dp
+                    .fillMaxSize()
+                    .padding(24.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = "Modifica Account",
-                        tint = Color.White,
-                        modifier = Modifier.size(20.dp)
-                    )
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                        SummarySectionTitle("Dati di base")
+                        SummaryDataRow(Icons.Default.Person, "Nome", user.nome)
+                        SummaryDataRow(Icons.Default.Badge, "Cognome", user.cognome)
+                    }
                 }
+
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                        SummarySectionTitle("Credenziali di accesso")
+                        SummaryDataRow(Icons.Default.Email, "Email di accesso", user.email)
+                        SummaryDataRow(Icons.Default.Lock, "Password", "••••••••") // Mostriamo sempre dei pallini per la password
+                    }
+                }
+                
             }
         }
 
-        // --- CONTENUTO ---
-        Column(
+        // TASTO MODIFICA FAB (In basso a destra)
+        FloatingActionButton(
+            onClick = { navController?.navigate(Destination.ACCOUNT_EDIT.route) },
             modifier = Modifier
-                .padding(24.dp)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+                .align(Alignment.BottomEnd)
+                .padding(24.dp),
+            containerColor = com.example.superspan.ui.theme.LogoLeft,
+            contentColor = Color.White,
+            shape = CircleShape
         ) {
-            SummarySectionTitle("Dati di base")
-
-            SummaryDataRow(Icons.Default.Person, "Nome", user.nome)
-            SummaryDataRow(Icons.Default.Badge, "Cognome", user.cognome)
-
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), thickness = 0.5.dp)
-
-            SummarySectionTitle("Credenziali di accesso")
-            
-            SummaryDataRow(Icons.Default.Email, "Email di accesso", user.email)
-            SummaryDataRow(Icons.Default.Lock, "Password", "••••••••") // Mostriamo sempre dei pallini per la password
+            Icon(Icons.Default.Edit, contentDescription = "Modifica Dati")
         }
     }
 }

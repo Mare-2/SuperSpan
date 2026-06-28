@@ -56,7 +56,6 @@ fun AccountSettingsPage(user: User, navController: NavController?, paddingValues
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .background(com.example.superspan.ui.theme.AppBackgroundBrush)
         ) {
         // --- HEADER (Senza rettangolo bianco, testo scuro) ---
         Box(
@@ -77,59 +76,81 @@ fun AccountSettingsPage(user: User, navController: NavController?, paddingValues
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 25.dp)
+                    .padding(horizontal = 24.dp)
                     .verticalScroll(scrollState),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(Modifier.height(20.dp))
-
-                EditTextField("Nome", nome, KeyboardType.Text) { nome = it }
-                EditTextField("Cognome", cognome, KeyboardType.Text) { cognome = it }
-
-                Spacer(Modifier.height(16.dp))
-                Text("Modifica Password", Modifier.fillMaxWidth(), fontWeight = FontWeight.Bold, color = Color.Gray, fontSize = 14.sp)
                 Spacer(Modifier.height(8.dp))
 
-                // Vecchia Password
-                EditTextField(
-                    label = "Vecchia Password",
-                    value = oldPassword,
-                    keyboardType = KeyboardType.Password,
-                    isError = oldPasswordError,
-                    errorMessage = "Password errata",
-                    visualTransformation = if (oldPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    trailingIcon = {
-                        val image = if (oldPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                        IconButton(onClick = { oldPasswordVisible = !oldPasswordVisible }) {
-                            Icon(imageVector = image, contentDescription = "Mostra/Nascondi")
-                        }
-                    },
-                    onValueChange = { 
-                        oldPassword = it
-                        oldPasswordError = false
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(20.dp)) {
+                        Text("Modifica Dati Personali", Modifier.fillMaxWidth().padding(bottom = 16.dp), fontWeight = FontWeight.Bold, color = com.example.superspan.ui.theme.LogoLeft, fontSize = 14.sp)
+                        EditTextField("Nome", nome, KeyboardType.Text) { nome = it }
+                        Spacer(Modifier.height(16.dp))
+                        EditTextField("Cognome", cognome, KeyboardType.Text) { cognome = it }
                     }
-                )
+                }
 
-                // Nuova Password
-                EditTextField(
-                    label = "Nuova Password",
-                    value = newPassword,
-                    keyboardType = KeyboardType.Password,
-                    isError = newPassword.isNotEmpty() && !isNewPasswordValid,
-                    errorMessage = "La password non rispetta i requisiti",
-                    visualTransformation = if (newPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    trailingIcon = {
-                        val image = if (newPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                        IconButton(onClick = { newPasswordVisible = !newPasswordVisible }) {
-                            Icon(imageVector = image, contentDescription = "Mostra/Nascondi")
+                Spacer(Modifier.height(24.dp))
+
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(20.dp)) {
+                        Text("Modifica Password", Modifier.fillMaxWidth().padding(bottom = 16.dp), fontWeight = FontWeight.Bold, color = com.example.superspan.ui.theme.LogoLeft, fontSize = 14.sp)
+
+                        // Vecchia Password
+                        EditTextField(
+                            label = "Vecchia Password",
+                            value = oldPassword,
+                            keyboardType = KeyboardType.Password,
+                            isError = oldPasswordError,
+                            errorMessage = "Password errata",
+                            visualTransformation = if (oldPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                            trailingIcon = {
+                                val image = if (oldPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                                IconButton(onClick = { oldPasswordVisible = !oldPasswordVisible }) {
+                                    Icon(imageVector = image, contentDescription = "Mostra/Nascondi")
+                                }
+                            },
+                            onValueChange = { 
+                                oldPassword = it
+                                oldPasswordError = false
+                            }
+                        )
+
+                        Spacer(Modifier.height(16.dp))
+
+                        if (newPassword.isNotEmpty()) {
+                            CheckPassword(password = newPassword) { isNewPasswordValid = it }
+                            Spacer(Modifier.height(8.dp))
                         }
-                    },
-                    onValueChange = { newPassword = it }
-                )
 
-                if (newPassword.isNotEmpty()) {
-                    Spacer(Modifier.height(8.dp))
-                    CheckPassword(password = newPassword) { isNewPasswordValid = it }
+                        // Nuova Password
+                        EditTextField(
+                            label = "Nuova Password",
+                            value = newPassword,
+                            keyboardType = KeyboardType.Password,
+                            isError = newPassword.isNotEmpty() && !isNewPasswordValid,
+                            errorMessage = "La password non rispetta i requisiti",
+                            visualTransformation = if (newPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                            trailingIcon = {
+                                val image = if (newPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                                IconButton(onClick = { newPasswordVisible = !newPasswordVisible }) {
+                                    Icon(imageVector = image, contentDescription = "Mostra/Nascondi")
+                                }
+                            },
+                            onValueChange = { newPassword = it }
+                        )
+                    }
                 }
 
                 Spacer(Modifier.height(30.dp))
@@ -146,7 +167,7 @@ fun AccountSettingsPage(user: User, navController: NavController?, paddingValues
                     enabled = canSave,
                     modifier = Modifier.fillMaxWidth().height(55.dp),
                     shape = CircleShape,
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF388E3C))
+                    colors = ButtonDefaults.buttonColors(containerColor = com.example.superspan.ui.theme.LogoLeft)
                 ) {
                     Text("Salva Modifiche", fontSize = 18.sp, fontWeight = FontWeight.Bold)
                 }
@@ -174,7 +195,7 @@ fun AccountSettingsPage(user: User, navController: NavController?, paddingValues
                             android.widget.Toast.makeText(context, "Dati salvati con successo!", android.widget.Toast.LENGTH_SHORT).show()
                         }
                     }) {
-                        Text("Salva", color = Color(0xFF388E3C))
+                        Text("Salva", color = com.example.superspan.ui.theme.LogoLeft)
                     }
                 },
                 dismissButton = {

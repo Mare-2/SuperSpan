@@ -28,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -105,11 +106,22 @@ fun FormPassword(
 ) {
     var password by rememberSaveable { mutableStateOf("") }
     var confirmPassword by rememberSaveable { mutableStateOf("") }
-    var check by rememberSaveable { mutableStateOf(false) }
+    var isPasswordStrong by rememberSaveable { mutableStateOf(false) }
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
     var confirmPasswordVisible by rememberSaveable { mutableStateOf(false) }
     
+    val doPasswordsMatch = password.isNotEmpty() && confirmPassword.isNotEmpty() && password == confirmPassword
+    
+    // Notifichiamo all'esterno se il form è valido
+    LaunchedEffect(isPasswordStrong, doPasswordsMatch) {
+        checking(isPasswordStrong && doPasswordsMatch)
+    }
+    
     Column(modifier = Modifier.padding(horizontal = 25.dp)) {
+        // Controllo della password visibile prima del campo
+        CheckPassword(password, { isPasswordStrong = it })
+        Spacer(Modifier.size(16.dp))
+        
         EditTextField(
             label = "Password",
             value = password,
@@ -127,6 +139,7 @@ fun FormPassword(
                 onPasswordChange(password)
             }
         )
+
         EditTextField(
             label = "Confirm Password",
             value = confirmPassword,
@@ -143,11 +156,8 @@ fun FormPassword(
             },
             onValueChange = {
                 confirmPassword = it
-                check = password.isNotEmpty() && confirmPassword.isNotEmpty() && password == confirmPassword
-                checking(check)
             }
         )
-        CheckPassword(password, {check = it})
 
         Spacer(Modifier.size(50.dp))
     }
@@ -172,51 +182,113 @@ fun CheckPassword(
     check = upperCase && minLen && digitChar && specialChar
     checking(check)
 
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 15.dp).clip(RoundedCornerShape(10.dp)).background(Color.LightGray),
-        horizontalArrangement = Arrangement.spacedBy(30.dp)
+    val score = listOf(upperCase, minLen, specialChar, digitChar).count { it }
 
+    val strengthText = when (score) {
+        0 -> "Troppo debole"
+        1 -> "Debole"
+        2 -> "Media"
+        3 -> "Buona"
+        4 -> "Forte"
+        else -> ""
+    }
+    
+    val strengthColor = when (score) {
+        0, 1 -> com.example.superspan.ui.theme.AppError
+        2 -> Color(0xFFFFB74D) // Orange
+        3 -> Color(0xFF81C784) // Light green
+        4 -> Color(0xFF388E3C) // Dark green
+        else -> Color.LightGray
+    }
+
+    androidx.compose.material3.Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        color = Color(0xFFF9F9F9),
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFE0E0E0))
     ) {
-        Column(Modifier.weight(1f)) {
-            PasswordCheckItem(minLen, "Almeno 8 caratteri")
-            Spacer(Modifier.size(5.dp))
-            PasswordCheckItem(specialChar, "Almeno un carattere speciale")
-        }
-        Column(Modifier.weight(1f)) {
-            PasswordCheckItem(upperCase, "Almeno una lettera maiuscola")
-            Spacer(Modifier.size(5.dp))
-            PasswordCheckItem(digitChar, "Almeno una cifra")
+        Column(modifier = Modifier.padding(16.dp)) {
+            // Animated Progress Bar
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = "Forza Password: ", 
+                    fontSize = 13.sp, 
+                    color = Color.DarkGray,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    text = strengthText, 
+                    fontSize = 13.sp, 
+                    color = strengthColor,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            Spacer(Modifier.height(8.dp))
+            
+            val animatedProgress by androidx.compose.animation.core.animateFloatAsState(
+                targetValue = score / 4f, 
+                animationSpec = androidx.compose.animation.core.tween(durationMillis = 300)
+            )
+            
+            androidx.compose.material3.LinearProgressIndicator(
+                progress = animatedProgress,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(6.dp)
+                    .clip(RoundedCornerShape(3.dp)),
+                color = strengthColor,
+                trackColor = Color(0xFFE0E0E0)
+            )
+
+            Spacer(Modifier.height(16.dp))
+            
+            // Checklist
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        PasswordCheckItem(minLen, "Almeno 8 caratteri")
+                        PasswordCheckItem(specialChar, "Almeno 1 carattere speciale")
+                    }
+                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        PasswordCheckItem(upperCase, "Almeno 1 maiuscola")
+                        PasswordCheckItem(digitChar, "Almeno 1 numero")
+                    }
+                }
+            }
         }
     }
 }
 
 @Composable
-fun IconOk() {
-    Icon(
-        Icons.Filled.Check,
-        "",
-        tint = Color.Green,
-        modifier = Modifier.padding(end = 5.dp)
-    )
-}
-
-@Composable
-fun IconFail() {
-    Icon(
-        Icons.Filled.Clear,
-        "",
-        tint = com.example.superspan.ui.theme.AppError,
-        modifier = Modifier.padding(end = 5.dp)
-    )
-}
-
-@Composable
 fun PasswordCheckItem(condition: Boolean, text: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        if(condition) IconOk()
-        else IconFail()
-        Spacer(Modifier.size(7.dp))
-        Text(text, fontSize = 11.sp, lineHeight = 14.sp)
+        if(condition) {
+            Icon(
+                Icons.Filled.Check,
+                contentDescription = null,
+                tint = Color(0xFF388E3C),
+                modifier = Modifier.size(16.dp)
+            )
+        } else {
+            // Empty dot
+            Box(
+                modifier = Modifier
+                    .size(16.dp)
+                    .clip(androidx.compose.foundation.shape.CircleShape)
+                    .background(Color(0xFFE0E0E0)),
+                contentAlignment = Alignment.Center
+            ) {
+                Box(modifier = Modifier.size(6.dp).clip(androidx.compose.foundation.shape.CircleShape).background(Color.White))
+            }
+        }
+        Spacer(Modifier.width(8.dp))
+        Text(
+            text = text, 
+            fontSize = 12.sp, 
+            color = if (condition) Color.DarkGray else Color.Gray,
+            fontWeight = if (condition) FontWeight.Medium else FontWeight.Normal,
+            lineHeight = 14.sp
+        )
     }
 }
 

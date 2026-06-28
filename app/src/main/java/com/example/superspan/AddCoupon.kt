@@ -83,7 +83,7 @@ fun AddCoupon(paddingValues: PaddingValues, navController: NavController?) {
     var pendingCouponSave by remember { mutableStateOf<Coupon?>(null) }
     val context = LocalContext.current
 
-    Box(modifier = Modifier.fillMaxSize().background(com.example.superspan.ui.theme.AppBackgroundBrush)) {
+    Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .padding(paddingValues)
