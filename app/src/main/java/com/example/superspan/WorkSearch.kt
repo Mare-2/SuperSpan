@@ -400,8 +400,8 @@ fun WorkFilterPage(modifier: Modifier, filterData: WorkFilterData, padding: Padd
                             filterData.ruoli.clear()
                             filterData.tipiContratto.clear()
                             filterData.orari.clear()
-                            filterData.distanzaMax = 50f
-                            tuttaItalia = false
+                            filterData.distanzaMax = 1000f
+                            tuttaItalia = true
                         },
                         modifier = Modifier.background(Color.White.copy(alpha = 0.7f), CircleShape)
                     ) {
