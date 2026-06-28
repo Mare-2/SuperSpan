@@ -34,20 +34,19 @@ fun AccountSettingsPage(user: User, navController: NavController?, paddingValues
     var cognome by remember { mutableStateOf(user.cognome) }
     var email by remember { mutableStateOf(user.email) }
     var oldPassword by remember { mutableStateOf("") }
-    var newPassword by remember { mutableStateOf(user.password) }
+    var newPassword by remember { mutableStateOf("") }
     
     var oldPasswordVisible by remember { mutableStateOf(false) }
     var newPasswordVisible by remember { mutableStateOf(false) }
+    var oldPasswordError by remember { mutableStateOf(false) }
     var showSaveConfirm by remember { mutableStateOf(false) }
+    var isNewPasswordValid by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
     val context = androidx.compose.ui.platform.LocalContext.current
 
-    val isOldPasswordValid = oldPassword == user.password || oldPassword.isEmpty()
-
     // Controllo abilitazione tasto salva
-    val canSave = nome.isNotBlank() && cognome.isNotBlank() && 
-                  (oldPassword.isEmpty() || oldPassword == user.password)
+    val canSave = nome.isNotBlank() && cognome.isNotBlank() && (newPassword.isEmpty() || isNewPasswordValid)
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -96,7 +95,7 @@ fun AccountSettingsPage(user: User, navController: NavController?, paddingValues
                     label = "Vecchia Password",
                     value = oldPassword,
                     keyboardType = KeyboardType.Password,
-                    isError = oldPassword.isNotEmpty() && oldPassword != user.password,
+                    isError = oldPasswordError,
                     errorMessage = "Password errata",
                     visualTransformation = if (oldPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
@@ -105,7 +104,10 @@ fun AccountSettingsPage(user: User, navController: NavController?, paddingValues
                             Icon(imageVector = image, contentDescription = "Mostra/Nascondi")
                         }
                     },
-                    onValueChange = { oldPassword = it }
+                    onValueChange = { 
+                        oldPassword = it
+                        oldPasswordError = false
+                    }
                 )
 
                 // Nuova Password
@@ -113,6 +115,8 @@ fun AccountSettingsPage(user: User, navController: NavController?, paddingValues
                     label = "Nuova Password",
                     value = newPassword,
                     keyboardType = KeyboardType.Password,
+                    isError = newPassword.isNotEmpty() && !isNewPasswordValid,
+                    errorMessage = "La password non rispetta i requisiti",
                     visualTransformation = if (newPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
                         val image = if (newPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
@@ -123,11 +127,22 @@ fun AccountSettingsPage(user: User, navController: NavController?, paddingValues
                     onValueChange = { newPassword = it }
                 )
 
+                if (newPassword.isNotEmpty()) {
+                    Spacer(Modifier.height(8.dp))
+                    CheckPassword(password = newPassword) { isNewPasswordValid = it }
+                }
+
                 Spacer(Modifier.height(30.dp))
 
                 // TASTO SALVA
                 Button(
-                    onClick = { showSaveConfirm = true },
+                    onClick = { 
+                        if ((oldPassword.isNotEmpty() || newPassword.isNotEmpty()) && oldPassword != user.password) {
+                            oldPasswordError = true
+                        } else {
+                            showSaveConfirm = true 
+                        }
+                    },
                     enabled = canSave,
                     modifier = Modifier.fillMaxWidth().height(55.dp),
                     shape = CircleShape,

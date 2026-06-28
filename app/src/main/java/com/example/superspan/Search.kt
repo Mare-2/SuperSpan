@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -281,6 +282,38 @@ fun SearchPage(
                             cursorColor = com.example.superspan.ui.theme.LogoLeft
                         )
                     )
+                }
+            }
+        }
+
+        val maxPossiblePrice = filterData.maxPossiblePrice()
+        val hasActiveFilters = filterData.categorie.isNotEmpty() || filterData.minPrice > 0.0 || filterData.maxPrice < maxPossiblePrice
+
+        if (hasActiveFilters) {
+            item {
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, top = 12.dp, end = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    if (filterData.minPrice > 0.0 || filterData.maxPrice < maxPossiblePrice) {
+                        item {
+                            FilterChipCustom(
+                                text = "€ ${"%.2f".format(filterData.minPrice)} - € ${"%.2f".format(filterData.maxPrice)}",
+                                onRemove = { 
+                                    filterData.minPrice = 0.0
+                                    filterData.maxPrice = maxPossiblePrice.toDouble()
+                                }
+                            )
+                        }
+                    }
+                    items(filterData.categorie.toList()) { cat ->
+                        FilterChipCustom(
+                            text = cat.nome,
+                            onRemove = { filterData.categorie.remove(cat) }
+                        )
+                    }
                 }
             }
         }
