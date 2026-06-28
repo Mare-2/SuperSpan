@@ -141,7 +141,7 @@ fun WorkOfferPage(offer: WorkOffer?, navController: NavController?, paddingValue
         ) {
             IconButton(
                 onClick = { navController?.popBackStack() },
-                modifier = Modifier.size(48.dp)
+                modifier = Modifier.size(48.dp).background(Color.White.copy(alpha = 0.7f), CircleShape)
             ) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = Color.Black)
             }

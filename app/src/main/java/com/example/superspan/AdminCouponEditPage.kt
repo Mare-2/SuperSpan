@@ -125,7 +125,13 @@ fun AdminCouponEditPage(
                         .fillMaxWidth()
                         .padding(top = 80.dp, bottom = 16.dp)
                 ) {
-                    IconButton(onClick = { navController?.popBackStack() }, modifier = Modifier.align(Alignment.CenterStart).padding(start = 8.dp)) {
+                    IconButton(
+                        onClick = { navController?.popBackStack() }, 
+                        modifier = Modifier
+                            .align(Alignment.CenterStart)
+                            .padding(start = 8.dp)
+                            .background(androidx.compose.ui.graphics.Color.White.copy(alpha = 0.7f), androidx.compose.foundation.shape.CircleShape)
+                    ) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = Color.Black)
                     }
                     if (existingCoupon != null) {

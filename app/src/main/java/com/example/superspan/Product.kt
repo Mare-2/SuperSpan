@@ -292,7 +292,7 @@ fun ProductPage(product: Product?, navController: NavController?, paddingValues:
             onClick = { navController?.popBackStack() },
             modifier = Modifier
                 .padding(top = 16.dp + paddingValues.calculateTopPadding(), start = 16.dp)
-                .background(Color.White.copy(alpha = 0.8f), androidx.compose.foundation.shape.CircleShape)
+                .background(Color.White.copy(alpha = 0.7f), androidx.compose.foundation.shape.CircleShape)
                 .size(48.dp)
         ) {
             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.Black)

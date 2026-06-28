@@ -1,6 +1,7 @@
 package com.example.superspan
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,51 +30,42 @@ fun AdminWorkMainPage(paddingValues: PaddingValues, navController: NavController
     var selectedTabIndex by remember { mutableStateOf(initialTab) }
     val tabs = listOf("Posizioni Aperte", "Candidature")
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(paddingValues)
+            .padding(top = paddingValues.calculateTopPadding())
     ) {
-        // Header in comune
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 24.dp, bottom = 12.dp),
-            horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "Lavora con noi!",
-                fontSize = 32.sp,
-                fontWeight = FontWeight.ExtraBold
-            )
-            Text(
-                text = "Trova la posizione adatta a te",
-                fontSize = 16.sp,
-                color = Color.Gray
-            )
-        }
-
-        // Switch
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 12.dp)
-                .shadow(4.dp, CircleShape)
-                .background(Color(0xFFEDF7E7), CircleShape)
-                .padding(4.dp)
-        ) {
-            TabButton("Posizioni Aperte", selectedTabIndex == 0, Modifier.weight(1f)) { selectedTabIndex = 0 }
-            TabButton("Candidature", selectedTabIndex == 1, Modifier.weight(1f)) { selectedTabIndex = 1 }
+        val sliderContent: @Composable () -> Unit = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 20.dp, end = 20.dp, top = 28.dp, bottom = 12.dp)
+                    .shadow(4.dp, CircleShape)
+                    .background(Color(0xFFEDF7E7), CircleShape)
+                    .padding(4.dp)
+            ) {
+                TabButton("Posizioni Aperte", selectedTabIndex == 0, Modifier.weight(1f)) { selectedTabIndex = 0 }
+                TabButton("Candidature", selectedTabIndex == 1, Modifier.weight(1f)) { selectedTabIndex = 1 }
+            }
         }
 
         when (selectedTabIndex) {
             0 -> {
                 // Posizioni Aperte
-                WorkSearchPageComplete(padding = PaddingValues(0.dp), navController = navController, hideHeader = true)
+                WorkSearchPageComplete(
+                    padding = paddingValues,
+                    navController = navController,
+                    hideHeader = false,
+                    sliderContent = sliderContent
+                )
             }
             1 -> {
                 // Candidature
-                AdminCandidaciesPage(navController = navController, paddingValues = PaddingValues(0.dp))
+                AdminCandidaciesPage(
+                    navController = navController,
+                    paddingValues = paddingValues,
+                    sliderContent = sliderContent
+                )
             }
         }
     }

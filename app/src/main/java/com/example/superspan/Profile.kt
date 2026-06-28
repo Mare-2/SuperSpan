@@ -42,7 +42,6 @@ fun ProfilePage(user: User, navController: NavController?, paddingValues: Paddin
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(com.example.superspan.ui.theme.AppBackgroundBrush)
             .verticalScroll(scrollState)
     ) {
         // --- 1. HEADER (Solo Logo, senza sfondo bianco) ---

@@ -24,11 +24,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.ExperimentalFoundationApi
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DraftsPage(navController: NavController?, padding: PaddingValues) {
-    val scrollState = rememberScrollState()
-    
     var selectedTabIndex by remember { mutableStateOf(0) }
     
     // Lista di coppie (offerId -> DraftWork)
@@ -40,53 +42,57 @@ fun DraftsPage(navController: NavController?, padding: PaddingValues) {
     var showDeleteConfirmFor by remember { mutableStateOf<Int?>(null) }
 
     Box(Modifier.fillMaxSize().padding(padding)) {
-        Column(Modifier.fillMaxSize()) {
-            // Header
-            Row(Modifier.fillMaxWidth().padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = { navController?.popBackStack() }) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(bottom = 120.dp)
+        ) {
+            item {
+                // Header
+                Row(Modifier.fillMaxWidth().padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(onClick = { navController?.popBackStack() }, modifier = Modifier.background(androidx.compose.ui.graphics.Color.White.copy(alpha = 0.7f), androidx.compose.foundation.shape.CircleShape)) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
+                    }
+                    Spacer(Modifier.width(8.dp))
+                    Text("Le tue Candidature", fontSize = 20.sp, fontWeight = FontWeight.ExtraBold)
                 }
-                Spacer(Modifier.width(8.dp))
-                Text("Le tue Candidature", fontSize = 20.sp, fontWeight = FontWeight.ExtraBold)
             }
             
-            // Tabs
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                color = Color.Transparent
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 12.dp)
-                        .shadow(4.dp, CircleShape)
-                        .background(Color(0xFFEDF7E7), CircleShape)
-                        .padding(4.dp)
+            stickyHeader {
+                // Tabs
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = Color.Transparent
                 ) {
-                    TabButton("Bozze", selectedTabIndex == 0, Modifier.weight(1f)) { selectedTabIndex = 0 }
-                    TabButton("Inviate", selectedTabIndex == 1, Modifier.weight(1f)) { selectedTabIndex = 1 }
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp, vertical = 12.dp)
+                            .shadow(4.dp, CircleShape)
+                            .background(Color(0xFFEDF7E7), CircleShape)
+                            .padding(4.dp)
+                    ) {
+                        TabButton("Bozze", selectedTabIndex == 0, Modifier.weight(1f)) { selectedTabIndex = 0 }
+                        TabButton("Inviate", selectedTabIndex == 1, Modifier.weight(1f)) { selectedTabIndex = 1 }
+                    }
                 }
             }
 
-            // Parabola / area contenuto
-            Column(
-                Modifier
-                    .fillMaxSize()
-                    .padding(top = 8.dp)
-                    .verticalScroll(scrollState)
-                    .padding(16.dp)
-            ) {
-                if (selectedTabIndex == 0) {
-                    // --- BOZZE ---
-                    if (draftsList.isEmpty()) {
-                        Spacer(Modifier.height(40.dp))
-                        Text("Nessuna bozza salvata.", color = Color.Gray, modifier = Modifier.align(Alignment.CenterHorizontally))
-                    } else {
-                        draftsList.forEach { entry ->
-                            val offerId = entry.key
-                            val draft = entry.value
-                            val offer = WorkOfferSearchList.find { it.id == offerId }
+            if (selectedTabIndex == 0) {
+                // --- BOZZE ---
+                if (draftsList.isEmpty()) {
+                    item {
+                        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                            Spacer(Modifier.height(40.dp))
+                            Text("Nessuna bozza salvata.", color = Color.Gray)
+                        }
+                    }
+                } else {
+                    items(draftsList) { entry ->
+                        val offerId = entry.key
+                        val draft = entry.value
+                        val offer = WorkOfferSearchList.find { it.id == offerId }
 
+                        Box(modifier = Modifier.padding(horizontal = 16.dp)) {
                             Surface(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -106,8 +112,6 @@ fun DraftsPage(navController: NavController?, padding: PaddingValues) {
                                     Spacer(Modifier.height(12.dp))
                                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                                         TextButton(onClick = {
-                                            // Continua: popola currentDraft e vai allo step 1
-                                            // Continua: popola currentDraft e vai allo step salvato
                                             currentDraft = draft.copy()
                                             currentOfferIdApplying = offerId
                                             candidacySourceRoute = Destination.DRAFTS.route
@@ -128,20 +132,24 @@ fun DraftsPage(navController: NavController?, padding: PaddingValues) {
                             }
                         }
                     }
-                } else {
-                    // --- INVIATE ---
-                    if (submittedList.isEmpty()) {
-                        Spacer(Modifier.height(40.dp))
-                        Text("Nessuna candidatura inviata.", color = Color.Gray, modifier = Modifier.align(Alignment.CenterHorizontally))
-                    } else {
-                        submittedList.forEach { candidacy ->
-                            SubmittedCandidacyCard(candidacy)
-                            Spacer(Modifier.height(12.dp))
+                }
+            } else {
+                // --- INVIATE ---
+                if (submittedList.isEmpty()) {
+                    item {
+                        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                            Spacer(Modifier.height(40.dp))
+                            Text("Nessuna candidatura inviata.", color = Color.Gray)
                         }
                     }
+                } else {
+                    items(submittedList) { candidacy ->
+                        Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                            SubmittedCandidacyCard(candidacy)
+                        }
+                        Spacer(Modifier.height(12.dp))
+                    }
                 }
-
-                Spacer(Modifier.height(120.dp))
             }
         }
 

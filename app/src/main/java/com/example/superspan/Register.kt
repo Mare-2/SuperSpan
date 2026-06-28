@@ -73,7 +73,7 @@ fun Register(
                     text = "Benvenuto!",
                     fontSize = 32.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    color = androidx.compose.material3.MaterialTheme.colorScheme.primary
+                    color = com.example.superspan.ui.theme.LogoLeft
                 )
                 Text(
                     text = "Crea un nuovo account",
@@ -106,9 +106,9 @@ fun Register(
                         modifier = Modifier
                             .width(180.dp)
                             .height(56.dp),
-                        shape = RoundedCornerShape(16.dp),
+                        shape = androidx.compose.foundation.shape.CircleShape,
                         colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                            containerColor = androidx.compose.material3.MaterialTheme.colorScheme.primary
+                            containerColor = com.example.superspan.ui.theme.LogoLeft
                         )
                     ) { 
                         Text("Registrati", fontSize = 18.sp, fontWeight = FontWeight.Bold) 
@@ -132,7 +132,7 @@ fun Register(
                         Text(
                             "Accedi", 
                             fontWeight = FontWeight.Bold, 
-                            color = androidx.compose.material3.MaterialTheme.colorScheme.primary
+                            color = com.example.superspan.ui.theme.LogoLeft
                         )
                     }
                 }
@@ -203,9 +203,9 @@ fun FormDati(
                 .align(Alignment.CenterHorizontally)
                 .padding(bottom = 15.dp)
                 .height(56.dp),
-            shape = RoundedCornerShape(16.dp),
+            shape = androidx.compose.foundation.shape.CircleShape,
             colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                containerColor = androidx.compose.material3.MaterialTheme.colorScheme.primary
+                containerColor = com.example.superspan.ui.theme.LogoLeft
             )
         ) {
             Text("Avanti", fontSize = 18.sp, fontWeight = FontWeight.Bold)

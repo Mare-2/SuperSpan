@@ -56,7 +56,7 @@ fun SearchPageComplete(
     var showFilters by remember { mutableStateOf(false) }
     val filterData by remember { mutableStateOf(FilterData()) }
 
-    Box(modifier = Modifier.fillMaxSize().background(com.example.superspan.ui.theme.AppBackgroundBrush)) {
+    Box(modifier = Modifier.fillMaxSize()) {
         if (!showFilters) {
             SearchPage(navController, filterData, padding) { showFilters = true }
         } else {
@@ -545,7 +545,7 @@ fun FilterPage(modifier: Modifier, filterData: FilterData, onDismiss: () -> Unit
                     .padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = onDismiss) {
+                IconButton(onClick = onDismiss, modifier = Modifier.background(Color.White.copy(alpha = 0.7f), androidx.compose.foundation.shape.CircleShape)) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
                 }
                 Text(

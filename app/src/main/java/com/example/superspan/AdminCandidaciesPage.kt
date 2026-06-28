@@ -18,6 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.compose.foundation.layout.Box
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.ui.platform.LocalContext
@@ -26,9 +27,9 @@ import java.io.File
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.style.TextAlign
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class, androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
-fun AdminCandidaciesPage(navController: NavController?, paddingValues: PaddingValues) {
+fun AdminCandidaciesPage(navController: NavController?, paddingValues: PaddingValues, sliderContent: (@Composable () -> Unit)? = null) {
     // Stati per i filtri
     var selectedRole by remember { mutableStateOf<Role?>(null) }
     var selectedSupermarket by remember { mutableStateOf<Supermarket?>(null) }
@@ -64,17 +65,36 @@ fun AdminCandidaciesPage(navController: NavController?, paddingValues: PaddingVa
             }
         )
     } else {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(bottom = paddingValues.calculateBottomPadding() + 32.dp)
         ) {
-            // --- SEZIONE FILTRI ---
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                elevation = CardDefaults.cardElevation(2.dp)
+            item {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 64.dp, bottom = 24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text("Lavora con noi!", fontSize = 32.sp, fontWeight = FontWeight.ExtraBold)
+                    Text("Gestione Candidature", fontSize = 16.sp, color = Color.Gray)
+                }
+            }
+
+            if (sliderContent != null) {
+                stickyHeader {
+                    sliderContent()
+                }
+            }
+
+            item {
+                // --- SEZIONE FILTRI ---
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    elevation = CardDefaults.cardElevation(2.dp)
             ) {
                 Column(Modifier.padding(16.dp)) {
                     Row(
@@ -146,20 +166,20 @@ fun AdminCandidaciesPage(navController: NavController?, paddingValues: PaddingVa
                             }
                         )
                     }
+                    }
                 }
             }
 
             // --- LISTA CANDIDATURE ---
             if (filteredCandidacies.isEmpty()) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Nessuna candidatura trovata", color = Color.Gray)
+                item {
+                    Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
+                        Text("Nessuna candidatura trovata", color = Color.Gray)
+                    }
                 }
             } else {
-                LazyColumn(
-                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = paddingValues.calculateBottomPadding() + 32.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(filteredCandidacies) { candidacy ->
+                items(filteredCandidacies) { candidacy ->
+                    Box(Modifier.padding(horizontal = 16.dp, vertical = 6.dp)) {
                         CandidacyAdminCard(candidacy)
                     }
                 }

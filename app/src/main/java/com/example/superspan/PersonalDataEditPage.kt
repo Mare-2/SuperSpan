@@ -297,7 +297,7 @@ fun PersonalDataEditPage(navController: NavController?, padding: PaddingValues) 
                 .fillMaxWidth()
                 .padding(top = 80.dp, bottom = 16.dp)
         ) {
-            IconButton(onClick = { navController?.popBackStack() }, modifier = Modifier.align(Alignment.CenterStart).padding(start = 8.dp)) {
+            IconButton(onClick = { navController?.popBackStack() }, modifier = Modifier.align(Alignment.CenterStart).padding(start = 8.dp).background(Color.White.copy(alpha = 0.7f), CircleShape)) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = Color.Black)
             }
             Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {

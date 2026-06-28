@@ -84,7 +84,7 @@ fun Login(
                     text = "Bentornato!",
                     fontSize = 32.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    color = androidx.compose.material3.MaterialTheme.colorScheme.primary
+                    color = com.example.superspan.ui.theme.LogoLeft
                 )
                 Text(
                     text = "Accedi al tuo account per continuare",
@@ -145,9 +145,9 @@ fun Login(
                     modifier = Modifier
                         .width(180.dp)
                         .height(56.dp),
-                    shape = RoundedCornerShape(16.dp),
+                    shape = androidx.compose.foundation.shape.CircleShape,
                     colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                        containerColor = androidx.compose.material3.MaterialTheme.colorScheme.primary
+                        containerColor = com.example.superspan.ui.theme.LogoLeft
                     )
                 ) { 
                     Text(text, fontSize = 18.sp, fontWeight = FontWeight.Bold) 
@@ -170,7 +170,7 @@ fun Login(
                         Text(
                             "Registrati", 
                             fontWeight = FontWeight.Bold, 
-                            color = androidx.compose.material3.MaterialTheme.colorScheme.primary
+                            color = com.example.superspan.ui.theme.LogoLeft
                         )
                     }
                 }

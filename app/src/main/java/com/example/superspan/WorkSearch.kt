@@ -40,11 +40,13 @@ val globalWorkFilterData = WorkFilterData().apply {
     distanzaMax = 1000f // Mostra tutto all'inizio
 }
 
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun WorkSearchPageComplete(
     padding: PaddingValues,
     navController: NavController?,
-    hideHeader: Boolean = false
+    hideHeader: Boolean = false,
+    sliderContent: (@Composable () -> Unit)? = null
 ) {
     var enabled by remember { mutableStateOf(false) }
 
@@ -54,7 +56,7 @@ fun WorkSearchPageComplete(
     val snackbarHostState = remember { SnackbarHostState() }
     val listState = rememberLazyListState()
 
-    Box(modifier = Modifier.fillMaxSize().background(com.example.superspan.ui.theme.AppBackgroundBrush)) {
+    Box(modifier = Modifier.fillMaxSize()) {
         if (!enabled) {
             WorkSearchPage(
                 navController = navController,
@@ -63,6 +65,7 @@ fun WorkSearchPageComplete(
                 snackbarHostState = snackbarHostState,
                 padding = padding,
                 hideHeader = hideHeader,
+                sliderContent = sliderContent,
                 onOpenFilters = { enabled = true }
             )
         } else {
@@ -82,8 +85,9 @@ fun WorkSearchPageComplete(
         if (actualUser.admin && !enabled) {
             FloatingActionButton(
                 onClick = { navController?.navigate(Destination.ADD_WORK_OFFER.route) },
-                containerColor = androidx.compose.material3.MaterialTheme.colorScheme.primary,
+                containerColor = com.example.superspan.ui.theme.LogoLeft,
                 contentColor = Color.White,
+                shape = CircleShape,
                 modifier = Modifier.align(Alignment.BottomEnd).padding(end = 24.dp, bottom = padding.calculateBottomPadding() + 24.dp)
             ) {
                 Icon(Icons.Default.Add, "Aggiungi")
@@ -92,6 +96,7 @@ fun WorkSearchPageComplete(
     }
 }
 
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun WorkSearchPage(
     navController: NavController?,
@@ -100,6 +105,7 @@ fun WorkSearchPage(
     snackbarHostState: SnackbarHostState,
     padding: PaddingValues,
     hideHeader: Boolean = false,
+    sliderContent: (@Composable () -> Unit)? = null,
     onOpenFilters: () -> Unit
 ) {
     val workSearchList by remember {
@@ -157,6 +163,12 @@ fun WorkSearchPage(
                         color = Color.Gray
                     )
                 }
+            }
+        }
+
+        if (sliderContent != null) {
+            stickyHeader {
+                sliderContent()
             }
         }
 
@@ -297,7 +309,7 @@ fun WorkOfferCompose(workOffer: WorkOffer, navController: NavController?, isHigh
                     modifier = Modifier.weight(1f)
                 )
                 if (badgeText != null) {
-                    val badgeColor = if (badgeText == "Bozza") androidx.compose.material3.MaterialTheme.colorScheme.secondary else if (badgeText == "Inviata") com.example.superspan.ui.theme.LogoCenter else Color(0xFF2196F3)
+                    val badgeColor = if (badgeText == "Bozza") androidx.compose.material3.MaterialTheme.colorScheme.secondary else if (badgeText == "Inviata") com.example.superspan.ui.theme.LogoCenter else com.example.superspan.ui.theme.LogoLeft
                     Surface(
                         color = badgeColor.copy(alpha = 0.15f),
                         shape = CircleShape,
@@ -384,7 +396,7 @@ fun WorkFilterPage(modifier: Modifier, filterData: WorkFilterData, padding: Padd
                 ) {
                     IconButton(
                         onClick = onDismiss,
-                        modifier = Modifier.background(Color.White, CircleShape)
+                        modifier = Modifier.background(Color.White.copy(alpha = 0.7f), CircleShape)
                     ) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
                     }

@@ -437,9 +437,7 @@ import com.example.superspan.ui.theme.LogoRight
 @Composable
 fun Home(paddingValues: PaddingValues, navController: NavController?) {
     LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(com.example.superspan.ui.theme.AppBackgroundBrush), // Sfondo sfumato
+        modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = paddingValues.calculateBottomPadding() + 32.dp)
     ) {
         // 1. HEADER (Scorre via con il resto)

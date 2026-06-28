@@ -43,6 +43,8 @@ import androidx.navigation.NavController
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.alpha
 
 @Suppress("UNUSED_PARAMETER")
 @Composable
@@ -347,6 +349,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -456,7 +460,7 @@ fun CouponPageComplete(paddingValues: PaddingValues, navController: NavControlle
 
     Box(modifier = Modifier
         .fillMaxSize()
-        .background(com.example.superspan.ui.theme.AppBackgroundBrush)
+        .padding(top = paddingValues.calculateTopPadding())
     ) {
         if (currentSelectedOffer == null) {
             LazyColumn(
@@ -520,20 +524,16 @@ fun CouponPageComplete(paddingValues: PaddingValues, navController: NavControlle
 
                 // 2. STICKY TABS
                 stickyHeader {
-                    Surface(
-                        modifier = Modifier.padding(16.dp).height(48.dp),
-                        shape = CircleShape,
-                        color = Color(0xFFEDF7E7),
-                        shadowElevation = 4.dp
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 20.dp, end = 20.dp, top = 28.dp, bottom = 12.dp)
+                            .shadow(4.dp, CircleShape)
+                            .background(Color(0xFFEDF7E7), CircleShape)
+                            .padding(4.dp)
                     ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(4.dp)
-                        ) {
-                            TabButton("I tuoi Coupon", selectedTab == 0, Modifier.weight(1f)) { selectedTab = 0 }
-                            TabButton("Promozioni", selectedTab == 1, Modifier.weight(1f)) { selectedTab = 1 }
-                        }
+                        TabButton("I tuoi Coupon", selectedTab == 0, Modifier.weight(1f)) { selectedTab = 0 }
+                        TabButton("Promozioni", selectedTab == 1, Modifier.weight(1f)) { selectedTab = 1 }
                     }
                 }
 
@@ -577,8 +577,9 @@ fun CouponPageComplete(paddingValues: PaddingValues, navController: NavControlle
                     navController?.currentBackStackEntry?.savedStateHandle?.set("add_type", selectedTab)
                     navController?.navigate(Destination.ADD_COUPON.route)
                 },
-                containerColor = androidx.compose.material3.MaterialTheme.colorScheme.primary,
+                containerColor = com.example.superspan.ui.theme.LogoLeft,
                 contentColor = Color.White,
+                shape = CircleShape,
                 modifier = Modifier.align(Alignment.BottomEnd).padding(end = 24.dp, bottom = paddingValues.calculateBottomPadding() + 24.dp)
             ) {
                 Icon(Icons.Default.Add, "Aggiungi")
@@ -656,38 +657,39 @@ fun TabButton(text: String, isSelected: Boolean, modifier: Modifier, onClick: ()
 @Composable
 fun CouponTicketCard(coupon: Coupon, isHighlighted: Boolean = false, navController: NavController? = null, onDeleteClick: () -> Unit = {}, onClick: () -> Unit = {}) {
     val status = getExpirationStatus(coupon.dateOfExpiration)
+    val isExpired = status.label == "SCADUTO"
 
     Card(
-        modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth().clickable { onClick() },
+        modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth().alpha(if(isExpired) 0.6f else 1f).clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = if (isHighlighted) Color(0xFFE0E0E0) else Color.White),
-        elevation = CardDefaults.cardElevation(2.dp)
+        elevation = CardDefaults.cardElevation(if(isExpired) 0.dp else 2.dp)
     ) {
         Column {
             Row(modifier = Modifier.height(IntrinsicSize.Min)) {
                 Column(modifier = Modifier.weight(1f).padding(16.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Surface(color = status.color.copy(0.1f), shape = CircleShape) {
-                            Text(status.label, modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp), color = status.color, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                        Surface(color = status.color.copy(0.15f), shape = RoundedCornerShape(12.dp)) {
+                            Text(status.label, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp), color = status.color, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold)
                         }
                         Spacer(Modifier.width(8.dp))
-                        Text(text = "Scade: ${formatDisplayDate(coupon.dateOfExpiration)}", fontSize = 11.sp, color = Color.Gray)
+                        Text(text = "Scade: ${formatDisplayDate(coupon.dateOfExpiration)}", fontSize = 11.sp, color = status.color, fontWeight = FontWeight.SemiBold)
                     }
                     Spacer(Modifier.height(8.dp))
-                    Text(coupon.description, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    Text(coupon.description, fontWeight = FontWeight.Bold, fontSize = 16.sp, textDecoration = if(isExpired) TextDecoration.LineThrough else null)
                     Text("Valido su: ${coupon.products.joinToString(", ") { it.nome }}", fontSize = 12.sp, color = Color.Gray)
                     Spacer(Modifier.height(12.dp))
-                    Surface(color = Color(0xFFF1F1F1), shape = RoundedCornerShape(8.dp), border = androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray.copy(0.5f))) {
-                        Text(coupon.code, modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp), fontWeight = FontWeight.ExtraBold, letterSpacing = 2.sp, color = Color.DarkGray)
+                    Surface(color = if(isExpired) Color.Transparent else Color(0xFFF1F1F1), shape = RoundedCornerShape(8.dp), border = androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray.copy(0.5f))) {
+                        Text(coupon.code, modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp), fontWeight = FontWeight.ExtraBold, letterSpacing = 2.sp, color = if(isExpired) Color.Gray else Color.DarkGray)
                     }
                 }
                 Box(Modifier.fillMaxHeight().width(1.dp).background(Color.LightGray))
                 Column(
-                    modifier = Modifier.fillMaxHeight().width(90.dp).background(status.color.copy(0.05f)),
+                    modifier = Modifier.fillMaxHeight().width(90.dp).background(if(isExpired) Color.LightGray.copy(0.2f) else status.color.copy(0.05f)),
                     horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center
                 ) {
                     Text("SCONTO", fontSize = 10.sp, color = Color.Gray)
-                    Text("-${coupon.discount.toInt()}%", fontSize = 26.sp, fontWeight = FontWeight.Black, color = status.color)
+                    Text("-${coupon.discount.toInt()}%", fontSize = 26.sp, fontWeight = FontWeight.Black, color = if(isExpired) Color.Gray else status.color)
                 }
             }
             if (actualUser.admin) {
@@ -723,27 +725,34 @@ fun CouponTicketCard(coupon: Coupon, isHighlighted: Boolean = false, navControll
 fun OfferPromoCard(coupon: Coupon, isHighlighted: Boolean = false, navController: NavController? = null, onDeleteClick: () -> Unit = {}) {
     val status = getExpirationStatus(coupon.dateOfExpiration)
     val product = coupon.products.firstOrNull() ?: return
+    val isExpired = status.label == "SCADUTO"
 
     Card(
-        modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
+        modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth().alpha(if(isExpired) 0.6f else 1f),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = if (isHighlighted) Color(0xFFE0E0E0) else Color.White),
-        elevation = CardDefaults.cardElevation(2.dp)
+        elevation = CardDefaults.cardElevation(if(isExpired) 0.dp else 2.dp)
     ) {
         Column {
             Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                Box(Modifier.size(40.dp).background(Color(0xFFE8F5E9), CircleShape), contentAlignment = Alignment.Center) {
-                    Icon(Icons.Default.LocalOffer, null, tint = Color(0xFF388E3C), modifier = Modifier.size(20.dp))
+                Box(Modifier.size(40.dp).background(if(isExpired) Color.LightGray else Color(0xFFE8F5E9), CircleShape), contentAlignment = Alignment.Center) {
+                    Icon(Icons.Default.LocalOffer, null, tint = if(isExpired) Color.Gray else Color(0xFF388E3C), modifier = Modifier.size(20.dp))
                 }
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
-                    Text(product.nome, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    Text(product.nome, fontWeight = FontWeight.Bold, fontSize = 16.sp, textDecoration = if(isExpired) TextDecoration.LineThrough else null)
                     Text(coupon.description, fontSize = 12.sp, color = Color.Gray)
                     Spacer(Modifier.height(4.dp))
-                    Text(text = "Scade: ${formatDisplayDate(coupon.dateOfExpiration)}", fontSize = 12.sp, color = Color(0xFFD32F2F), fontWeight = FontWeight.Medium)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Surface(color = status.color.copy(0.15f), shape = RoundedCornerShape(12.dp)) {
+                            Text(status.label, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp), color = status.color, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold)
+                        }
+                        Spacer(Modifier.width(8.dp))
+                        Text(text = "Scade: ${formatDisplayDate(coupon.dateOfExpiration)}", fontSize = 11.sp, color = status.color, fontWeight = FontWeight.SemiBold)
+                    }
                 }
                 Column(horizontalAlignment = Alignment.End) {
-                    Text("-${coupon.discount.toInt()}%", fontSize = 24.sp, fontWeight = FontWeight.Black, color = status.color)
+                    Text("-${coupon.discount.toInt()}%", fontSize = 24.sp, fontWeight = FontWeight.Black, color = if(isExpired) Color.Gray else status.color)
                 }
             }
             if (actualUser.admin) {
@@ -779,9 +788,9 @@ fun OfferPromoCard(coupon: Coupon, isHighlighted: Boolean = false, navController
 
 @Composable
 fun OfferDetailPage(coupon: Coupon, navController: NavController? = null, onBack: () -> Unit) {
-    Column(Modifier.fillMaxSize().background(com.example.superspan.ui.theme.AppBackgroundBrush)) {
+    Column(Modifier.fillMaxSize()) {
         Row(Modifier.padding(8.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null) }
+            IconButton(onClick = onBack, modifier = androidx.compose.ui.Modifier.background(androidx.compose.ui.graphics.Color.White.copy(alpha = 0.7f), androidx.compose.foundation.shape.CircleShape)) { Icon(androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack, null) }
             Text("Torna alla lista", color = Color.Gray)
         }
         Column(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp).verticalScroll(rememberScrollState())) {

@@ -10,9 +10,9 @@ val AppError = Color(0xFFE63946)
 
 val AppBackgroundBrush = Brush.verticalGradient(
     colors = listOf(
-        LogoLeft.copy(alpha = 0.20f),
-        LogoCenter.copy(alpha = 0.15f),
-        LogoRight.copy(alpha = 0.20f)
+        LogoLeft.copy(alpha = 0.49f),
+        LogoCenter.copy(alpha = 0.39f),
+        LogoRight.copy(alpha = 0.49f)
     )
 )
 

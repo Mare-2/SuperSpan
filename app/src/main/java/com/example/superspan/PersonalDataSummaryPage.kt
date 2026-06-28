@@ -36,7 +36,9 @@ fun PersonalDataSummaryPage(navController: NavController?, padding: PaddingValue
             // 1. TASTO INDIETRO (A sinistra)
             IconButton(
                 onClick = { navController?.popBackStack() },
-                modifier = Modifier.align(Alignment.CenterStart)
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .background(Color.White.copy(alpha = 0.7f), CircleShape)
             ) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
             }
