@@ -520,7 +520,7 @@ fun UserDashboard(navController: NavController?) {
                 modifier = Modifier.clickable { navController?.navigateTopLevel(Destination.OFFERTE.route) }
             )
         }
-        val topOffers = ListOfCoupon.sortedByDescending { it.discount }.take(5)
+        val topOffers = ListOfCoupon.filter { it.products.size == 1 }.sortedByDescending { it.discount }.take(5)
         LazyRow(
             contentPadding = PaddingValues(horizontal = 20.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -529,8 +529,7 @@ fun UserDashboard(navController: NavController?) {
                 Card(
                     modifier = Modifier
                         .width(220.dp)
-                        .height(140.dp)
-                        .clickable { navController?.navigateTopLevel(Destination.OFFERTE.route) },
+                        .height(140.dp),
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.White),
                     elevation = CardDefaults.cardElevation(3.dp)
@@ -538,7 +537,7 @@ fun UserDashboard(navController: NavController?) {
                     Column(Modifier.padding(16.dp)) {
                         TagChip("Sconto ${coupon.discount.toInt()}%", LogoRight)
                         Spacer(Modifier.height(8.dp))
-                        Text(coupon.code, fontWeight = FontWeight.Bold, fontSize = 16.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                        Text(coupon.products.first().nome, fontWeight = FontWeight.Bold, fontSize = 16.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
                         Spacer(Modifier.height(4.dp))
                         Text(coupon.description, color = Color.Gray, fontSize = 12.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
                     }

@@ -98,6 +98,7 @@ fun Navigation(navController: NavHostController, startDestination: Destination, 
     NavHost(
         navController = navController, 
         startDestination = startDestination.route,
+        modifier = Modifier.imePadding(),
         enterTransition = { androidx.compose.animation.EnterTransition.None },
         exitTransition = { androidx.compose.animation.ExitTransition.None },
         popEnterTransition = { androidx.compose.animation.EnterTransition.None },
@@ -182,6 +183,16 @@ fun Navigation(navController: NavHostController, startDestination: Destination, 
 
             // 3. Richiamiamo la pagina WorkOfferPage che abbiamo creato
             WorkOfferPage(offerta, navController, paddingValues)
+        }
+
+        composable(
+            route = "coupon_detail/{code}",
+            arguments = listOf(
+                navArgument("code") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val code = backStackEntry.arguments?.getString("code")
+            CouponPageComplete(paddingValues, navController, code)
         }
     }
 }
@@ -282,7 +293,6 @@ fun MainNavigation() {
 
     Box(modifier = Modifier.fillMaxSize().background(com.example.superspan.ui.theme.AppBackgroundBrush)) {
         Scaffold(
-            modifier = Modifier.imePadding(),
             containerColor = Color.Transparent,
             bottomBar = {
                 if (showBar) {
@@ -314,7 +324,7 @@ fun MainNavigation() {
                 }
             }
         ) { contentPadding ->
-            Navigation(navController, Destination.HOME, contentPadding)
+            Navigation(navController, Destination.LOGIN, contentPadding)
         }
     }
 }

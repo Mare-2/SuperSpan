@@ -411,7 +411,13 @@ fun searchProduct(filterData: FilterData): List<Product> {
         var cmp = 0
         // Ordina prima per Prezzo (se attivo)
         if (filterData.ordinamentoPrezzoCrescente != null) {
-            cmp = p1.prezzo.compareTo(p2.prezzo)
+            val d1 = ListOfCoupon.filter { it.products.contains(p1) }.maxOfOrNull { it.discount } ?: 0f
+            val p1Price = p1.prezzo * (1 - d1 / 100)
+            
+            val d2 = ListOfCoupon.filter { it.products.contains(p2) }.maxOfOrNull { it.discount } ?: 0f
+            val p2Price = p2.prezzo * (1 - d2 / 100)
+            
+            cmp = p1Price.compareTo(p2Price)
             if (!filterData.ordinamentoPrezzoCrescente!!) cmp = -cmp
         }
         // Se i prezzi sono uguali o il prezzo non è attivo, ordina per Nome (se attivo)

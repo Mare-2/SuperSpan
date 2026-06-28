@@ -48,8 +48,8 @@ import androidx.compose.ui.draw.alpha
 
 @Suppress("UNUSED_PARAMETER")
 @Composable
-fun CouponPageComplete(paddingValues: PaddingValues, navController: NavController?) {
-    var selectedOffer: Coupon? by remember { mutableStateOf(null) }
+fun CouponPageComplete(paddingValues: PaddingValues, navController: NavController?, initialCouponCode: String? = null) {
+    var selectedOffer: Coupon? by remember { mutableStateOf(ListOfCoupon.find { it.code == initialCouponCode }) }
     Box(
         modifier = Modifier
             .padding(paddingValues)
@@ -376,9 +376,9 @@ data class ExpirationStatus(val label: String, val color: Color)
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CouponPageComplete(paddingValues: PaddingValues, navController: NavController?) {
+fun CouponPageComplete(paddingValues: PaddingValues, navController: NavController?, initialCouponCode: String? = null) {
     var selectedTab by remember { mutableIntStateOf(0) }
-    var selectedOffer: Coupon? by remember { mutableStateOf(null) }
+    var selectedOffer: Coupon? by remember { mutableStateOf(ListOfCoupon.find { it.code == initialCouponCode }) }
     var searchQuery by remember { mutableStateOf("") }
 
     // --- GESTIONE RITORNO IN ALTO ---
