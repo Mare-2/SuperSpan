@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.LazyListState
@@ -195,6 +196,46 @@ fun WorkSearchPage(
                             cursorColor = com.example.superspan.ui.theme.LogoLeft
                         )
                     )
+                }
+            }
+        }
+
+        val hasActiveFilters = filterData.ruoli.isNotEmpty() || filterData.tipiContratto.isNotEmpty() || filterData.orari.isNotEmpty() || filterData.distanzaMax < 1000f
+
+        if (hasActiveFilters) {
+            item {
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    if (filterData.distanzaMax < 1000f) {
+                        item {
+                            FilterChipCustom(
+                                text = "< ${filterData.distanzaMax.toInt()} km",
+                                onRemove = { filterData.distanzaMax = 1000f }
+                            )
+                        }
+                    }
+                    items(filterData.ruoli.toList()) { ruolo ->
+                        FilterChipCustom(
+                            text = ruolo.nome,
+                            onRemove = { filterData.ruoli.remove(ruolo) }
+                        )
+                    }
+                    items(filterData.tipiContratto.toList()) { tipo ->
+                        FilterChipCustom(
+                            text = tipo.nome,
+                            onRemove = { filterData.tipiContratto.remove(tipo) }
+                        )
+                    }
+                    items(filterData.orari.toList()) { orario ->
+                        FilterChipCustom(
+                            text = orario.nome,
+                            onRemove = { filterData.orari.remove(orario) }
+                        )
+                    }
                 }
             }
         }
@@ -573,5 +614,34 @@ fun FilterCheckboxRow(label: String, isChecked: Boolean, onCheckedChange: (Boole
             colors = CheckboxDefaults.colors(checkedColor = com.example.superspan.ui.theme.LogoLeft)
         )
         Text(label, fontSize = 14.sp)
+    }
+}
+
+@Composable
+fun FilterChipCustom(text: String, onRemove: () -> Unit) {
+    androidx.compose.material3.Surface(
+        color = com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.15f),
+        shape = RoundedCornerShape(16.dp),
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Text(
+                text = text,
+                color = com.example.superspan.ui.theme.LogoLeft,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = "Rimuovi filtro",
+                tint = com.example.superspan.ui.theme.LogoLeft,
+                modifier = Modifier
+                    .size(16.dp)
+                    .clickable { onRemove() }
+            )
+        }
     }
 }
