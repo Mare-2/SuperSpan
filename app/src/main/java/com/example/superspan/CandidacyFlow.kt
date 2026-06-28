@@ -1421,50 +1421,68 @@ fun ApplyStep1(navController: NavController?, padding: PaddingValues) {
             goToOfferPresentation(navController)
         })
 
-        Column(Modifier.padding(horizontal = 24.dp).verticalScroll(rememberScrollState())) {
-            Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween, Alignment.CenterVertically) {
-                Text("Tutti i campi sono obbligatori", fontSize = 12.sp, color = Color.Gray)
-                TextButton(onClick = { showResetDialog = true }) { Icon(Icons.Default.Refresh, null); Text(" Reset") }
-            }
-            EditTextField("Nome", nome, KeyboardType.Text) { nome = it }
-            EditTextField("Cognome", cognome, KeyboardType.Text) { cognome = it }
-            EditTextField("Email di contatto", emailLavoro, KeyboardType.Email, !isEmailValid && emailLavoro.isNotEmpty(), "Email non valida") { emailLavoro = it }
-
-            Row(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
-                OutlinedTextField("+39", {}, readOnly = true, label = { Text("Pre") }, modifier = Modifier.width(80.dp), shape = RoundedCornerShape(20.dp))
-                Spacer(Modifier.width(8.dp))
-                EditTextField("Telefono", telefonoDigits, KeyboardType.Phone, false, "", PhoneVisualTransformation(), Modifier.weight(1f)) {
-                    if (it.all { c -> c.isDigit() } && it.length <= 10) telefonoDigits = it
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(Modifier.fillMaxSize().padding(horizontal = 24.dp).verticalScroll(rememberScrollState())) {
+                androidx.compose.material3.Card(
+                    colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = Color.White),
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = androidx.compose.material3.CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(Modifier.padding(20.dp)) {
+                        Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween, Alignment.CenterVertically) {
+                            Text("Tutti i campi sono obbligatori", fontSize = 12.sp, color = Color.Gray)
+                            TextButton(onClick = { showResetDialog = true }) { Icon(Icons.Default.Refresh, null); Text(" Reset") }
+                        }
+                        EditTextField("Nome", nome, KeyboardType.Text) { nome = it }
+                        EditTextField("Cognome", cognome, KeyboardType.Text) { cognome = it }
+                        EditTextField("Email di contatto", emailLavoro, KeyboardType.Email, !isEmailValid && emailLavoro.isNotEmpty(), "Email non valida") { emailLavoro = it }
+            
+                        Row(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+                            OutlinedTextField("+39", {}, readOnly = true, label = { Text("Pre") }, modifier = Modifier.width(80.dp), shape = RoundedCornerShape(20.dp))
+                            Spacer(Modifier.width(8.dp))
+                            EditTextField("Telefono", telefonoDigits, KeyboardType.Phone, false, "", PhoneVisualTransformation(), Modifier.weight(1f)) {
+                                if (it.all { c -> c.isDigit() } && it.length <= 10) telefonoDigits = it
+                            }
+                        }
+            
+                        Text("Documento Curriculum", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                        Surface(
+                            onClick = { launcher.launch("application/pdf") },
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            color = if (cvPath.isNotEmpty()) MaterialTheme.colorScheme.primary.copy(alpha = 0.1f) else Color(0xFFFFF3E0),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, if (cvPath.isNotEmpty()) MaterialTheme.colorScheme.primary else Color(0xFFFFB74D))
+                        ) {
+                            Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Icon(if (cvPath.isNotEmpty()) Icons.Default.CheckCircle else Icons.Default.FileUpload, null, tint = if (cvPath.isNotEmpty()) MaterialTheme.colorScheme.primary else Color(0xFFFFB74D))
+                                Spacer(Modifier.width(12.dp))
+                                Text(if (cvName.isEmpty()) "Scegli il tuo CV (PDF)" else cvName, Modifier.weight(1f))
+                            }
+                        }
+                    }
                 }
+                Spacer(Modifier.height(100.dp))
             }
-
-            Text("Documento Curriculum", fontWeight = FontWeight.Bold, fontSize = 14.sp)
-            Surface(
-                onClick = { launcher.launch("application/pdf") },
-                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-                shape = RoundedCornerShape(16.dp),
-                color = if (cvPath.isNotEmpty()) MaterialTheme.colorScheme.primary.copy(alpha = 0.1f) else Color(0xFFFFF3E0),
-                border = androidx.compose.foundation.BorderStroke(1.dp, if (cvPath.isNotEmpty()) MaterialTheme.colorScheme.primary else Color(0xFFFFB74D))
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp, vertical = 24.dp),
+                contentAlignment = Alignment.Center
             ) {
-                Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Icon(if (cvPath.isNotEmpty()) Icons.Default.CheckCircle else Icons.Default.FileUpload, null, tint = if (cvPath.isNotEmpty()) MaterialTheme.colorScheme.primary else Color(0xFFFFB74D))
-                    Spacer(Modifier.width(12.dp))
-                    Text(if (cvName.isEmpty()) "Scegli il tuo CV (PDF)" else cvName, Modifier.weight(1f))
-                }
+                Button(
+                    onClick = {
+                        currentDraft = CandidacyDraft(nome, cognome, emailLavoro, "+39 $telefonoDigits", cvName, cvPath, currentDraft.videoPath)
+                        if (isReturnToSummary) { isReturnToSummary = false; navController?.popBackStack() }
+                        else { navController?.navigate(Destination.APPLY_STEP_2_INTRO.route) }
+                    },
+                    modifier = Modifier.height(55.dp),
+                    contentPadding = PaddingValues(horizontal = 32.dp),
+                    enabled = nome.isNotBlank() && cognome.isNotBlank() && isEmailValid && isPhoneValid && cvPath.isNotEmpty(),
+                    shape = CircleShape
+                ) { Text(if (isReturnToSummary) "Torna al riepilogo" else "Avanti: Video Presentazione") }
             }
-
-            Spacer(Modifier.height(30.dp))
-            Button(
-                onClick = {
-                    currentDraft = CandidacyDraft(nome, cognome, emailLavoro, "+39 $telefonoDigits", cvName, cvPath, currentDraft.videoPath)
-                    if (isReturnToSummary) { isReturnToSummary = false; navController?.popBackStack() }
-                    else { navController?.navigate(Destination.APPLY_STEP_2_INTRO.route) }
-                },
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-                enabled = nome.isNotBlank() && cognome.isNotBlank() && isEmailValid && isPhoneValid,
-                shape = CircleShape
-            ) { Text(if (isReturnToSummary) "Torna al riepilogo" else "Avanti: Video Presentazione") }
-            Spacer(Modifier.height(20.dp))
         }
     }
 }
@@ -1518,38 +1536,88 @@ fun ApplyStep2Intro(navController: NavController?, padding: PaddingValues) {
             }
             Spacer(Modifier.height(16.dp))
             Row(Modifier.fillMaxWidth(0.9f), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(onClick = { navController?.navigate(Destination.APPLY_STEP_2_RECORD.route) }, modifier = Modifier.weight(1f).height(50.dp), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary), shape = CircleShape) {
-                    Icon(Icons.Default.Videocam, null, Modifier.size(18.dp)); Spacer(Modifier.width(4.dp)); Text("Registra", fontSize = 12.sp)
+                Button(
+                    onClick = { navController?.navigate(Destination.APPLY_STEP_2_RECORD.route) }, 
+                    modifier = Modifier.weight(1f).height(55.dp), 
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEEEEEE), contentColor = Color.Black), 
+                    shape = CircleShape
+                ) {
+                    Icon(Icons.Default.Videocam, null, Modifier.size(18.dp))
+                    Spacer(Modifier.width(4.dp))
+                    Text("Registra", fontSize = 14.sp)
                 }
-                OutlinedButton(onClick = { videoPickerLauncher.launch("video/*") }, modifier = Modifier.weight(1f).height(50.dp), shape = CircleShape, border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary)) {
-                    Icon(Icons.Default.PhotoLibrary, null, Modifier.size(18.dp), tint = MaterialTheme.colorScheme.primary); Spacer(Modifier.width(4.dp)); Text("Galleria", color = MaterialTheme.colorScheme.primary, fontSize = 12.sp)
+                Button(
+                    onClick = { videoPickerLauncher.launch("video/*") }, 
+                    modifier = Modifier.weight(1f).height(55.dp), 
+                    shape = CircleShape, 
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEEEEEE), contentColor = Color.Black)
+                ) {
+                    Icon(Icons.Default.PhotoLibrary, null, Modifier.size(18.dp))
+                    Spacer(Modifier.width(4.dp))
+                    Text("Galleria", fontSize = 14.sp)
                 }
             }
             Spacer(Modifier.height(16.dp))
-            Button(onClick = {
-                if (isReturnToSummary) {
-                    isReturnToSummary = false
-                    navController?.navigate(Destination.APPLY_STEP_3.route) { popUpTo(Destination.APPLY_STEP_3.route) { inclusive = true } }
-                } else navController?.navigate(Destination.APPLY_STEP_3.route)
-            }, Modifier.padding(vertical = 24.dp).height(56.dp).width(200.dp), shape = CircleShape, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)) {
+            Button(
+                onClick = {
+                    if (isReturnToSummary) {
+                        isReturnToSummary = false
+                        navController?.navigate(Destination.APPLY_STEP_3.route) { popUpTo(Destination.APPLY_STEP_3.route) { inclusive = true } }
+                    } else navController?.navigate(Destination.APPLY_STEP_3.route)
+                }, 
+                Modifier.padding(vertical = 24.dp).height(55.dp), 
+                contentPadding = PaddingValues(horizontal = 32.dp), 
+                shape = CircleShape, 
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+            ) {
                 Text("Avanti")
             }
         } else {
-            Column(Modifier.padding(30.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(Color(0xFFF5F5F5)).padding(24.dp)) {
-                    Column {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(30.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                androidx.compose.material3.Card(
+                    colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = Color.White),
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = androidx.compose.material3.CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(Modifier.padding(24.dp)) {
                         Text("${actualUser.nome}, ecco cosa dire:", fontWeight = FontWeight.Bold, fontSize = 18.sp)
                         Text("• Presentati\n• Esperienze lavorative\n• Perché SuperSpan?", Modifier.padding(vertical = 10.dp), lineHeight = 24.sp)
-                        Text("Hai 30 secondi.", fontWeight = FontWeight.Bold, color = com.example.superspan.ui.theme.AppError)
+                        Text("Hai 30 secondi di tempo.", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                     }
                 }
-                Spacer(Modifier.weight(1f))
-                Button(onClick = { navController?.navigate(Destination.APPLY_STEP_2_RECORD.route) }, Modifier.height(60.dp).fillMaxWidth(0.8f), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary), shape = CircleShape) {
-                    Icon(Icons.Default.Videocam, null); Spacer(Modifier.width(8.dp)); Text("Inizia Registrazione")
+                Spacer(Modifier.height(40.dp))
+                Button(
+                    onClick = { navController?.navigate(Destination.APPLY_STEP_2_RECORD.route) }, 
+                    Modifier.height(55.dp), 
+                    contentPadding = PaddingValues(horizontal = 32.dp), 
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary), 
+                    shape = CircleShape
+                ) {
+                    Icon(Icons.Default.Videocam, null)
+                    Spacer(Modifier.width(8.dp))
+                    Text("Inizia Registrazione")
                 }
                 Spacer(Modifier.height(16.dp))
-                OutlinedButton(onClick = { videoPickerLauncher.launch("video/*") }, Modifier.height(60.dp).fillMaxWidth(0.8f), shape = CircleShape, border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary)) {
-                    Icon(Icons.Default.PhotoLibrary, null, tint = MaterialTheme.colorScheme.primary); Spacer(Modifier.width(8.dp)); Text("Carica da Galleria", color = MaterialTheme.colorScheme.primary)
+                Button(
+                    onClick = { videoPickerLauncher.launch("video/*") }, 
+                    Modifier.height(55.dp), 
+                    contentPadding = PaddingValues(horizontal = 32.dp), 
+                    shape = CircleShape, 
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFEEEEEE), 
+                        contentColor = Color.Black
+                    )
+                ) {
+                    Icon(Icons.Default.PhotoLibrary, null, tint = Color.Black)
+                    Spacer(Modifier.width(8.dp))
+                    Text("Carica da Galleria")
                 }
             }
         }
@@ -1828,17 +1896,27 @@ fun ApplyStep3(navController: NavController?, padding: PaddingValues) {
             )
         }
 
-        Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text("Paolo, controlla un'ultima volta:", color = Color.Gray)
-            SummaryInteractiveRow(Icons.Default.Person, "Candidato", "${currentDraft.nome} ${currentDraft.cognome}", { showEditConfirm = "Dati" }) { previewContent = "Nome: ${currentDraft.nome}\nCognome: ${currentDraft.cognome}" }
-            SummaryInteractiveRow(Icons.Default.Email, "Email", currentDraft.emailLavoro, { showEditConfirm = "Dati" }) { previewContent = "Email: ${currentDraft.emailLavoro}" }
-            SummaryInteractiveRow(Icons.Default.Phone, "Telefono", currentDraft.telefono, { showEditConfirm = "Dati" }) { previewContent = "Telefono: ${currentDraft.telefono}" }
-            SummaryInteractiveRow(Icons.Default.Description, "CV", currentDraft.cvFileName.ifEmpty { "Nessun file" }, { showEditConfirm = "Dati" }) { showPreviewCV = true }
-            SummaryInteractiveRow(Icons.Default.Videocam, "Video", if (currentDraft.videoPath != null) "Registrato correttamente" else "Nessun video", { showEditConfirm = "Video" }) { showPreviewVideo = true }
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(Modifier.fillMaxSize().padding(horizontal = 24.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text("Paolo, controlla un'ultima volta:", color = Color.Gray)
+                SummaryInteractiveRow(Icons.Default.Person, "Candidato", "${currentDraft.nome} ${currentDraft.cognome}", { showEditConfirm = "Dati" }) { previewContent = "Nome: ${currentDraft.nome}\nCognome: ${currentDraft.cognome}" }
+                SummaryInteractiveRow(Icons.Default.Email, "Email", currentDraft.emailLavoro, { showEditConfirm = "Dati" }) { previewContent = "Email: ${currentDraft.emailLavoro}" }
+                SummaryInteractiveRow(Icons.Default.Phone, "Telefono", currentDraft.telefono, { showEditConfirm = "Dati" }) { previewContent = "Telefono: ${currentDraft.telefono}" }
+                SummaryInteractiveRow(Icons.Default.Description, "CV", currentDraft.cvFileName.ifEmpty { "Nessun file" }, { showEditConfirm = "Dati" }) { showPreviewCV = true }
+                SummaryInteractiveRow(Icons.Default.Videocam, "Video", if (currentDraft.videoPath != null) "Registrato correttamente" else "Nessun video", { showEditConfirm = "Video" }) { showPreviewVideo = true }
 
-            Spacer(Modifier.weight(1f))
-            Button(onClick = { showSendConfirm = true }, Modifier.fillMaxWidth().height(60.dp), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary), shape = CircleShape) {
-                Text("CONFERMA E INVIA", fontWeight = FontWeight.Bold)
+                Spacer(Modifier.height(100.dp))
+            }
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp, vertical = 24.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Button(onClick = { showSendConfirm = true }, Modifier.height(55.dp), contentPadding = PaddingValues(horizontal = 32.dp), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary), shape = CircleShape) {
+                    Text("Conferma e Invia", fontWeight = FontWeight.Bold)
+                }
             }
         }
     }
