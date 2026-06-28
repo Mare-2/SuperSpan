@@ -81,7 +81,7 @@ fun ProductPage(product: Product?, navController: NavController?, paddingValues:
                             colors = listOf(
                                 Color.White,
                                 Color.White,
-                                com.example.superspan.ui.theme.LogoRight.copy(alpha = 0.03f)
+                                Color.White.copy(alpha = 0f)
                             )
                         )
                     )

@@ -75,9 +75,9 @@ fun Login(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 androidx.compose.foundation.Image(
-                    painter = painterResource(id = R.drawable.logo_superspan),
+                    painter = painterResource(id = R.drawable.superspan),
                     contentDescription = "Logo SuperSpan",
-                    modifier = Modifier.height(70.dp).padding(bottom = 16.dp),
+                    modifier = Modifier.height(55.dp).padding(bottom = 16.dp),
                     contentScale = ContentScale.Fit
                 )
                 Text(

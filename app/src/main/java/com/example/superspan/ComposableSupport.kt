@@ -65,23 +65,10 @@ fun Header(modifier: Modifier = Modifier) {
             contentAlignment = Alignment.Center
         ) {
             // Effetto bagliore (glow) dietro al logo per farlo risaltare sullo sfondo sfumato
-            Box(
-                modifier = Modifier
-                    .size(110.dp)
-                    .background(
-                        brush = androidx.compose.ui.graphics.Brush.radialGradient(
-                            colors = listOf(
-                                Color.White.copy(alpha = 0.8f),
-                                Color.White.copy(alpha = 0.3f),
-                                Color.Transparent
-                            )
-                        )
-                    )
-            )
             androidx.compose.foundation.Image(
-                painter = androidx.compose.ui.res.painterResource(id = R.drawable.logo_superspan),
+                painter = androidx.compose.ui.res.painterResource(id = R.drawable.superspan),
                 contentDescription = "Logo SuperSpan",
-                modifier = Modifier.height(60.dp),
+                modifier = Modifier.height(48.dp),
                 contentScale = androidx.compose.ui.layout.ContentScale.Fit
             )
         }
@@ -271,9 +258,9 @@ fun HeaderHomeAlt(modifier: Modifier, navController: NavController?) {
             ) {
                 // Logo al centro
                 androidx.compose.foundation.Image(
-                    painter = androidx.compose.ui.res.painterResource(id = R.drawable.logo_superspan),
+                    painter = androidx.compose.ui.res.painterResource(id = R.drawable.superspan),
                     contentDescription = "Logo SuperSpan",
-                    modifier = Modifier.height(45.dp).align(Alignment.Center),
+                    modifier = Modifier.height(36.dp).align(Alignment.Center),
                     contentScale = androidx.compose.ui.layout.ContentScale.Fit
                 )
                 

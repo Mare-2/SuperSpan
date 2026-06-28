@@ -1258,47 +1258,101 @@ fun goToOfferPresentation(navController: NavController?) {
 @Composable
 fun ExitDraftDialog(visible: Boolean, onDismiss: () -> Unit, onSave: () -> Unit, onDiscard: () -> Unit) {
     if (visible) {
-        AlertDialog(
-            onDismissRequest = onDismiss,
-            title = { Text("Esci dalla candidatura") },
-            text = { Text("Vuoi salvare questa bozza prima di uscire?") },
-            confirmButton = { TextButton(onClick = onSave) { Text("Salva") } },
-            dismissButton = {
-                Row {
-                    TextButton(onClick = onDiscard) { Text("Scarta", color = com.example.superspan.ui.theme.AppError) }
-                    TextButton(onClick = onDismiss) { Text("Annulla") }
+        androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss) {
+            Surface(
+                shape = RoundedCornerShape(24.dp),
+                color = Color.White,
+                shadowElevation = 8.dp
+            ) {
+                Column(
+                    modifier = Modifier.padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(56.dp)
+                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(Icons.Default.Save, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(28.dp))
+                    }
+                    Spacer(Modifier.height(16.dp))
+                    Text("Salvare la bozza?", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        "Vuoi salvare i progressi di questa candidatura per riprenderla in un secondo momento?",
+                        fontSize = 14.sp,
+                        color = Color.Gray,
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(Modifier.height(24.dp))
+                    Button(
+                        onClick = onSave,
+                        modifier = Modifier.fillMaxWidth().height(50.dp),
+                        shape = CircleShape
+                    ) {
+                        Text("Salva ed Esci")
+                    }
+                    Spacer(Modifier.height(8.dp))
+                    OutlinedButton(
+                        onClick = onDiscard,
+                        modifier = Modifier.fillMaxWidth().height(50.dp),
+                        shape = CircleShape,
+                        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.error)
+                    ) {
+                        Text("Scarta Modifiche", color = MaterialTheme.colorScheme.error)
+                    }
+                    Spacer(Modifier.height(8.dp))
+                    TextButton(onClick = onDismiss, modifier = Modifier.fillMaxWidth()) {
+                        Text("Annulla", color = Color.Gray)
+                    }
                 }
             }
-        )
+        }
     }
 }
 
 @Composable
 fun ApplyHeader(step: String, title: String, onBack: () -> Unit, onClose: () -> Unit) {
+    val progress = when(step) {
+        "1" -> 0.33f
+        "2" -> 0.66f
+        "3" -> 1.0f
+        else -> 0f
+    }
     Column(
         modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(
-            Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+            Modifier.fillMaxWidth().padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = onBack, modifier = androidx.compose.ui.Modifier.background(androidx.compose.ui.graphics.Color.White.copy(alpha = 0.7f), androidx.compose.foundation.shape.CircleShape)) { Icon(androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack, null, tint = androidx.compose.material3.MaterialTheme.colorScheme.primary)
+            IconButton(onClick = onBack, modifier = Modifier.background(Color.White.copy(alpha = 0.7f), CircleShape)) { 
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = MaterialTheme.colorScheme.primary)
             }
-            androidx.compose.foundation.Image(
-                painter = androidx.compose.ui.res.painterResource(id = R.drawable.logo_superspan),
+            Image(
+                painter = androidx.compose.ui.res.painterResource(id = R.drawable.superspan),
                 contentDescription = "Logo SuperSpan",
-                modifier = Modifier.height(35.dp),
+                modifier = Modifier.height(28.dp),
                 contentScale = androidx.compose.ui.layout.ContentScale.Fit
             )
-            IconButton(onClick = onClose) {
-                Icon(Icons.Default.Close, null, tint = androidx.compose.material3.MaterialTheme.colorScheme.error)
+            IconButton(onClick = onClose, modifier = Modifier.background(Color.White.copy(alpha = 0.7f), CircleShape)) {
+                Icon(Icons.Default.Close, null, tint = MaterialTheme.colorScheme.error)
             }
         }
-        Spacer(modifier = Modifier.height(12.dp))
-        Text("STEP $step DI 3", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.Gray)
-        Text(title, fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, color = androidx.compose.material3.MaterialTheme.colorScheme.primary)
+        Spacer(modifier = Modifier.height(16.dp))
+        LinearProgressIndicator(
+            progress = { progress },
+            modifier = Modifier.fillMaxWidth(0.6f).height(8.dp).clip(CircleShape),
+            color = MaterialTheme.colorScheme.primary,
+            trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text("Step $step di 3", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(title, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.onSurface)
     }
 }
 
@@ -1389,11 +1443,11 @@ fun ApplyStep1(navController: NavController?, padding: PaddingValues) {
                 onClick = { launcher.launch("application/pdf") },
                 modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
                 shape = RoundedCornerShape(16.dp),
-                color = if (cvPath.isNotEmpty()) Color(0xFFE8F5E9) else Color(0xFFFFF3E0),
-                border = androidx.compose.foundation.BorderStroke(1.dp, if (cvPath.isNotEmpty()) Color(0xFF81C784) else Color(0xFFFFB74D))
+                color = if (cvPath.isNotEmpty()) MaterialTheme.colorScheme.primary.copy(alpha = 0.1f) else Color(0xFFFFF3E0),
+                border = androidx.compose.foundation.BorderStroke(1.dp, if (cvPath.isNotEmpty()) MaterialTheme.colorScheme.primary else Color(0xFFFFB74D))
             ) {
                 Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Icon(if (cvPath.isNotEmpty()) Icons.Default.CheckCircle else Icons.Default.FileUpload, null, tint = if (cvPath.isNotEmpty()) Color(0xFF388E3C) else Color.Gray)
+                    Icon(if (cvPath.isNotEmpty()) Icons.Default.CheckCircle else Icons.Default.FileUpload, null, tint = if (cvPath.isNotEmpty()) MaterialTheme.colorScheme.primary else Color(0xFFFFB74D))
                     Spacer(Modifier.width(12.dp))
                     Text(if (cvName.isEmpty()) "Scegli il tuo CV (PDF)" else cvName, Modifier.weight(1f))
                 }
@@ -1464,11 +1518,11 @@ fun ApplyStep2Intro(navController: NavController?, padding: PaddingValues) {
             }
             Spacer(Modifier.height(16.dp))
             Row(Modifier.fillMaxWidth(0.9f), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(onClick = { navController?.navigate(Destination.APPLY_STEP_2_RECORD.route) }, modifier = Modifier.weight(1f).height(50.dp), colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray), shape = CircleShape) {
+                Button(onClick = { navController?.navigate(Destination.APPLY_STEP_2_RECORD.route) }, modifier = Modifier.weight(1f).height(50.dp), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary), shape = CircleShape) {
                     Icon(Icons.Default.Videocam, null, Modifier.size(18.dp)); Spacer(Modifier.width(4.dp)); Text("Registra", fontSize = 12.sp)
                 }
-                OutlinedButton(onClick = { videoPickerLauncher.launch("video/*") }, modifier = Modifier.weight(1f).height(50.dp), shape = CircleShape) {
-                    Icon(Icons.Default.PhotoLibrary, null, Modifier.size(18.dp), tint = Color.DarkGray); Spacer(Modifier.width(4.dp)); Text("Galleria", color = Color.DarkGray, fontSize = 12.sp)
+                OutlinedButton(onClick = { videoPickerLauncher.launch("video/*") }, modifier = Modifier.weight(1f).height(50.dp), shape = CircleShape, border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary)) {
+                    Icon(Icons.Default.PhotoLibrary, null, Modifier.size(18.dp), tint = MaterialTheme.colorScheme.primary); Spacer(Modifier.width(4.dp)); Text("Galleria", color = MaterialTheme.colorScheme.primary, fontSize = 12.sp)
                 }
             }
             Spacer(Modifier.height(16.dp))
@@ -1477,7 +1531,7 @@ fun ApplyStep2Intro(navController: NavController?, padding: PaddingValues) {
                     isReturnToSummary = false
                     navController?.navigate(Destination.APPLY_STEP_3.route) { popUpTo(Destination.APPLY_STEP_3.route) { inclusive = true } }
                 } else navController?.navigate(Destination.APPLY_STEP_3.route)
-            }, Modifier.padding(vertical = 24.dp).height(56.dp).width(200.dp), shape = CircleShape, colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray)) {
+            }, Modifier.padding(vertical = 24.dp).height(56.dp).width(200.dp), shape = CircleShape, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)) {
                 Text("Avanti")
             }
         } else {
@@ -1490,12 +1544,12 @@ fun ApplyStep2Intro(navController: NavController?, padding: PaddingValues) {
                     }
                 }
                 Spacer(Modifier.weight(1f))
-                Button(onClick = { navController?.navigate(Destination.APPLY_STEP_2_RECORD.route) }, Modifier.height(60.dp).fillMaxWidth(0.8f), colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray), shape = CircleShape) {
+                Button(onClick = { navController?.navigate(Destination.APPLY_STEP_2_RECORD.route) }, Modifier.height(60.dp).fillMaxWidth(0.8f), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary), shape = CircleShape) {
                     Icon(Icons.Default.Videocam, null); Spacer(Modifier.width(8.dp)); Text("Inizia Registrazione")
                 }
                 Spacer(Modifier.height(16.dp))
-                OutlinedButton(onClick = { videoPickerLauncher.launch("video/*") }, Modifier.height(60.dp).fillMaxWidth(0.8f), shape = CircleShape) {
-                    Icon(Icons.Default.PhotoLibrary, null, tint = Color.DarkGray); Spacer(Modifier.width(8.dp)); Text("Carica da Galleria", color = Color.DarkGray)
+                OutlinedButton(onClick = { videoPickerLauncher.launch("video/*") }, Modifier.height(60.dp).fillMaxWidth(0.8f), shape = CircleShape, border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary)) {
+                    Icon(Icons.Default.PhotoLibrary, null, tint = MaterialTheme.colorScheme.primary); Spacer(Modifier.width(8.dp)); Text("Carica da Galleria", color = MaterialTheme.colorScheme.primary)
                 }
             }
         }
@@ -1765,7 +1819,7 @@ fun ApplyStep3(navController: NavController?, padding: PaddingValues) {
                         android.widget.Toast.makeText(context, "Candidatura inviata con successo", android.widget.Toast.LENGTH_SHORT).show()
                         navController?.navigate(Destination.LAVORO.route) { popUpTo(Destination.LAVORO.route) { inclusive = true } }
                     }) {
-                        Text("Invia", color = Color(0xFF388E3C))
+                        Text("Invia", color = MaterialTheme.colorScheme.primary)
                     }
                 },
                 dismissButton = {
@@ -1783,7 +1837,7 @@ fun ApplyStep3(navController: NavController?, padding: PaddingValues) {
             SummaryInteractiveRow(Icons.Default.Videocam, "Video", if (currentDraft.videoPath != null) "Registrato correttamente" else "Nessun video", { showEditConfirm = "Video" }) { showPreviewVideo = true }
 
             Spacer(Modifier.weight(1f))
-            Button(onClick = { showSendConfirm = true }, Modifier.fillMaxWidth().height(60.dp), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF388E3C)), shape = CircleShape) {
+            Button(onClick = { showSendConfirm = true }, Modifier.fillMaxWidth().height(60.dp), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary), shape = CircleShape) {
                 Text("CONFERMA E INVIA", fontWeight = FontWeight.Bold)
             }
         }
@@ -1796,20 +1850,26 @@ fun SummaryInteractiveRow(icon: ImageVector, label: String, value: String, onEdi
         onClick = onView,
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        color = Color(0xFFF9F9F9),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray)
+        color = Color.White,
+        shadowElevation = 2.dp,
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.5f))
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically // FIX ALIGNMENT
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(icon, null, tint = Color.Gray)
+            Box(
+                modifier = Modifier.size(40.dp).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(icon, null, tint = MaterialTheme.colorScheme.primary)
+            }
             Spacer(Modifier.width(16.dp))
             Column(Modifier.weight(1f)) {
-                Text(label, fontSize = 11.sp, color = Color.Gray)
-                Text(value, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                Text(label, fontSize = 12.sp, color = Color.Gray)
+                Text(value, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
             }
-            IconButton(onClick = onEdit) { Icon(Icons.Default.Edit, "Modifica", Modifier.size(20.dp), tint = Color(0xFF388E3C)) }
+            IconButton(onClick = onEdit) { Icon(Icons.Default.Edit, "Modifica", Modifier.size(20.dp), tint = MaterialTheme.colorScheme.secondary) }
         }
     }
 }
