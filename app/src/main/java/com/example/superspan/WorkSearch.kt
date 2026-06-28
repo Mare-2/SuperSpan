@@ -31,6 +31,14 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
 
+val globalWorkFilterData = WorkFilterData().apply {
+    nome = ""
+    ruoli.clear()
+    tipiContratto.clear()
+    orari.clear()
+    distanzaMax = 1000f // Mostra tutto all'inizio
+}
+
 @Composable
 fun WorkSearchPageComplete(
     padding: PaddingValues,
@@ -39,16 +47,8 @@ fun WorkSearchPageComplete(
 ) {
     var enabled by remember { mutableStateOf(false) }
 
-    // Inizializzazione pulita senza filtri pre-applicati
-    val filterData by remember {
-        mutableStateOf(WorkFilterData().apply {
-            nome = ""
-            ruoli.clear()
-            tipiContratto.clear()
-            orari.clear()
-            distanzaMax = 1000f // Mostra tutto all'inizio
-        })
-    }
+    // Utilizziamo un'istanza globale per mantenere i filtri attivi anche quando si cambia pagina
+    val filterData = globalWorkFilterData
 
     val snackbarHostState = remember { SnackbarHostState() }
     val listState = rememberLazyListState()
