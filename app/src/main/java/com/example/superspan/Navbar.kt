@@ -286,17 +286,29 @@ fun MainNavigation() {
             containerColor = Color.Transparent,
             bottomBar = {
                 if (showBar) {
-                    CustomAnimatedBottomBar(currentRoute) { route ->
-                        // --- NAVIGAZIONE OTTIMIZZATA ---
-                        navController.navigate(route) {
-                            // Pulisce lo stack ma salva lo stato delle pagine
-                            // per evitare di ricaricarle da zero ogni volta (causa della lentezza)
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
+                    CustomAnimatedBottomBar(currentRoute) { route, isAlreadySelected ->
+                        if (isAlreadySelected) {
+                            val popped = navController.popBackStack(route, inclusive = false)
+                            if (!popped) {
+                                navController.navigate(route) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                }
                             }
-                            launchSingleTop = true
-                            // Ripristina lo stato precedente per un caricamento istantaneo
-                            restoreState = true
+                        } else {
+                            // --- NAVIGAZIONE OTTIMIZZATA ---
+                            navController.navigate(route) {
+                                // Pulisce lo stack ma salva lo stato delle pagine
+                                // per evitare di ricaricarle da zero ogni volta (causa della lentezza)
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                // Ripristina lo stato precedente per un caricamento istantaneo
+                                restoreState = true
+                            }
                         }
                     }
                 }
@@ -308,7 +320,7 @@ fun MainNavigation() {
 }
 
 @Composable
-fun CustomAnimatedBottomBar(currentRoute: String, onNavigate: (String) -> Unit) {
+fun CustomAnimatedBottomBar(currentRoute: String, onNavigate: (String, Boolean) -> Unit) {
     val items = listOf(
         Destination.HOME,
         Destination.SEARCH,
@@ -392,7 +404,7 @@ fun CustomAnimatedBottomBar(currentRoute: String, onNavigate: (String) -> Unit) 
                                     // --- FIX RETTANGOLO GRIGIO ---
                                     interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
                                     indication = null // Rimuove il rettangolo di sfondo al clic
-                                ) { onNavigate(destination.route) },
+                                ) { onNavigate(destination.route, isSelected) },
                             contentAlignment = Alignment.Center
                         ) {
                             Column(
