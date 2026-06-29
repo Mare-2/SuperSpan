@@ -76,7 +76,6 @@ fun AdminCouponEditPage(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = paddingValues.calculateBottomPadding())
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,
@@ -95,7 +94,6 @@ fun AdminCouponEditPage(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = paddingValues.calculateBottomPadding())
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,

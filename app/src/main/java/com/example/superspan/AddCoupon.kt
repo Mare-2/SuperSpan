@@ -163,7 +163,6 @@ fun AddCoupon(paddingValues: PaddingValues, navController: NavController?) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(bottom = paddingValues.calculateBottomPadding())
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null,
@@ -184,7 +183,6 @@ fun AddCoupon(paddingValues: PaddingValues, navController: NavController?) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(bottom = paddingValues.calculateBottomPadding())
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null,
@@ -608,89 +606,12 @@ fun MultiProductSelectionScreen(
         }
     }
 
-    Scaffold(
-        bottomBar = {
-            Box(modifier = Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
-                Button(
-                    onClick = { onConfirm(currentSelection.toList()) },
-                    enabled = currentSelection.size == maxSelection,
-                    modifier = Modifier.wrapContentWidth().height(55.dp),
-                    shape = CircleShape,
-                    colors = ButtonDefaults.buttonColors(containerColor = com.example.superspan.ui.theme.LogoLeft)
-                ) {
-                    Text("Conferma Selezione", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                }
-            }
-        }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
+    Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 220.dp, bottom = 100.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // --- HEADER ---
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp, bottom = 16.dp)
-            ) {
-                IconButton(
-                    onClick = onBack,
-                    modifier = Modifier
-                        .align(Alignment.CenterStart)
-                        .padding(start = 16.dp)
-                        .background(Color.White.copy(alpha = 0.7f), CircleShape)
-                ) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = com.example.superspan.ui.theme.LogoLeft)
-                }
-            }
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "Seleziona Prodotti",
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = Color(0xFF1A1A1A)
-                )
-                Text(
-                    text = "Selezionati ${currentSelection.size} su $maxSelection",
-                    fontSize = 16.sp,
-                    color = Color.Gray
-                )
-            }
-            TextField(
-                value = query,
-                onValueChange = { query = it },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                placeholder = { Text("Cerca prodotto per nome...") },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = Color.Gray) },
-                trailingIcon = {
-                    if (query.isNotEmpty()) {
-                        IconButton(onClick = { query = "" }) {
-                            Icon(Icons.Default.Close, contentDescription = "Cancella", tint = Color.Gray)
-                        }
-                    }
-                },
-                shape = RoundedCornerShape(24.dp),
-                colors = TextFieldDefaults.colors(
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    disabledIndicatorColor = Color.Transparent
-                ),
-                singleLine = true
-            )
-
-            LazyColumn(
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
                 items(filteredList) { p ->
                     val isSelected = currentSelection.contains(p)
                     Card(
@@ -741,49 +662,15 @@ fun MultiProductSelectionScreen(
                     }
                 }
             }
-        }
-    }
-}
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ProductSelectionScreen(
-    onBack: () -> Unit,
-    onSelected: (Product) -> Unit
-) {
-    var query by remember { mutableStateOf("") }
-
-    val filteredList = remember(query) {
-        if (query.isBlank()) ListOfProduct
-        else ListOfProduct.filter {
-            it.nome.contains(query, ignoreCase = true)
-        }
-    }
-
-    Scaffold(
-    ) { innerPadding ->
+        // --- TRANSLUCENT HEADER ---
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
+                .fillMaxWidth()
+                .background(Color.White)
+                .align(Alignment.TopCenter)
         ) {
-            // --- HEADER ---
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp, bottom = 16.dp)
-            ) {
-                IconButton(
-                    onClick = onBack,
-                    modifier = Modifier
-                        .align(Alignment.CenterStart)
-                        .padding(start = 16.dp)
-                        .background(Color.White.copy(alpha = 0.7f), CircleShape)
-                ) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = com.example.superspan.ui.theme.LogoLeft)
-                }
-            }
-
+            Spacer(modifier = Modifier.height(64.dp))
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -791,10 +678,15 @@ fun ProductSelectionScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Seleziona Prodotto",
+                    text = "Seleziona Prodotti",
                     fontSize = 32.sp,
                     fontWeight = FontWeight.ExtraBold,
                     color = Color(0xFF1A1A1A)
+                )
+                Text(
+                    text = "Selezionati ${currentSelection.size} su $maxSelection",
+                    fontSize = 16.sp,
+                    color = Color.Gray
                 )
             }
             TextField(
@@ -820,11 +712,62 @@ fun ProductSelectionScreen(
                 ),
                 singleLine = true
             )
+        }
 
-            LazyColumn(
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+        // Floating Back Button
+        IconButton(
+            onClick = onBack,
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(top = 16.dp, start = 16.dp)
+                .background(Color.White.copy(alpha = 0.7f), CircleShape)
+                .size(48.dp)
+        ) {
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = com.example.superspan.ui.theme.LogoLeft)
+        }
+
+        // Floating Bottom Confirm Button
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 100.dp, start = 16.dp, end = 16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Button(
+                onClick = { onConfirm(currentSelection.toList()) },
+                enabled = currentSelection.size == maxSelection,
+                modifier = Modifier.wrapContentWidth().height(55.dp),
+                shape = CircleShape,
+                colors = ButtonDefaults.buttonColors(containerColor = com.example.superspan.ui.theme.LogoLeft)
             ) {
+                Text("Conferma Selezione", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ProductSelectionScreen(
+    onBack: () -> Unit,
+    onSelected: (Product) -> Unit
+) {
+    var query by remember { mutableStateOf("") }
+
+    val filteredList = remember(query) {
+        if (query.isBlank()) ListOfProduct
+        else ListOfProduct.filter {
+            it.nome.contains(query, ignoreCase = true)
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 220.dp, bottom = 100.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
                 items(filteredList) { p ->
                     Card(
                         modifier = Modifier
@@ -865,6 +808,63 @@ fun ProductSelectionScreen(
                     }
                 }
             }
+
+        // --- TRANSLUCENT HEADER ---
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White)
+                .align(Alignment.TopCenter)
+        ) {
+            Spacer(modifier = Modifier.height(64.dp))
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Seleziona Prodotto",
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color(0xFF1A1A1A)
+                )
+            }
+            TextField(
+                value = query,
+                onValueChange = { query = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                placeholder = { Text("Cerca prodotto per nome...") },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = Color.Gray) },
+                trailingIcon = {
+                    if (query.isNotEmpty()) {
+                        IconButton(onClick = { query = "" }) {
+                            Icon(Icons.Default.Close, contentDescription = "Cancella", tint = Color.Gray)
+                        }
+                    }
+                },
+                shape = RoundedCornerShape(24.dp),
+                colors = TextFieldDefaults.colors(
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent
+                ),
+                singleLine = true
+            )
+        }
+
+        // Floating Back Button
+        IconButton(
+            onClick = onBack,
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(top = 16.dp, start = 16.dp)
+                .background(Color.White.copy(alpha = 0.7f), CircleShape)
+                .size(48.dp)
+        ) {
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = com.example.superspan.ui.theme.LogoLeft)
         }
     }
 }
