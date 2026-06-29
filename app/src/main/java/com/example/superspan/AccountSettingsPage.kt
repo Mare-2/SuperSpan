@@ -51,7 +51,11 @@ fun AccountSettingsPage(user: User, navController: NavController?, paddingValues
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
-                modifier = Modifier.fillMaxSize().padding(paddingValues).verticalScroll(scrollState)
+                modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = paddingValues.calculateTopPadding())
+                        .imePadding()
+                        .verticalScroll(scrollState)
         ) {
             // --- HEADER (Senza rettangolo bianco, testo scuro) ---
             Box(modifier = Modifier.fillMaxWidth().padding(top = 80.dp, bottom = 16.dp)) {
@@ -205,7 +209,8 @@ fun AccountSettingsPage(user: User, navController: NavController?, paddingValues
                                 )
                 ) { Text("Salva Modifiche", fontSize = 18.sp, fontWeight = FontWeight.Bold) }
 
-                Spacer(Modifier.height(paddingValues.calculateBottomPadding() + 24.dp))
+                val isImeVisible = androidx.compose.foundation.layout.WindowInsets.ime.getBottom(androidx.compose.ui.platform.LocalDensity.current) > 0
+                Spacer(Modifier.height(if (isImeVisible) 24.dp else paddingValues.calculateBottomPadding() + 24.dp))
             }
         } // End of scrollable Column
 
