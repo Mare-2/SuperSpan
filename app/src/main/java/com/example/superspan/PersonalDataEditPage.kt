@@ -96,7 +96,7 @@ fun PersonalDataEditPage(navController: NavController?, padding: PaddingValues) 
                     .padding(horizontal = 20.dp, vertical = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                
+
             }
             Column(
                 modifier = Modifier
