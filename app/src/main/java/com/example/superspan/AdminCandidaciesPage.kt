@@ -26,6 +26,9 @@ import androidx.core.content.FileProvider
 import java.io.File
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.style.TextAlign
+import com.example.superspan.ui.theme.LogoLeft
+import com.example.superspan.ui.theme.LogoCenter
+import com.example.superspan.ui.theme.AppError
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class, androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
@@ -76,8 +79,8 @@ fun AdminCandidaciesPage(navController: NavController?, paddingValues: PaddingVa
                         .padding(top = 64.dp, bottom = 24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("Lavora con noi!", fontSize = 32.sp, fontWeight = FontWeight.ExtraBold)
-                    Text("Gestione Candidature", fontSize = 16.sp, color = Color.Gray)
+                    Text("Gestione Candidature", fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, color = Color.Black)
+                    Text("Pannello di Amministrazione", fontSize = 16.sp, color = Color.Gray)
                 }
             }
 
@@ -92,80 +95,95 @@ fun AdminCandidaciesPage(navController: NavController?, paddingValues: PaddingVa
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.White),
-                    elevation = CardDefaults.cardElevation(2.dp)
-            ) {
-                Column(Modifier.padding(16.dp)) {
-                    Row(
-                        Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text("Filtri di Ricerca", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                        if (selectedRole != null || selectedSupermarket != null) {
-                            TextButton(onClick = {
-                                selectedRole = null
-                                selectedSupermarket = null
-                            }, contentPadding = PaddingValues(0.dp)) {
-                                Text("Azzera", color = com.example.superspan.ui.theme.AppError)
+                    shape = RoundedCornerShape(20.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                ) {
+                    Column(Modifier.padding(20.dp)) {
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text("Filtri di Ricerca", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = LogoLeft)
+                            if (selectedRole != null || selectedSupermarket != null) {
+                                TextButton(onClick = {
+                                    selectedRole = null
+                                    selectedSupermarket = null
+                                }, contentPadding = PaddingValues(0.dp)) {
+                                    Text("Azzera", color = AppError)
+                                }
                             }
                         }
-                    }
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
 
-                    // Filtro Sede
-                    OutlinedButton(
-                        onClick = { isSelectionOpen = true },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Icon(Icons.Default.LocationOn, contentDescription = null, modifier = Modifier.size(20.dp))
-                        Spacer(Modifier.width(8.dp))
-                        Text(selectedSupermarket?.nome ?: "Tutte le Sedi")
-                    }
+                        // Filtro Sede
+                        OutlinedButton(
+                            onClick = { isSelectionOpen = true },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = LogoLeft)
+                        ) {
+                            Icon(Icons.Default.LocationOn, contentDescription = null, modifier = Modifier.size(20.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Text(selectedSupermarket?.nome ?: "Tutte le Sedi", fontWeight = FontWeight.Bold)
+                        }
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
 
-                    // Filtro Ruolo
-                    ScrollableTabRow(
-                        selectedTabIndex = Role.entries.indexOf(selectedRole).takeIf { it >= 0 } ?: 0,
-                        edgePadding = 0.dp,
-                        containerColor = Color.Transparent,
-                        indicator = {},
-                        divider = {}
-                    ) {
-                        FilterChip(
-                            selected = selectedRole == null,
-                            onClick = { selectedRole = null },
-                            label = { Text("Tutti i Ruoli") },
-                            modifier = Modifier.padding(end = 8.dp)
-                        )
-                        Role.entries.forEach { role ->
+                        // Filtro Ruolo
+                        ScrollableTabRow(
+                            selectedTabIndex = Role.entries.indexOf(selectedRole).takeIf { it >= 0 } ?: 0,
+                            edgePadding = 0.dp,
+                            containerColor = Color.Transparent,
+                            indicator = {},
+                            divider = {}
+                        ) {
+                            val chipColors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = LogoLeft.copy(alpha = 0.1f),
+                                selectedLabelColor = LogoLeft,
+                                selectedLeadingIconColor = LogoLeft
+                            )
                             FilterChip(
-                                selected = selectedRole == role,
-                                onClick = { selectedRole = role },
-                                label = { Text(role.nome) },
-                                modifier = Modifier.padding(end = 8.dp)
+                                selected = selectedRole == null,
+                                onClick = { selectedRole = null },
+                                label = { Text("Tutti i Ruoli") },
+                                modifier = Modifier.padding(end = 8.dp),
+                                colors = chipColors
+                            )
+                            Role.entries.forEach { role ->
+                                FilterChip(
+                                    selected = selectedRole == role,
+                                    onClick = { selectedRole = role },
+                                    label = { Text(role.nome) },
+                                    modifier = Modifier.padding(end = 8.dp),
+                                    colors = chipColors
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // Ordinamento Data
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text("Ordina per Data: ", fontSize = 14.sp, color = Color.Gray, fontWeight = FontWeight.Medium)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            FilterChip(
+                                selected = true,
+                                onClick = { dateDescending = !dateDescending },
+                                label = { Text(if (dateDescending) "Più Recenti" else "Meno Recenti") },
+                                leadingIcon = {
+                                    Icon(if (dateDescending) Icons.Default.ArrowDownward else Icons.Default.ArrowUpward, null, modifier = Modifier.size(16.dp))
+                                },
+                                colors = FilterChipDefaults.filterChipColors(
+                                    selectedContainerColor = LogoCenter.copy(alpha = 0.1f),
+                                    selectedLabelColor = LogoCenter,
+                                    selectedLeadingIconColor = LogoCenter
+                                )
                             )
                         }
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Ordinamento Data
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("Ordina per Data: ", fontSize = 14.sp, color = Color.Gray)
-                        FilterChip(
-                            selected = true,
-                            onClick = { dateDescending = !dateDescending },
-                            label = { Text(if (dateDescending) "Più Recenti" else "Meno Recenti") },
-                            leadingIcon = {
-                                Icon(if (dateDescending) Icons.Default.ArrowDownward else Icons.Default.ArrowUpward, null, modifier = Modifier.size(16.dp))
-                            }
-                        )
-                    }
                     }
                 }
             }
@@ -174,12 +192,12 @@ fun AdminCandidaciesPage(navController: NavController?, paddingValues: PaddingVa
             if (filteredCandidacies.isEmpty()) {
                 item {
                     Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
-                        Text("Nessuna candidatura trovata", color = Color.Gray)
+                        Text("Nessuna candidatura trovata", color = Color.Gray, fontSize = 16.sp)
                     }
                 }
             } else {
                 items(filteredCandidacies) { candidacy ->
-                    Box(Modifier.padding(horizontal = 16.dp, vertical = 6.dp)) {
+                    Box(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
                         CandidacyAdminCard(candidacy)
                     }
                 }
@@ -259,71 +277,73 @@ fun CandidacyAdminCard(candidacy: Candidacy) {
     }
 
     Card(
-        modifier = if (isForwarded) Modifier.fillMaxWidth().alpha(0.6f) else Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = if (isForwarded) Color(0xFFF5F5F5) else Color.White),
+        modifier = if (isForwarded) Modifier.fillMaxWidth().alpha(0.7f) else Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = if (isForwarded) Color(0xFFF9F9F9) else Color.White),
         elevation = CardDefaults.cardElevation(if (isForwarded) 0.dp else 2.dp),
-        shape = RoundedCornerShape(16.dp)
+        shape = RoundedCornerShape(20.dp)
     ) {
-        Column(Modifier.padding(16.dp)) {
+        Column(Modifier.padding(20.dp)) {
             // Header: Ruolo e Delete
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Top) {
                 Text(
                     text = offer?.titolo ?: "Offerta rimossa",
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.ExtraBold,
                     fontSize = 18.sp,
-                    color = Color(0xFF1565C0),
+                    color = LogoLeft,
                     modifier = Modifier.weight(1f)
                 )
                 if (!isForwarded) {
-                    IconButton(onClick = { showDiscardDialog = true }, modifier = Modifier.size(24.dp)) {
-                        Icon(Icons.Default.Delete, contentDescription = "Scarta", tint = com.example.superspan.ui.theme.AppError, modifier = Modifier.size(20.dp))
+                    IconButton(onClick = { showDiscardDialog = true }, modifier = Modifier.size(28.dp).background(AppError.copy(alpha = 0.1f), RoundedCornerShape(8.dp))) {
+                        Icon(Icons.Default.Delete, contentDescription = "Scarta", tint = AppError, modifier = Modifier.size(18.dp))
                     }
                 }
             }
-            
+
+            Spacer(Modifier.height(8.dp))
+
             // Sede
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 4.dp)) {
-                Icon(Icons.Default.LocationOn, null, tint = Color.Gray, modifier = Modifier.size(16.dp))
-                Spacer(Modifier.width(4.dp))
-                Text(offer?.supermarket?.nome ?: "Sede non specificata", fontSize = 14.sp, color = Color.DarkGray)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.LocationOn, null, tint = LogoCenter, modifier = Modifier.size(16.dp))
+                Spacer(Modifier.width(6.dp))
+                Text(offer?.supermarket?.nome ?: "Sede non specificata", fontSize = 14.sp, color = Color.DarkGray, fontWeight = FontWeight.Medium)
             }
 
             // Data Inviata
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 4.dp)) {
                 Icon(Icons.Default.DateRange, null, tint = Color.Gray, modifier = Modifier.size(16.dp))
-                Spacer(Modifier.width(4.dp))
+                Spacer(Modifier.width(6.dp))
                 Text("Inviata il: ${candidacy.dataInvio}", fontSize = 14.sp, color = Color.Gray)
             }
 
-            Spacer(Modifier.height(12.dp))
-            Divider(color = Color(0xFFEEEEEE))
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(16.dp))
+            HorizontalDivider(color = Color(0xFFEEEEEE))
+            Spacer(Modifier.height(16.dp))
 
             // Info Candidato
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.Person, null, tint = Color(0xFF388E3C))
+                Icon(Icons.Default.Person, null, tint = LogoLeft, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.width(8.dp))
-                Text("${candidacy.nome} ${candidacy.cognome}", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text("${candidacy.nome} ${candidacy.cognome}", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.Black)
             }
             
-            Spacer(Modifier.height(4.dp))
+            Spacer(Modifier.height(6.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.Email, null, tint = Color.Gray, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(8.dp))
-                Text(candidacy.emailContatto, fontSize = 14.sp, color = Color.Gray)
+                Text(candidacy.emailContatto, fontSize = 14.sp, color = Color.DarkGray)
             }
             
-            Spacer(Modifier.height(4.dp))
+            Spacer(Modifier.height(6.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.Phone, null, tint = Color.Gray, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(8.dp))
-                Text(candidacy.telefono, fontSize = 14.sp, color = Color.Gray)
+                Text(candidacy.telefono, fontSize = 14.sp, color = Color.DarkGray)
             }
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(20.dp))
 
             // Bottoni Download
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 if (candidacy.cvPath != null) {
                     Button(
                         onClick = { 
@@ -355,12 +375,14 @@ fun CandidacyAdminCard(candidacy: Candidacy) {
                                 }
                             }
                         },
-                        modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE8F5E9), contentColor = Color(0xFF2E7D32))
+                        modifier = Modifier.weight(1f).height(45.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = LogoLeft.copy(alpha = 0.1f), contentColor = LogoLeft),
+                        elevation = ButtonDefaults.buttonElevation(0.dp)
                     ) {
                         Icon(Icons.Default.Description, null, modifier = Modifier.size(18.dp))
                         Spacer(Modifier.width(6.dp))
-                        Text("Vedi CV")
+                        Text("Vedi CV", fontWeight = FontWeight.Bold)
                     }
                 }
                 if (candidacy.videoPath != null) {
@@ -394,41 +416,56 @@ fun CandidacyAdminCard(candidacy: Candidacy) {
                                 }
                             }
                         },
-                        modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFF3E0), contentColor = Color(0xFFE65100))
+                        modifier = Modifier.weight(1f).height(45.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = LogoCenter.copy(alpha = 0.15f), contentColor = LogoCenter),
+                        elevation = ButtonDefaults.buttonElevation(0.dp)
                     ) {
                         Icon(Icons.Default.PlayArrow, null, modifier = Modifier.size(18.dp))
                         Spacer(Modifier.width(6.dp))
-                        Text("Vedi Video")
+                        Text("Vedi Video", fontWeight = FontWeight.Bold)
                     }
                 }
             }
 
             // Bottoni Inoltro
             if (!isForwarded) {
-                Spacer(Modifier.height(12.dp))
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Spacer(Modifier.height(16.dp))
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     Button(
                         onClick = { showHRConfirm = true },
-                        modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE3F2FD), contentColor = Color(0xFF1976D2)),
+                        modifier = Modifier.weight(1f).height(45.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = LogoLeft, contentColor = Color.White),
                         contentPadding = PaddingValues(horizontal = 4.dp)
                     ) {
-                        Text("Invia a HR", fontSize = 12.sp, textAlign = TextAlign.Center)
+                        Text("Invia a HR", fontSize = 13.sp, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold)
                     }
                     Button(
                         onClick = { showManagerConfirm = true },
-                        modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE3F2FD), contentColor = Color(0xFF1976D2)),
+                        modifier = Modifier.weight(1f).height(45.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = LogoCenter, contentColor = Color.White),
                         contentPadding = PaddingValues(horizontal = 4.dp)
                     ) {
-                        Text("Invia a Responsabile", fontSize = 12.sp, textAlign = TextAlign.Center)
+                        Text("A Responsabile", fontSize = 13.sp, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold)
                     }
                 }
             } else {
-                Spacer(Modifier.height(12.dp))
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                    Text("Candidatura ${candidacy.stato}", color = Color.Gray, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                Spacer(Modifier.height(16.dp))
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color(0xFFEEEEEE), RoundedCornerShape(12.dp))
+                        .padding(vertical = 12.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Stato: ${candidacy.stato}",
+                        color = Color.DarkGray,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
         }

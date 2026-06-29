@@ -42,7 +42,7 @@ fun AccountSummaryPage(user: User, navController: NavController?, padding: Paddi
                         .align(Alignment.CenterStart)
                         .background(Color.White.copy(alpha = 0.7f), CircleShape)
                 ) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = com.example.superspan.ui.theme.LogoLeft)
                 }
             }
 

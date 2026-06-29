@@ -786,7 +786,7 @@ fun OfferPromoCard(coupon: Coupon, isHighlighted: Boolean = false, navController
 fun OfferDetailPage(coupon: Coupon, navController: NavController? = null, onBack: () -> Unit) {
     Column(Modifier.fillMaxSize()) {
         Row(Modifier.padding(8.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onBack, modifier = androidx.compose.ui.Modifier.background(androidx.compose.ui.graphics.Color.White.copy(alpha = 0.7f), androidx.compose.foundation.shape.CircleShape)) { Icon(androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack, null) }
+            IconButton(onClick = onBack, modifier = androidx.compose.ui.Modifier.background(androidx.compose.ui.graphics.Color.White.copy(alpha = 0.7f), androidx.compose.foundation.shape.CircleShape)) { Icon(androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack, null, tint = com.example.superspan.ui.theme.LogoLeft) }
             Text("Torna alla lista", color = Color.Gray)
         }
         Column(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp).verticalScroll(rememberScrollState())) {

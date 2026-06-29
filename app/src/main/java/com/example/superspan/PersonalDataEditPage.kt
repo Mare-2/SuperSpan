@@ -75,7 +75,7 @@ fun PersonalDataEditPage(navController: NavController?, padding: PaddingValues) 
                     .padding(start = 8.dp)
                     .background(Color.White.copy(alpha = 0.7f), CircleShape)
             ) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = Color.Black)
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = com.example.superspan.ui.theme.LogoLeft)
             }
             Text(
                 text = "Modifica Dati",
@@ -290,31 +290,53 @@ fun PersonalDataEditPage(navController: NavController?, padding: PaddingValues) 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(padding)
+            .verticalScroll(scrollState)
     ) {
-        // --- HEADER (Senza rettangolo bianco, testo scuro) ---
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 80.dp, bottom = 16.dp)
-        ) {
-            IconButton(onClick = { navController?.popBackStack() }, modifier = Modifier.align(Alignment.CenterStart).padding(start = 8.dp).background(Color.White.copy(alpha = 0.7f), CircleShape)) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = Color.Black)
-            }
-            Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("Modifica Dati", color = Color.Black, fontSize = 22.sp, fontWeight = FontWeight.Bold)
-                Text("I campi verdi sono completati", color = Color.DarkGray, fontSize = 12.sp)
-            }
-        }
+            // Spazio per la barra di stato
+            Spacer(Modifier.height(padding.calculateTopPadding()))
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 25.dp)
-                .verticalScroll(scrollState),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Spacer(Modifier.height(20.dp))
+            // --- HEADER ---
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                IconButton(
+                    onClick = { navController?.popBackStack() },
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .background(Color.White.copy(alpha = 0.7f), CircleShape)
+                ) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = com.example.superspan.ui.theme.LogoLeft)
+                }
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Modifica Dati",
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color(0xFF1A1A1A)
+                )
+                Text(
+                    text = "I campi verdi sono completati",
+                    fontSize = 16.sp,
+                    color = Color.Gray
+                )
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(Modifier.height(8.dp))
 
             // Campi Nome e Cognome
             EditTextField("Nome", nome, KeyboardType.Text) { nome = it }
@@ -404,69 +426,19 @@ fun PersonalDataEditPage(navController: NavController?, padding: PaddingValues) 
                     navController?.popBackStack()
                 },
                 enabled = nome.isNotEmpty() && cognome.isNotEmpty() && isEmailValid && isPhoneValid && telefonoDigits.isNotEmpty(),
-                modifier = Modifier.height(55.dp).width(220.dp),
+                modifier = Modifier.height(55.dp),
                 shape = CircleShape,
                 colors = ButtonDefaults.buttonColors(containerColor = com.example.superspan.ui.theme.LogoLeft)
             ) {
                 Text("Conferma e Salva", fontSize = 18.sp, fontWeight = FontWeight.Bold)
             }
 
-            Spacer(Modifier.height(40.dp))
+            Spacer(Modifier.height(padding.calculateBottomPadding() + 24.dp))
         }
     }
 }
 
-@Composable
-fun EditTextField(
-    label: String,
-    value: String,
-    keyboardType: KeyboardType,
-    isError: Boolean = false,
-    errorMessage: String = "",
-    visualTransformation: VisualTransformation = VisualTransformation.None,
-    modifier: Modifier = Modifier,
-    trailingIcon: @Composable (() -> Unit)? = null,
-    onValueChange: (String) -> Unit
-) {
-    // Logica colori:
-    // Errore -> Rosso
-    // Pieno (senza errore) -> Verde
-    // Vuoto -> Grigio (Neutro e moderno)
-    val containerColor = when {
-        isError -> Color(0xFFFDECEA)
-        value.isNotEmpty() -> Color(0xFFF0F9F0)
-        else -> Color(0xFFF5F5F5)
-    }
 
-    val borderColor = when {
-        isError -> com.example.superspan.ui.theme.AppError
-        value.isNotEmpty() -> Color(0xFF81C784)
-        else -> Color.LightGray
-    }
-
-    Column(modifier = modifier.padding(vertical = 4.dp)) {
-        OutlinedTextField(
-            value = value,
-            onValueChange = onValueChange,
-            visualTransformation = visualTransformation,
-            label = { Text(label) },
-            modifier = Modifier.fillMaxWidth().background(containerColor, RoundedCornerShape(20.dp)),
-            shape = RoundedCornerShape(20.dp),
-            singleLine = true,
-            isError = isError,
-            trailingIcon = trailingIcon,
-            keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-            colors = OutlinedTextFieldDefaults.colors(
-                unfocusedBorderColor = borderColor,
-                focusedBorderColor = borderColor,
-                errorBorderColor = borderColor
-            )
-        )
-        if (isError) {
-            Text(errorMessage, color = com.example.superspan.ui.theme.AppError, fontSize = 12.sp, modifier = Modifier.padding(start = 12.dp))
-        }
-    }
-}
 
 
 class PhoneVisualTransformation : VisualTransformation {

@@ -48,12 +48,40 @@ fun DraftsPage(navController: NavController?, padding: PaddingValues) {
         ) {
             item {
                 // Header
-                Row(Modifier.fillMaxWidth().padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = { navController?.popBackStack() }, modifier = Modifier.background(androidx.compose.ui.graphics.Color.White.copy(alpha = 0.7f), androidx.compose.foundation.shape.CircleShape)) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
+                Column {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                    ) {
+                        IconButton(
+                            onClick = { navController?.popBackStack() },
+                            modifier = Modifier
+                                .align(Alignment.CenterStart)
+                                .background(Color.White.copy(alpha = 0.7f), CircleShape)
+                        ) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = com.example.superspan.ui.theme.LogoLeft)
+                        }
                     }
-                    Spacer(Modifier.width(8.dp))
-                    Text("Le tue Candidature", fontSize = 20.sp, fontWeight = FontWeight.ExtraBold)
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp, vertical = 8.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "Le tue Candidature",
+                            fontSize = 32.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = Color(0xFF1A1A1A)
+                        )
+                        Text(
+                            text = "Monitora e gestisci le tue opportunità",
+                            fontSize = 16.sp,
+                            color = Color.Gray
+                        )
+                    }
                 }
             }
             

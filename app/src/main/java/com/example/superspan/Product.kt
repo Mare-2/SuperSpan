@@ -295,7 +295,7 @@ fun ProductPage(product: Product?, navController: NavController?, paddingValues:
                 .background(Color.White.copy(alpha = 0.7f), androidx.compose.foundation.shape.CircleShape)
                 .size(48.dp)
         ) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.Black)
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = com.example.superspan.ui.theme.LogoLeft)
         }
     }
 

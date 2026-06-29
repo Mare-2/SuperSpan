@@ -46,6 +46,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.OutlinedTextFieldDefaults
 
 
 
@@ -379,3 +383,56 @@ fun HeaderHomeAlt(modifier: Modifier, navController: NavController?) {
 
 
 val longTestText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam bibendum lobortis lobortis. Phasellus pretium sagittis interdum. Donec posuere sapien eget enim placerat cursus. Phasellus condimentum bibendum enim in vestibulum. Vivamus varius quam odio, eget bibendum diam tincidunt nec. In eu posuere metus. Aliquam erat volutpat. Nam non iaculis nibh, eget luctus orci. Integer id scelerisque enim, non placerat elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam bibendum lobortis lobortis. Phasellus pretium sagittis interdum. Donec posuere sapien eget enim placerat cursus. Phasellus condimentum bibendum enim in vestibulum. Vivamus varius quam odio, eget bibendum diam tincidunt nec. In eu posuere metus. Aliquam erat volutpat. Nam non iaculis nibh, eget luctus orci. Integer id scelerisque enim, non placerat elit."
+
+@Composable
+fun EditTextField(
+    label: String,
+    value: String,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    isError: Boolean = false,
+    errorMessage: String = "",
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    modifier: Modifier = Modifier,
+    trailingIcon: @Composable (() -> Unit)? = null,
+    readOnly: Boolean = false,
+    singleLine: Boolean = true,
+    minLines: Int = 1,
+    onValueChange: (String) -> Unit
+) {
+    val containerColor = when {
+        isError -> Color(0xFFFDECEA)
+        value.isNotEmpty() -> Color(0xFFF0F9F0)
+        else -> Color(0xFFF5F5F5)
+    }
+
+    val borderColor = when {
+        isError -> com.example.superspan.ui.theme.AppError
+        value.isNotEmpty() -> Color(0xFF81C784)
+        else -> Color.LightGray
+    }
+
+    Column(modifier = modifier.padding(vertical = 4.dp)) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            visualTransformation = visualTransformation,
+            label = { Text(label) },
+            modifier = Modifier.fillMaxWidth().background(containerColor, RoundedCornerShape(20.dp)),
+            shape = RoundedCornerShape(20.dp),
+            singleLine = singleLine,
+            minLines = minLines,
+            isError = isError,
+            readOnly = readOnly,
+            trailingIcon = trailingIcon,
+            keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+            colors = OutlinedTextFieldDefaults.colors(
+                unfocusedBorderColor = borderColor,
+                focusedBorderColor = borderColor,
+                errorBorderColor = borderColor
+            )
+        )
+        if (isError) {
+            Text(errorMessage, color = com.example.superspan.ui.theme.AppError, fontSize = 12.sp, modifier = Modifier.padding(start = 12.dp))
+        }
+    }
+}

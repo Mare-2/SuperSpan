@@ -51,37 +51,59 @@ fun AccountSettingsPage(user: User, navController: NavController?, paddingValues
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        modifier = Modifier.padding(paddingValues)
-    ) { innerPadding ->
+        modifier = Modifier.fillMaxSize(),
+        containerColor = Color.Transparent
+    ) { _ ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
+                .verticalScroll(scrollState)
         ) {
-        // --- HEADER (Senza rettangolo bianco, testo scuro) ---
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 80.dp, bottom = 16.dp)
-        ) {
-            IconButton(onClick = { navController?.popBackStack() }, modifier = Modifier.align(Alignment.CenterStart).padding(start = 8.dp).background(androidx.compose.ui.graphics.Color.White.copy(alpha = 0.7f), androidx.compose.foundation.shape.CircleShape)) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = Color.Black)
+            // Spazio per la barra di stato
+            Spacer(Modifier.height(paddingValues.calculateTopPadding()))
+
+            // --- HEADER ---
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                IconButton(
+                    onClick = { navController?.popBackStack() },
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .background(Color.White.copy(alpha = 0.7f), CircleShape)
+                ) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = com.example.superspan.ui.theme.LogoLeft)
+                }
             }
-            Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("Modifica Account", color = Color.Black, fontSize = 22.sp, fontWeight = FontWeight.Bold)
-                Text("Email e password", color = Color.DarkGray, fontSize = 12.sp)
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Modifica Account",
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color(0xFF1A1A1A)
+                )
+                Text(
+                    text = "Credenziali e sicurezza",
+                    fontSize = 16.sp,
+                    color = Color.Gray
+                )
             }
-        }
 
             // --- FORM ---
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 24.dp)
-                    .verticalScroll(scrollState),
+                    .fillMaxWidth()
+                    .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(Modifier.height(8.dp))
 
                 Card(
                     colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -166,14 +188,14 @@ fun AccountSettingsPage(user: User, navController: NavController?, paddingValues
                         }
                     },
                     enabled = canSave,
-                    modifier = Modifier.fillMaxWidth().height(55.dp),
+                    modifier = Modifier.height(55.dp),
                     shape = CircleShape,
                     colors = ButtonDefaults.buttonColors(containerColor = com.example.superspan.ui.theme.LogoLeft)
                 ) {
                     Text("Salva Modifiche", fontSize = 18.sp, fontWeight = FontWeight.Bold)
                 }
                 
-                Spacer(Modifier.height(40.dp))
+                Spacer(Modifier.height(paddingValues.calculateBottomPadding() + 24.dp))
             }
         }
 

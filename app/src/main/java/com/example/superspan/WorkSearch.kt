@@ -217,9 +217,8 @@ fun WorkSearchPage(
         if (hasActiveFilters) {
             item {
                 LazyRow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     if (filterData.distanzaMax < 1000f) {
@@ -284,86 +283,99 @@ fun WorkOfferCompose(workOffer: WorkOffer, navController: NavController?, isHigh
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
+            .clip(RoundedCornerShape(20.dp))
             .clickable { 
                 if (!actualUser.viewedOffers.contains(workOffer.id)) {
                     actualUser.viewedOffers.add(workOffer.id)
                 }
                 navController?.navigate("dettaglio_offerta/${workOffer.id}") 
             },
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = backgroundColor)
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = backgroundColor),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp, pressedElevation = 8.dp),
+        border = if (isHighlighted) BorderStroke(2.dp, com.example.superspan.ui.theme.LogoLeft) else BorderStroke(1.dp, Color(0xFFEAEAEA))
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
+            // RIGA SUPERIORE: Titolo e Badge Status
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = workOffer.titolo,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(1f)
+                    fontSize = 19.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    modifier = Modifier.weight(1f),
+                    color = Color(0xFF1A1A1A)
                 )
                 if (badgeText != null) {
                     val badgeColor = if (badgeText == "Bozza") androidx.compose.material3.MaterialTheme.colorScheme.secondary else if (badgeText == "Inviata") com.example.superspan.ui.theme.LogoCenter else com.example.superspan.ui.theme.LogoLeft
                     Surface(
-                        color = badgeColor.copy(alpha = 0.15f),
-                        shape = CircleShape,
-                        modifier = Modifier.padding(start = 8.dp)
+                        color = badgeColor.copy(alpha = 0.12f),
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier.padding(start = 12.dp)
                     ) {
                         Text(
                             text = badgeText.uppercase(),
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                            fontSize = 12.sp,
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+                            fontSize = 11.sp,
                             fontWeight = FontWeight.ExtraBold,
-                            color = badgeColor
+                            color = badgeColor,
+                            letterSpacing = 0.5.sp
                         )
                     }
                 }
             }
 
+            // DESCRIZIONE
             Text(
                 text = workOffer.descrizioneBreve,
                 fontSize = 14.sp,
-                color = Color.Gray,
-                maxLines = 2
+                color = Color.DarkGray,
+                maxLines = 2,
+                lineHeight = 20.sp,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
             )
 
-            // RIGA INFERIORE: Città • Contratto • Orario e Badge Distanza
+            HorizontalDivider(color = Color(0xFFF0F0F0), thickness = 1.dp)
+
+            // RIGA INFERIORE: Dettagli e Badge Distanza
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.Top) {
                     Icon(
                         imageVector = Icons.Default.LocationOn,
                         contentDescription = null,
-                        modifier = Modifier.size(14.dp).padding(top = 2.dp),
-                        tint = Color.Gray
+                        modifier = Modifier.size(16.dp).padding(top = 2.dp),
+                        tint = com.example.superspan.ui.theme.LogoLeft
                     )
+                    Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = " ${workOffer.supermarket.citta} • ${workOffer.tipoContratto.nome} • ${workOffer.orario.nome}",
-                        fontSize = 12.sp,
+                        text = "${workOffer.supermarket.citta} • ${workOffer.tipoContratto.nome} • ${workOffer.orario.nome}",
+                        fontSize = 13.sp,
                         color = Color.Gray,
+                        fontWeight = FontWeight.Medium,
                         modifier = Modifier.weight(1f)
                     )
                 }
 
                 // Badge Distanza
                 Surface(
-                    color = Color.White,
-                    shape = CircleShape,
-                    modifier = Modifier.padding(start = 8.dp)
+                    color = Color(0xFFF5F5F5),
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.padding(start = 12.dp)
                 ) {
                     Text(
                         "${workOffer.distanzaKm.toInt()} km",
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
-                        fontSize = 11.sp,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                        fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.DarkGray
                     )
@@ -381,56 +393,42 @@ fun WorkFilterPage(modifier: Modifier, filterData: WorkFilterData, padding: Padd
     // Stato locale per gestire lo switch "Tutta Italia"
     var tuttaItalia by remember { mutableStateOf(filterData.distanzaMax >= 1000f) }
 
-    Scaffold(
-        modifier = modifier,
-        containerColor = com.example.superspan.ui.theme.LogoCenter.copy(alpha = 0.15f),
-        topBar = {
-            Surface(
-                modifier = Modifier.fillMaxWidth().padding(top = padding.calculateTopPadding() + 8.dp),
-                color = Color.Transparent,
-                shadowElevation = 0.dp
-            ) {
-                Row(
-                    Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(
-                        onClick = onDismiss,
-                        modifier = Modifier.background(Color.White.copy(alpha = 0.7f), CircleShape)
-                    ) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
-                    }
-                    Text(
-                        "Filtri",
-                        fontSize = 26.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        modifier = Modifier.padding(start = 12.dp)
-                    )
-                    Spacer(Modifier.weight(1f))
-                    TextButton(
-                        onClick = {
-                            filterData.ruoli.clear()
-                            filterData.tipiContratto.clear()
-                            filterData.orari.clear()
-                            filterData.distanzaMax = 1000f
-                            tuttaItalia = true
-                        },
-                        modifier = Modifier.background(Color.White.copy(alpha = 0.7f), CircleShape)
-                    ) {
-                        Text("Reset", color = Color.Red, fontWeight = FontWeight.SemiBold)
-                    }
-                }
-            }
-        }
-    ) { innerPadding ->
-        Box(Modifier.fillMaxSize()) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(com.example.superspan.ui.theme.LogoRight.copy(alpha = 0.03f))
+    ) {
         Column(
             Modifier
                 .fillMaxSize()
-                .padding(top = innerPadding.calculateTopPadding())
                 .verticalScroll(scrollState)
-                .padding(horizontal = 24.dp, vertical = 16.dp)
         ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = padding.calculateTopPadding())
+                    .background(
+                        androidx.compose.ui.graphics.Brush.verticalGradient(
+                            colors = listOf(
+                                Color.White,
+                                Color.White.copy(alpha = 0f)
+                            )
+                        )
+                    )
+            ) {
+                Column(Modifier.padding(horizontal = 24.dp)) {
+                    Spacer(Modifier.height(64.dp))
+                    Text(
+                        "Filtri",
+                        fontSize = 32.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    Spacer(Modifier.height(80.dp))
+                }
+            }
+
+            Column(Modifier.padding(horizontal = 24.dp)) {
 
             // --- 2. SEZIONE DISTANZA (CARD MODERNA) ---
             Text("Dove vuoi lavorare?", fontSize = 18.sp, fontWeight = FontWeight.Bold)
@@ -591,6 +589,7 @@ fun WorkFilterPage(modifier: Modifier, filterData: WorkFilterData, padding: Padd
             }
 
             Spacer(Modifier.height(100.dp + padding.calculateBottomPadding()))
+            }
         }
 
         Button(
@@ -608,8 +607,35 @@ fun WorkFilterPage(modifier: Modifier, filterData: WorkFilterData, padding: Padd
                 modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
             )
         }
+
+        // Tasti fissi in alto
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = padding.calculateTopPadding() + 16.dp, start = 16.dp, end = 16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(
+                onClick = onDismiss,
+                modifier = Modifier.background(Color.White.copy(alpha = 0.7f), CircleShape)
+            ) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = com.example.superspan.ui.theme.LogoLeft)
+            }
+            TextButton(
+                onClick = {
+                    filterData.ruoli.clear()
+                    filterData.tipiContratto.clear()
+                    filterData.orari.clear()
+                    filterData.distanzaMax = 1000f
+                    tuttaItalia = true
+                },
+                modifier = Modifier.background(Color.White.copy(alpha = 0.7f), CircleShape)
+            ) {
+                Text("Reset", color = com.example.superspan.ui.theme.AppError, fontWeight = FontWeight.SemiBold)
+            }
+        }
     }
-}
 }
 
 @Composable

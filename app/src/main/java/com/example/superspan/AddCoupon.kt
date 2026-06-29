@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -92,19 +93,40 @@ fun AddCoupon(paddingValues: PaddingValues, navController: NavController?) {
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
-            // --- HEADER (Senza rettangolo bianco, testo scuro) ---
+            // --- HEADER ---
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 80.dp, bottom = 16.dp)
+                    .padding(top = 16.dp, bottom = 16.dp)
             ) {
-                IconButton(onClick = { navController?.popBackStack() }, modifier = Modifier.align(Alignment.CenterStart).padding(start = 8.dp)) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = Color.Black)
+                IconButton(
+                    onClick = { navController?.popBackStack() },
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .padding(start = 16.dp)
+                        .background(Color.White.copy(alpha = 0.7f), CircleShape)
+                ) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = com.example.superspan.ui.theme.LogoLeft)
                 }
-                Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(if (defaultTab == 0) "Aggiungi Coupon" else "Aggiungi Offerta", color = Color.Black, fontSize = 22.sp, fontWeight = FontWeight.Bold)
-                    Text("I campi verdi sono completati", color = Color.DarkGray, fontSize = 12.sp)
-                }
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = if (defaultTab == 0) "Aggiungi Coupon" else "Aggiungi Offerta",
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color(0xFF1A1A1A)
+                )
+                Text(
+                    text = "I campi verdi sono completati",
+                    fontSize = 16.sp,
+                    color = Color.Gray
+                )
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -234,7 +256,7 @@ private fun CouponForm(
         discountValue in 0f..100f
 
     Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-        CouponTextField(
+        EditTextField(
             value = code,
             onValueChange = { code = it },
             label = "Codice coupon",
@@ -243,7 +265,7 @@ private fun CouponForm(
             errorMessage = "Il codice deve avere almeno 3 caratteri"
         )
 
-        CouponTextField(
+        EditTextField(
             value = discount,
             onValueChange = { discount = it },
             label = "Sconto %",
@@ -252,7 +274,7 @@ private fun CouponForm(
             errorMessage = "Inserisci un numero tra 0 e 100"
         )
 
-        CouponTextField(
+        EditTextField(
             value = description,
             onValueChange = { description = it },
             label = "Descrizione (es. Kit Pranzo Veloce)",
@@ -291,7 +313,7 @@ private fun CouponForm(
             }
         }
 
-        CouponTextField(
+        EditTextField(
             value = expirationDate,
             onValueChange = { expirationDate = it },
             label = "Scadenza (yyyy-MM-dd)",
@@ -310,12 +332,22 @@ private fun CouponForm(
         selectedProducts.forEach { p ->
             Card(
                 modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.White),
                 border = androidx.compose.foundation.BorderStroke(2.dp, Color(0xFF81C784)),
                 elevation = CardDefaults.cardElevation(2.dp)
             ) {
                 Row(Modifier.padding(16.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.ShoppingCart, null, tint = Color(0xFF388E3C), modifier = Modifier.size(32.dp))
+                    if (p.image != null) {
+                        androidx.compose.foundation.Image(
+                            painter = androidx.compose.ui.res.painterResource(id = p.image!!),
+                            contentDescription = p.nome,
+                            modifier = Modifier.size(32.dp).clip(RoundedCornerShape(8.dp)),
+                            contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                        )
+                    } else {
+                        Icon(Icons.Default.ShoppingCart, null, tint = Color(0xFF388E3C), modifier = Modifier.size(32.dp))
+                    }
                     Spacer(Modifier.width(12.dp))
                     Column(Modifier.weight(1f)) {
                         Text(p.nome, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF1B5E20))
@@ -336,7 +368,8 @@ private fun CouponForm(
                 }
             },
             modifier = Modifier.fillMaxWidth().height(56.dp),
-            shape = RoundedCornerShape(12.dp),
+            shape = CircleShape,
+            border = androidx.compose.foundation.BorderStroke(2.dp, Color(0xFF81C784)),
             colors = androidx.compose.material3.ButtonDefaults.outlinedButtonColors(containerColor = Color.White)
         ) {
             Icon(Icons.Default.ShoppingCart, contentDescription = null)
@@ -362,21 +395,9 @@ private fun CouponForm(
             enabled = isFormValid,
             modifier = Modifier.height(55.dp).width(220.dp).align(Alignment.CenterHorizontally),
             shape = CircleShape,
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-            contentPadding = PaddingValues()
+            colors = ButtonDefaults.buttonColors(containerColor = com.example.superspan.ui.theme.LogoLeft)
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        if (isFormValid) Brush.horizontalGradient(listOf(Color(0xFF4CAF50), Color(0xFF2E7D32)))
-                        else Brush.horizontalGradient(listOf(Color.Gray, Color.DarkGray)),
-                        shape = CircleShape
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("Salva coupon", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-            }
+            Text("Salva coupon", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
         }
     }
 }
@@ -414,7 +435,7 @@ private fun PromoForm(
         discountValue in 0f..100f
 
     Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-        CouponTextField(
+        EditTextField(
             value = code,
             onValueChange = { code = it },
             label = "Codice offerta (interno)",
@@ -423,7 +444,7 @@ private fun PromoForm(
             errorMessage = "Il codice deve avere almeno 3 caratteri"
         )
 
-        CouponTextField(
+        EditTextField(
             value = discount,
             onValueChange = { discount = it },
             label = "Sconto %",
@@ -432,7 +453,7 @@ private fun PromoForm(
             errorMessage = "Inserisci un numero tra 0 e 100"
         )
 
-        CouponTextField(
+        EditTextField(
             value = description,
             onValueChange = { description = it },
             label = "Descrizione",
@@ -471,7 +492,7 @@ private fun PromoForm(
             }
         }
 
-        CouponTextField(
+        EditTextField(
             value = expirationDate,
             onValueChange = { expirationDate = it },
             label = "Scadenza (yyyy-MM-dd)",
@@ -495,7 +516,8 @@ private fun PromoForm(
                     }
                 },
                 modifier = Modifier.fillMaxWidth().height(56.dp),
-                shape = RoundedCornerShape(12.dp),
+                shape = CircleShape,
+                border = androidx.compose.foundation.BorderStroke(2.dp, Color(0xFF81C784)),
                 colors = androidx.compose.material3.ButtonDefaults.outlinedButtonColors(containerColor = Color.White)
             ) {
                 Icon(Icons.Default.ShoppingCart, contentDescription = null)
@@ -510,12 +532,22 @@ private fun PromoForm(
                             selectedProduct = product
                         }
                     },
+                    shape = RoundedCornerShape(20.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.White),
                     border = androidx.compose.foundation.BorderStroke(2.dp, Color(0xFF81C784)),
                     elevation = CardDefaults.cardElevation(2.dp)
                 ) {
                     Row(Modifier.padding(16.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                        if (p.image != null) {
+                        androidx.compose.foundation.Image(
+                            painter = androidx.compose.ui.res.painterResource(id = p.image!!),
+                            contentDescription = p.nome,
+                            modifier = Modifier.size(32.dp).clip(RoundedCornerShape(8.dp)),
+                            contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                        )
+                    } else {
                         Icon(Icons.Default.ShoppingCart, null, tint = Color(0xFF388E3C), modifier = Modifier.size(32.dp))
+                    }
                         Spacer(Modifier.width(12.dp))
                         Column(Modifier.weight(1f)) {
                             Text(p.nome, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF1B5E20))
@@ -546,73 +578,14 @@ private fun PromoForm(
             enabled = isFormValid,
             modifier = Modifier.height(55.dp).width(220.dp).align(Alignment.CenterHorizontally),
             shape = CircleShape,
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-            contentPadding = PaddingValues()
+            colors = ButtonDefaults.buttonColors(containerColor = com.example.superspan.ui.theme.LogoLeft)
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        if (isFormValid) Brush.horizontalGradient(listOf(Color(0xFF4CAF50), Color(0xFF2E7D32)))
-                        else Brush.horizontalGradient(listOf(Color.Gray, Color.DarkGray)),
-                        shape = CircleShape
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("Salva offerta", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-            }
+            Text("Salva offerta", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun CouponTextField(
-    label: String,
-    value: String,
-    keyboardType: KeyboardType = KeyboardType.Text,
-    isError: Boolean = false,
-    errorMessage: String = "",
-    readOnly: Boolean = false,
-    minLines: Int = 1,
-    singleLine: Boolean = true,
-    trailingIcon: @Composable (() -> Unit)? = null,
-    onValueChange: (String) -> Unit
-) {
-    val containerColor = Color.White
 
-    val borderColor = when {
-        isError -> com.example.superspan.ui.theme.AppError
-        value.isEmpty() -> Color(0xFFFFB74D)
-        else -> Color(0xFF81C784)
-    }
-
-    Column(modifier = Modifier.padding(vertical = 4.dp)) {
-        OutlinedTextField(
-            value = value,
-            onValueChange = onValueChange,
-            label = { Text(label) },
-            modifier = Modifier.fillMaxWidth().background(containerColor, RoundedCornerShape(20.dp)),
-            shape = RoundedCornerShape(20.dp),
-            isError = isError,
-            readOnly = readOnly,
-            minLines = minLines,
-            singleLine = singleLine,
-            trailingIcon = trailingIcon,
-            keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-            colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = containerColor,
-                unfocusedContainerColor = containerColor,
-                focusedBorderColor = borderColor,
-                unfocusedBorderColor = borderColor.copy(alpha = 0.5f),
-                errorBorderColor = com.example.superspan.ui.theme.AppError
-            )
-        )
-        if (isError) {
-            Text(errorMessage, color = com.example.superspan.ui.theme.AppError, fontSize = 12.sp, modifier = Modifier.padding(start = 12.dp, top = 4.dp))
-        }
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -633,35 +606,60 @@ fun MultiProductSelectionScreen(
     }
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Seleziona Prodotti (${currentSelection.size}/$maxSelection)", fontWeight = FontWeight.Bold, fontSize = 18.sp) },
-                navigationIcon = {
-                    IconButton(onClick = onBack, modifier = androidx.compose.ui.Modifier.background(androidx.compose.ui.graphics.Color.White.copy(alpha = 0.7f), androidx.compose.foundation.shape.CircleShape)) { Icon(androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
-            )
-        },
         bottomBar = {
-            Surface(modifier = Modifier.fillMaxWidth().padding(16.dp), color = Color.Transparent) {
+            Box(modifier = Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
                 Button(
                     onClick = { onConfirm(currentSelection.toList()) },
                     enabled = currentSelection.size == maxSelection,
-                    modifier = Modifier.fillMaxWidth().height(50.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF388E3C))
+                    modifier = Modifier.wrapContentWidth().height(55.dp),
+                    shape = CircleShape,
+                    colors = ButtonDefaults.buttonColors(containerColor = com.example.superspan.ui.theme.LogoLeft)
                 ) {
-                    Text("Conferma Selezione")
+                    Text("Conferma Selezione", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
                 }
             }
-        },
-        containerColor = Color(0xFFF8F9FA)
+        }
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
+            // --- HEADER ---
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp, bottom = 16.dp)
+            ) {
+                IconButton(
+                    onClick = onBack,
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .padding(start = 16.dp)
+                        .background(Color.White.copy(alpha = 0.7f), CircleShape)
+                ) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = com.example.superspan.ui.theme.LogoLeft)
+                }
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Seleziona Prodotti",
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color(0xFF1A1A1A)
+                )
+                Text(
+                    text = "Selezionati ${currentSelection.size} su $maxSelection",
+                    fontSize = 16.sp,
+                    color = Color.Gray
+                )
+            }
             TextField(
                 value = query,
                 onValueChange = { query = it },
@@ -713,13 +711,22 @@ fun MultiProductSelectionScreen(
                             modifier = Modifier.padding(16.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(48.dp)
-                                    .background(Color(0xFFFFF3E0), shape = RoundedCornerShape(12.dp)),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(Icons.Default.ShoppingCart, contentDescription = null, tint = Color(0xFFE65100))
+                            if (p.image != null) {
+                                androidx.compose.foundation.Image(
+                                    painter = androidx.compose.ui.res.painterResource(id = p.image!!),
+                                    contentDescription = p.nome,
+                                    modifier = Modifier.size(48.dp).clip(RoundedCornerShape(12.dp)),
+                                    contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                                )
+                            } else {
+                                Box(
+                                    modifier = Modifier
+                                        .size(48.dp)
+                                        .background(com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.1f), shape = RoundedCornerShape(12.dp)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(Icons.Default.ShoppingCart, contentDescription = null, tint = com.example.superspan.ui.theme.LogoLeft)
+                                }
                             }
                             Spacer(Modifier.width(16.dp))
                             Column(modifier = Modifier.weight(1f)) {
@@ -751,23 +758,42 @@ fun ProductSelectionScreen(
     }
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Seleziona Prodotto", fontWeight = FontWeight.Bold) },
-                navigationIcon = {
-                    IconButton(onClick = onBack, modifier = androidx.compose.ui.Modifier.background(androidx.compose.ui.graphics.Color.White.copy(alpha = 0.7f), androidx.compose.foundation.shape.CircleShape)) { Icon(androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
-            )
-        },
-        containerColor = Color(0xFFF8F9FA)
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
+            // --- HEADER ---
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp, bottom = 16.dp)
+            ) {
+                IconButton(
+                    onClick = onBack,
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .padding(start = 16.dp)
+                        .background(Color.White.copy(alpha = 0.7f), CircleShape)
+                ) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = com.example.superspan.ui.theme.LogoLeft)
+                }
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Seleziona Prodotto",
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color(0xFF1A1A1A)
+                )
+            }
             TextField(
                 value = query,
                 onValueChange = { query = it },
@@ -809,13 +835,22 @@ fun ProductSelectionScreen(
                             modifier = Modifier.padding(16.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(48.dp)
-                                    .background(Color(0xFFFFF3E0), shape = RoundedCornerShape(12.dp)),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(Icons.Default.ShoppingCart, contentDescription = null, tint = Color(0xFFE65100))
+                            if (p.image != null) {
+                                androidx.compose.foundation.Image(
+                                    painter = androidx.compose.ui.res.painterResource(id = p.image!!),
+                                    contentDescription = p.nome,
+                                    modifier = Modifier.size(48.dp).clip(RoundedCornerShape(12.dp)),
+                                    contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                                )
+                            } else {
+                                Box(
+                                    modifier = Modifier
+                                        .size(48.dp)
+                                        .background(com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.1f), shape = RoundedCornerShape(12.dp)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(Icons.Default.ShoppingCart, contentDescription = null, tint = com.example.superspan.ui.theme.LogoLeft)
+                                }
                             }
                             Spacer(Modifier.width(16.dp))
                             Column(modifier = Modifier.weight(1f)) {

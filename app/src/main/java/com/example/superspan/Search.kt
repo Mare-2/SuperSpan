@@ -294,7 +294,8 @@ fun SearchPage(
                 LazyRow(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 16.dp, top = 12.dp, end = 16.dp),
+                        .padding(top = 12.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     if (filterData.minPrice > 0.0 || filterData.maxPrice < maxPossiblePrice) {
@@ -546,7 +547,7 @@ fun FilterPage(modifier: Modifier, filterData: FilterData, onDismiss: () -> Unit
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onDismiss, modifier = Modifier.background(Color.White.copy(alpha = 0.7f), androidx.compose.foundation.shape.CircleShape)) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = com.example.superspan.ui.theme.LogoLeft)
                 }
                 Text(
                     "Filtri prodotti",
@@ -926,7 +927,7 @@ fun FilterPage(modifier: Modifier, filterData: FilterData, padding: PaddingValue
                 onClick = onDismiss,
                 modifier = Modifier.background(Color.White.copy(alpha = 0.7f), CircleShape)
             ) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = com.example.superspan.ui.theme.LogoLeft)
             }
             TextButton(
                 onClick = {

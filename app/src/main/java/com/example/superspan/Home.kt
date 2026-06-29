@@ -436,29 +436,22 @@ import com.example.superspan.ui.theme.LogoRight
 
 @Composable
 fun Home(paddingValues: PaddingValues, navController: NavController?) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(bottom = paddingValues.calculateBottomPadding() + 32.dp)
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = paddingValues.calculateBottomPadding())
     ) {
-        // 1. HEADER (Scorre via con il resto)
-        item {
-            Header()
-        }
+        // 1. HEADER
+        Header()
 
-        // 2. SEZIONE AZIONI RAPIDE (Fissa come da richiesta)
-        item {
-            QuickActionsSection(actualUser.admin, navController)
-        }
+        // 2. SEZIONE AZIONI RAPIDE
+        QuickActionsSection(actualUser.admin, navController)
 
         // 3. DASHBOARD DINAMICA
         if (actualUser.admin) {
-            item {
-                AdminDashboard(navController)
-            }
+            AdminDashboard(navController)
         } else {
-            item {
-                UserDashboard(navController)
-            }
+            UserDashboard(navController)
         }
     }
 }

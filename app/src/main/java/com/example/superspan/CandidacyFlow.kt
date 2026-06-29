@@ -105,7 +105,7 @@ fun ApplyHeader(step: String, title: String, onBack: () -> Unit, onClose: () -> 
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onBack, modifier = Modifier.background(Color.White.copy(alpha = 0.7f), CircleShape)) { 
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = MaterialTheme.colorScheme.primary)
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = com.example.superspan.ui.theme.LogoLeft)
             }
             Image(
                 painter = androidx.compose.ui.res.painterResource(id = R.drawable.superspan),
@@ -636,9 +636,9 @@ fun ApplyStep3(navController: NavController?, padding: PaddingValues) {
                 }
             },
             confirmText = "Chiudi",
-            onConfirm = { 
+            onConfirm = {
                 showPreviewVideo = false
-                exoPlayer.stop() 
+                exoPlayer.stop()
             }
         )
     }

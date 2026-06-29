@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -63,26 +64,52 @@ fun AdminWorkOfferEditPage(
     } else {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(modifier = Modifier.fillMaxSize()) {
-                // HEADER
+                // --- HEADER ---
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 80.dp, bottom = 16.dp)
+                        .padding(top = 16.dp, bottom = 16.dp)
                 ) {
-                    IconButton(onClick = { navController?.popBackStack() }, modifier = Modifier.align(Alignment.CenterStart).padding(start = 8.dp)) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = Color.Black)
+                    IconButton(
+                        onClick = { navController?.popBackStack() },
+                        modifier = Modifier
+                            .align(Alignment.CenterStart)
+                            .padding(start = 16.dp)
+                            .background(Color.White.copy(alpha = 0.7f), CircleShape)
+                    ) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = com.example.superspan.ui.theme.LogoLeft)
                     }
-                    Text(
-                        text = if (offer == null) "Aggiungi Offerta" else "Modifica Offerta",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        modifier = Modifier.align(Alignment.Center)
-                    )
+                    
                     if (offer != null) {
-                        IconButton(onClick = { showDeleteConfirm = true }, modifier = Modifier.align(Alignment.CenterEnd).padding(end = 8.dp)) {
-                            Icon(Icons.Default.Delete, "Elimina", tint = com.example.superspan.ui.theme.AppError)
+                        IconButton(
+                            onClick = { showDeleteConfirm = true },
+                            modifier = Modifier
+                                .align(Alignment.CenterEnd)
+                                .padding(end = 16.dp)
+                                .background(Color.White.copy(alpha = 0.7f), CircleShape)
+                        ) {
+                            Icon(Icons.Default.Delete, contentDescription = "Elimina", tint = com.example.superspan.ui.theme.AppError)
                         }
                     }
+                }
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = if (offer == null) "Aggiungi Offerta" else "Modifica Offerta",
+                        fontSize = 32.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Color(0xFF1A1A1A)
+                    )
+                    Text(
+                        text = "I campi verdi sono completati",
+                        fontSize = 16.sp,
+                        color = Color.Gray
+                    )
                 }
 
                 Column(
@@ -99,7 +126,8 @@ fun AdminWorkOfferEditPage(
                         OutlinedButton(
                             onClick = { isSelectionOpen = true },
                             modifier = Modifier.fillMaxWidth().height(56.dp),
-                            shape = RoundedCornerShape(12.dp),
+                            shape = CircleShape,
+                            border = androidx.compose.foundation.BorderStroke(2.dp, Color(0xFF81C784)),
                             colors = androidx.compose.material3.ButtonDefaults.outlinedButtonColors(containerColor = Color.White)
                         ) {
                             Icon(Icons.Default.LocationOn, contentDescription = null)
@@ -110,6 +138,7 @@ fun AdminWorkOfferEditPage(
                         selectedSupermarket?.let { s ->
                             Card(
                                 modifier = Modifier.fillMaxWidth().clickable { isSelectionOpen = true },
+                                shape = RoundedCornerShape(20.dp),
                                 colors = CardDefaults.cardColors(containerColor = Color.White),
                                 elevation = CardDefaults.cardElevation(2.dp)
                             ) {
@@ -137,28 +166,32 @@ fun AdminWorkOfferEditPage(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Role.entries.forEach { role ->
-                            FilterChip(
+                            Surface(
                                 selected = ruoloEnum == role,
                                 onClick = { ruoloEnum = role },
-                                label = { Text(role.nome) }
-                            )
+                                shape = CircleShape,
+                                color = if (ruoloEnum == role) com.example.superspan.ui.theme.LogoLeft else Color.White,
+                                border = if (ruoloEnum == role) null else androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF81C784)),
+                                modifier = Modifier.padding(2.dp)
+                            ) {
+                                Text(
+                                    text = role.nome,
+                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (ruoloEnum == role) Color.White else com.example.superspan.ui.theme.LogoLeft
+                                )
+                            }
                         }
                     }
 
                     // STEP 3: DETTAGLI
                     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                         Spacer(modifier = Modifier.height(8.dp))
-                        val tfColors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
-                            focusedContainerColor = Color.White,
-                            unfocusedContainerColor = Color.White,
-                            unfocusedBorderColor = Color.Transparent,
-                            focusedBorderColor = Color.Transparent
-                        )
-                        OutlinedTextField(value = titolo, onValueChange = { titolo = it }, label = { Text("Titolo Offerta") }, modifier = Modifier.fillMaxWidth(), colors = tfColors)
+                        EditTextField(value = titolo, onValueChange = { titolo = it }, label = "Titolo Offerta", modifier = Modifier.fillMaxWidth())
 
-                        OutlinedTextField(value = descrizioneBreve, onValueChange = { descrizioneBreve = it }, label = { Text("Descrizione Breve") }, modifier = Modifier.fillMaxWidth(), colors = tfColors)
-                        OutlinedTextField(value = descrizioneEstesa, onValueChange = { descrizioneEstesa = it }, label = { Text("Descrizione Estesa") }, modifier = Modifier.fillMaxWidth(), minLines = 3, colors = tfColors)
-                        OutlinedTextField(value = requisiti, onValueChange = { requisiti = it }, label = { Text("Requisiti") }, modifier = Modifier.fillMaxWidth(), minLines = 2, colors = tfColors)
+                        EditTextField(value = descrizioneBreve, onValueChange = { descrizioneBreve = it }, label = "Descrizione Breve", modifier = Modifier.fillMaxWidth())
+                        EditTextField(value = descrizioneEstesa, onValueChange = { descrizioneEstesa = it }, label = "Descrizione Estesa", modifier = Modifier.fillMaxWidth(), minLines = 3)
+                        EditTextField(value = requisiti, onValueChange = { requisiti = it }, label = "Requisiti", modifier = Modifier.fillMaxWidth(), minLines = 2)
 
                             Text("Tipo Contratto", fontWeight = FontWeight.Bold)
                             @OptIn(ExperimentalLayoutApi::class)
@@ -166,11 +199,21 @@ fun AdminWorkOfferEditPage(
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 TipoContratto.entries.forEach { tipo ->
-                                    FilterChip(
+                                    Surface(
                                         selected = tipoContratto == tipo,
                                         onClick = { tipoContratto = tipo },
-                                        label = { Text(tipo.nome) }
-                                    )
+                                        shape = CircleShape,
+                                        color = if (tipoContratto == tipo) com.example.superspan.ui.theme.LogoLeft else Color.White,
+                                        border = if (tipoContratto == tipo) null else androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF81C784)),
+                                        modifier = Modifier.padding(2.dp)
+                                    ) {
+                                        Text(
+                                            text = tipo.nome,
+                                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+                                            fontWeight = FontWeight.Bold,
+                                            color = if (tipoContratto == tipo) Color.White else com.example.superspan.ui.theme.LogoLeft
+                                        )
+                                    }
                                 }
                             }
 
@@ -180,11 +223,21 @@ fun AdminWorkOfferEditPage(
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 OrarioLavoro.entries.forEach { o ->
-                                    FilterChip(
+                                    Surface(
                                         selected = orario == o,
                                         onClick = { orario = o },
-                                        label = { Text(o.nome) }
-                                    )
+                                        shape = CircleShape,
+                                        color = if (orario == o) com.example.superspan.ui.theme.LogoLeft else Color.White,
+                                        border = if (orario == o) null else androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF81C784)),
+                                        modifier = Modifier.padding(2.dp)
+                                    ) {
+                                        Text(
+                                            text = o.nome,
+                                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+                                            fontWeight = FontWeight.Bold,
+                                            color = if (orario == o) Color.White else com.example.superspan.ui.theme.LogoLeft
+                                        )
+                                    }
                                 }
                             }
 
@@ -192,13 +245,12 @@ fun AdminWorkOfferEditPage(
 
                             Button(
                                 onClick = { showSaveConfirm = true },
-                                modifier = Modifier.fillMaxWidth().height(56.dp),
-                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier.height(55.dp).width(220.dp).align(Alignment.CenterHorizontally),
+                                shape = CircleShape,
+                                colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = com.example.superspan.ui.theme.LogoLeft),
                                 enabled = titolo.isNotBlank() && descrizioneBreve.isNotBlank() && selectedSupermarket != null && ruoloEnum != null
                             ) {
-                                Icon(Icons.Default.Save, contentDescription = null)
-                                Spacer(Modifier.width(8.dp))
-                                Text("Salva Offerta")
+                                Text("Salva Offerta", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                             }
                             
                             Spacer(modifier = Modifier.height(100.dp))
@@ -292,7 +344,7 @@ fun SupermarketSelectionScreen(
             TopAppBar(
                 title = { Text("Scegli la Sede", fontWeight = FontWeight.Bold) },
                 navigationIcon = {
-                    IconButton(onClick = onBack, modifier = androidx.compose.ui.Modifier.background(androidx.compose.ui.graphics.Color.White.copy(alpha = 0.7f), androidx.compose.foundation.shape.CircleShape)) { Icon(androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
+                    IconButton(onClick = onBack, modifier = androidx.compose.ui.Modifier.background(androidx.compose.ui.graphics.Color.White.copy(alpha = 0.7f), androidx.compose.foundation.shape.CircleShape)) { Icon(androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = com.example.superspan.ui.theme.LogoLeft)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)

@@ -42,7 +42,7 @@ fun PersonalDataSummaryPage(navController: NavController?, padding: PaddingValue
                         .align(Alignment.CenterStart)
                         .background(Color.White.copy(alpha = 0.7f), CircleShape)
                 ) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = com.example.superspan.ui.theme.LogoLeft)
                 }
             }
 
@@ -84,7 +84,7 @@ fun PersonalDataSummaryPage(navController: NavController?, padding: PaddingValue
                         SummarySectionTitle("Informazioni Personali")
                         SummaryDataRow(Icons.Default.Person, "Nome", actualUser.nome)
                         SummaryDataRow(Icons.Default.Badge, "Cognome", actualUser.cognome)
-                        SummaryDataRow(Icons.Default.Email, "Email (può essere diversa da quella del profilo)", actualUser.emailLavoro ?: "Non inserita")
+                        SummaryDataRow(Icons.Default.Email, "Email di contatto", actualUser.emailLavoro ?: "Non inserita")
                         SummaryDataRow(
                             icon = Icons.Default.Phone,
                             label = "Telefono",
