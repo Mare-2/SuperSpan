@@ -30,13 +30,7 @@ fun PersonalDataSummaryPage(navController: NavController?, padding: PaddingValue
             modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
         ) {
             // --- NUOVO HEADER ---
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                // TASTO INDIETRO (A sinistra)
-            }
+            Spacer(modifier = Modifier.height(64.dp))
 
             // TITOLI CENTRATI
             Column(
@@ -106,6 +100,7 @@ fun PersonalDataSummaryPage(navController: NavController?, padding: PaddingValue
                     }
                 }
             }
+            Spacer(modifier = Modifier.height(100.dp))
         }
 
         // Floating Back Button

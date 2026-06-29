@@ -49,12 +49,7 @@ fun DraftsPage(navController: NavController?, padding: PaddingValues) {
             item {
                 // Header
                 Column {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                    ) {
-                    }
+                    Spacer(modifier = Modifier.height(64.dp))
 
                     Column(
                         modifier = Modifier

@@ -1,211 +1,3 @@
-/*package com.example.superspan
-
-import android.net.Uri
-import android.util.Patterns
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.FileUpload
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-
-@Composable
-fun PersonalDataEditPage(navController: NavController?, padding: PaddingValues) {
-    val context = LocalContext.current
-    val scrollState = rememberScrollState()
-
-    // Stati locali
-    var nome by remember { mutableStateOf(actualUser.nome) }
-    var cognome by remember { mutableStateOf(actualUser.cognome) }
-    var emailLavoro by remember { mutableStateOf(actualUser.emailLavoro ?: "") }
-    var telefono by remember { mutableStateOf(actualUser.telefono ?: "") }
-    var prefisso by remember { mutableStateOf("+39") } // Prefisso predefinito
-    var cvName by remember { mutableStateOf(actualUser.cvFileName ?: "Seleziona file PDF") }
-
-    // Funzioni di validazione
-    val isEmailValid = Patterns.EMAIL_ADDRESS.matcher(emailLavoro).matches() || emailLavoro.isEmpty()
-    val isPhoneValid = telefono.all { it.isDigit() } && (telefono.length in 8..11 || telefono.isEmpty())
-
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        uri?.let { selectedUri ->
-            val destinationName = "cv_${actualUser.email.replace("@", "_")}.pdf"
-            val savedPath = saveFileToInternalStorage(context, selectedUri, destinationName)
-            if (savedPath != null) {
-                cvName = destinationName
-                actualUser.cvFileName = savedPath
-            }
-        }
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(padding)
-    ) {
-        // --- HEADER ---
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 24.dp)
-        ) {
-            Text(
-                text = "Modifica Dati",
-                color = Color.Black,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.align(Alignment.Center)
-            )
-        }
-
-        // --- FORM ---
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 30.dp)
-                .verticalScroll(scrollState),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Spacer(Modifier.height(24.dp))
-
-            EditTextField("Nome", nome, KeyboardType.Text) { nome = it }
-            EditTextField("Cognome", cognome, KeyboardType.Text) { cognome = it }
-
-            // Campo Email con validazione
-            EditTextField(
-                label = "Email di contatto",
-                value = emailLavoro,
-                keyboardType = KeyboardType.Email,
-                isError = !isEmailValid,
-                errorMessage = "Formato email non valido",
-                onValueChange = { emailLavoro = it }
-            )
-
-            // --- SEZIONE TELEFONO CON PREFISSO ---
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                verticalAlignment = Alignment.Top // Allineato in alto per gestire l'errore sotto
-            ) {
-                // Prefisso (piccolo)
-                OutlinedTextField(
-                    value = prefisso,
-                    onValueChange = { if (it.length <= 4) prefisso = it },
-                    label = { Text("Prefisso") },
-                    modifier = Modifier.width(85.dp),
-                    shape = RoundedCornerShape(20.dp),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
-                )
-
-                Spacer(Modifier.width(8.dp))
-
-                // Numero di telefono
-                EditTextField(
-                    label = "Telefono",
-                    value = telefono,
-                    keyboardType = KeyboardType.Phone,
-                    isError = !isPhoneValid,
-                    errorMessage = "Solo numeri (8-11 cifre)",
-                    modifier = Modifier.weight(1f),
-                    onValueChange = { if (it.length <= 11) telefono = it }
-                )
-            }
-
-            Spacer(Modifier.height(16.dp))
-
-            // SEZIONE CARICAMENTO CV
-            Text("Curriculum Vitae", Modifier.fillMaxWidth(), fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color.Gray)
-            Spacer(Modifier.height(8.dp))
-            Surface(
-                onClick = { launcher.launch("application/pdf") },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                color = Color(0xFFF1F1F1)
-            ) {
-                Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.FileUpload, null, tint = Color.DarkGray)
-                    Spacer(Modifier.width(12.dp))
-                    Text(cvName.ifEmpty { "Seleziona file PDF" }, color = if (cvName.contains("Seleziona")) Color.Gray else Color.Black, fontSize = 15.sp)
-                }
-            }
-
-            Spacer(Modifier.height(40.dp))
-
-            // --- TASTO SALVA ---
-            Button(
-                onClick = {
-                    actualUser.nome = nome
-                    actualUser.cognome = cognome
-                    actualUser.emailLavoro = emailLavoro
-                    actualUser.telefono = "$prefisso $telefono"
-                    navController?.popBackStack()
-                },
-                // Il tasto è attivo solo se i dati sono validi
-                enabled = isEmailValid && isPhoneValid && nome.isNotEmpty() && cognome.isNotEmpty(),
-                modifier = Modifier.height(55.dp).width(200.dp),
-                shape = CircleShape,
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF388E3C))
-            ) {
-                Text("Salva tutto", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-            }
-            Spacer(Modifier.height(40.dp))
-        }
-    }
-}
-
-@Composable
-fun EditTextField(
-    label: String,
-    value: String,
-    keyboardType: KeyboardType = KeyboardType.Text,
-    isError: Boolean = false,
-    errorMessage: String = "",
-    modifier: Modifier = Modifier,
-    onValueChange: (String) -> Unit
-) {
-    Column(modifier = modifier) {
-        OutlinedTextField(
-            value = value,
-            onValueChange = onValueChange,
-            label = { Text(label) },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
-            singleLine = true,
-            isError = isError,
-            keyboardOptions = KeyboardOptions(keyboardType = keyboardType)
-        )
-        if (isError) {
-            Text(
-                text = errorMessage,
-                color = com.example.superspan.ui.theme.AppError,
-                fontSize = 12.sp,
-                modifier = Modifier.padding(start = 12.dp, top = 4.dp)
-            )
-        }
-    }
-}*/
-
 package com.example.superspan
 
 import android.net.Uri
@@ -284,6 +76,7 @@ fun PersonalDataEditPage(navController: NavController?, padding: PaddingValues) 
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
+                .verticalScroll(scrollState)
         ) {
             // --- HEADER (Senza rettangolo bianco, testo scuro) ---
             Box(
@@ -297,25 +90,12 @@ fun PersonalDataEditPage(navController: NavController?, padding: PaddingValues) 
         }
 
             // --- HEADER ---
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-            }
-
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp, vertical = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = "Modifica Dati",
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = Color(0xFF1A1A1A)
-                )
                 Text(
                     text = "I campi verdi sono completati",
                     fontSize = 16.sp,
