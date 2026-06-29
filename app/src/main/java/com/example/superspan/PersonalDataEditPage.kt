@@ -331,82 +331,98 @@ fun PersonalDataEditPage(navController: NavController?, padding: PaddingValues) 
             ) {
                 Spacer(Modifier.height(8.dp))
 
-            // Campi Nome e Cognome
-            EditTextField("Nome", nome, KeyboardType.Text) { nome = it }
-            EditTextField("Cognome", cognome, KeyboardType.Text) { cognome = it }
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        // Campi Nome e Cognome
+                        EditTextField("Nome", nome, KeyboardType.Text) { nome = it }
+                        Spacer(Modifier.height(16.dp))
+                        EditTextField("Cognome", cognome, KeyboardType.Text) { cognome = it }
+                        Spacer(Modifier.height(16.dp))
 
-            // Email con validazione
-            EditTextField(
-                label = "Email di contatto",
-                value = emailLavoro,
-                keyboardType = KeyboardType.Email,
-                isError = !isEmailValid,
-                errorMessage = "Inserisci una mail valida",
-                onValueChange = { emailLavoro = it }
-            )
+                        // Email con validazione
+                        EditTextField(
+                            label = "Email di contatto",
+                            value = emailLavoro,
+                            keyboardType = KeyboardType.Email,
+                            isError = !isEmailValid,
+                            errorMessage = "Inserisci una mail valida",
+                            onValueChange = { emailLavoro = it }
+                        )
 
-            // Telefono e Prefisso
-            Row(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
-                OutlinedTextField(
-                    value = prefisso,
-                    onValueChange = {}, // Lo lasciamo fisso per ora
-                    readOnly = true,
-                    label = { Text("Pre") },
-                    modifier = Modifier.width(80.dp),
-                    shape = RoundedCornerShape(20.dp)
-                )
+                        // Telefono e Prefisso
+                        Row(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+                            OutlinedTextField(
+                                value = prefisso,
+                                onValueChange = {}, // Lo lasciamo fisso per ora
+                                readOnly = true,
+                                label = { Text("Pre") },
+                                modifier = Modifier.width(80.dp),
+                                shape = RoundedCornerShape(20.dp)
+                            )
 
-                Spacer(Modifier.width(8.dp))
+                            Spacer(Modifier.width(8.dp))
 
-                EditTextField(
-                    label = "Telefono",
-                    value = telefonoDigits, // USIAMO SOLO LE CIFRE
-                    keyboardType = KeyboardType.Phone,
-                    visualTransformation = PhoneVisualTransformation(), // Lo spazio è solo un trucco visivo
-                    isError = !isPhoneValid,
-                    errorMessage = "Inserisci un numero valido",
-                    modifier = Modifier.weight(1f),
-                    onValueChange = { input ->
-                        // Accettiamo solo se l'utente scrive numeri e non superiamo i 10
-                        if (input.all { it.isDigit() } && input.length <= 10) {
-                            telefonoDigits = input
+                            EditTextField(
+                                label = "Telefono",
+                                value = telefonoDigits, // USIAMO SOLO LE CIFRE
+                                keyboardType = KeyboardType.Phone,
+                                visualTransformation = PhoneVisualTransformation(), // Lo spazio è solo un trucco visivo
+                                isError = !isPhoneValid,
+                                errorMessage = "Inserisci un numero valido",
+                                modifier = Modifier.weight(1f),
+                                onValueChange = { input ->
+                                    // Accettiamo solo se l'utente scrive numeri e non superiamo i 10
+                                    if (input.all { it.isDigit() } && input.length <= 10) {
+                                        telefonoDigits = input
+                                    }
+                                }
+                            )
+                        }
+
+                        Spacer(Modifier.height(16.dp))
+
+                        // --- SEZIONE CV (Con conferma visiva per Paolo) ---
+                        Text("Curriculum Vitae", Modifier.fillMaxWidth(), fontWeight = FontWeight.Bold, color = Color.Gray, fontSize = 14.sp)
+
+                        val cvBoxColor = if (cvName.isNotEmpty()) Color(0xFFE8F5E9) else Color(0xFFFFF3E0)
+                        val cvBorderColor = if (cvName.isNotEmpty()) Color(0xFF81C784) else Color(0xFFFFB74D)
+
+                        Surface(
+                            onClick = { launcher.launch("application/pdf") },
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            color = cvBoxColor,
+                            border = androidx.compose.foundation.BorderStroke(1.dp, cvBorderColor)
+                        ) {
+                            Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    if (cvName.isNotEmpty()) Icons.Default.CheckCircle else Icons.Default.FileUpload,
+                                    null,
+                                    tint = if (cvName.isNotEmpty()) Color(0xFF388E3C) else Color.Gray
+                                )
+                                Spacer(Modifier.width(12.dp))
+                                Text(
+                                    text = if (cvName.isEmpty()) "Carica il tuo CV (PDF)" else cvName,
+                                    color = if (cvName.isEmpty()) Color.Gray else Color.Black,
+                                    fontSize = 15.sp,
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
                         }
                     }
-                )
-            }
-
-            Spacer(Modifier.height(16.dp))
-
-            // --- SEZIONE CV (Con conferma visiva per Paolo) ---
-            Text("Curriculum Vitae", Modifier.fillMaxWidth(), fontWeight = FontWeight.Bold, color = Color.Gray, fontSize = 14.sp)
-
-            val cvBoxColor = if (cvName.isNotEmpty()) Color(0xFFE8F5E9) else Color(0xFFFFF3E0)
-            val cvBorderColor = if (cvName.isNotEmpty()) Color(0xFF81C784) else Color(0xFFFFB74D)
-
-            Surface(
-                onClick = { launcher.launch("application/pdf") },
-                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-                shape = RoundedCornerShape(16.dp),
-                color = cvBoxColor,
-                border = androidx.compose.foundation.BorderStroke(1.dp, cvBorderColor)
-            ) {
-                Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        if (cvName.isNotEmpty()) Icons.Default.CheckCircle else Icons.Default.FileUpload,
-                        null,
-                        tint = if (cvName.isNotEmpty()) Color(0xFF388E3C) else Color.Gray
-                    )
-                    Spacer(Modifier.width(12.dp))
-                    Text(
-                        text = if (cvName.isEmpty()) "Carica il tuo CV (PDF)" else cvName,
-                        color = if (cvName.isEmpty()) Color.Gray else Color.Black,
-                        fontSize = 15.sp,
-                        modifier = Modifier.weight(1f)
-                    )
                 }
-            }
 
-            Spacer(Modifier.height(30.dp))
+                Spacer(Modifier.height(30.dp))
 
             // TASTO SALVA (Attivo solo se i campi minimi sono pieni)
             Button(
