@@ -784,12 +784,9 @@ fun OfferPromoCard(coupon: Coupon, isHighlighted: Boolean = false, navController
 
 @Composable
 fun OfferDetailPage(coupon: Coupon, navController: NavController? = null, onBack: () -> Unit) {
-    Column(Modifier.fillMaxSize()) {
-        Row(Modifier.padding(8.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onBack, modifier = androidx.compose.ui.Modifier.background(androidx.compose.ui.graphics.Color.White.copy(alpha = 0.7f), androidx.compose.foundation.shape.CircleShape)) { Icon(androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack, null) }
-            Text("Torna alla lista", color = Color.Gray)
-        }
+    Box(Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp).verticalScroll(rememberScrollState())) {
+            Spacer(Modifier.height(80.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(coupon.description, fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, lineHeight = 34.sp, modifier = Modifier.weight(1f))
                 if (actualUser.admin) {
@@ -817,6 +814,18 @@ fun OfferDetailPage(coupon: Coupon, navController: NavController? = null, onBack
                 }
             }
             Spacer(Modifier.height(40.dp))
+        }
+
+        // Floating Back Button
+        IconButton(
+            onClick = onBack,
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(top = 16.dp, start = 16.dp)
+                .background(Color.White.copy(alpha = 0.7f), CircleShape)
+                .size(48.dp)
+        ) {
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = Color.Black)
         }
     }
 }

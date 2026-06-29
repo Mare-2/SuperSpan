@@ -26,25 +26,12 @@ fun AccountSummaryPage(user: User, navController: NavController?, padding: Paddi
             .padding(padding)
     ) {
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
         ) {
 
-            // --- HEADER (Solo tasto indietro) ---
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                // TASTO INDIETRO (A sinistra)
-                IconButton(
-                    onClick = { navController?.popBackStack() },
-                    modifier = Modifier
-                        .align(Alignment.CenterStart)
-                        .background(Color.White.copy(alpha = 0.7f), CircleShape)
-                ) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
-                }
-            }
+            Spacer(Modifier.height(80.dp))
 
             // TITOLI CENTRATI
             Column(
@@ -101,6 +88,18 @@ fun AccountSummaryPage(user: User, navController: NavController?, padding: Paddi
                 }
                 
             }
+        }
+
+        // Floating Back Button
+        IconButton(
+            onClick = { navController?.popBackStack() },
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(top = 16.dp, start = 16.dp)
+                .background(Color.White.copy(alpha = 0.7f), CircleShape)
+                .size(48.dp)
+        ) {
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = Color.Black)
         }
 
         // TASTO MODIFICA FAB (In basso a destra)

@@ -144,7 +144,7 @@ fun ApplyStep1(navController: NavController?, padding: PaddingValues) {
         val base = currentDraft.telefono.ifEmpty { draft.telefono.ifEmpty { actualUser.telefono ?: "" } }
         mutableStateOf(base.filter { it.isDigit() }.removePrefix("39"))
     }
-    var cvName by remember { mutableStateOf(currentDraft.cvFileName.ifEmpty { draft.cvFileName.ifEmpty { actualUser.cvFileName ?: "" } }) }
+    var cvName by remember { mutableStateOf(currentDraft.cvFileName.ifEmpty { draft.cvFileName.ifEmpty { actualUser.cvFileName?.substringAfterLast('/') ?: "" } }) }
     var cvPath by remember { mutableStateOf(currentDraft.cvPath.ifEmpty { draft.cvPath.ifEmpty { actualUser.cvPath ?: "" } }) }
 
     var showExitDialog by remember { mutableStateOf(false) }
@@ -450,9 +450,9 @@ fun ApplyStep2Record(navController: NavController?, padding: PaddingValues) {
             while (seconds < 30 && isRecording) { delay(1000); seconds++ }
             if (seconds >= 30) {
                 activeRecording.value?.stop()
-                isRecording = false
                 delay(500)
                 navController?.popBackStack()
+                isRecording = false
             }
         }
     }
