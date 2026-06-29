@@ -415,6 +415,14 @@ fun ApplyStep2Record(navController: NavController?, padding: PaddingValues) {
     var seconds by remember { mutableStateOf(0) }
     var isRecording by remember { mutableStateOf(false) }
     var errorMsg by remember { mutableStateOf("") }
+
+    LaunchedEffect(errorMsg) {
+        if (errorMsg.isNotEmpty()) {
+            delay(2000)
+            errorMsg = ""
+        }
+    }
+    
     val videoFile = remember { File(context.filesDir, "video_${actualUser.email.replace("@", "_")}_off${currentOfferIdApplying}.mp4") }
 
     var hasPermissions by remember {

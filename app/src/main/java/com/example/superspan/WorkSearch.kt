@@ -482,9 +482,11 @@ fun WorkFilterPage(modifier: Modifier, filterData: WorkFilterData, padding: Padd
                     // SLIDER MODERNO (Sottile con pallino bianco)
                     Slider(
                         value = if (tuttaItalia) 100f else filterData.distanzaMax.coerceIn(5f, 100f),
-                        onValueChange = { filterData.distanzaMax = it },
+                        onValueChange = { 
+                            if (tuttaItalia) tuttaItalia = false
+                            filterData.distanzaMax = it 
+                        },
                         valueRange = 5f..100f,
-                        enabled = !tuttaItalia,
                         // Il Pallino (Thumb)
                         thumb = {
                             Box(
@@ -503,7 +505,7 @@ fun WorkFilterPage(modifier: Modifier, filterData: WorkFilterData, padding: Padd
                                 modifier = Modifier.height(4.dp),
                                 sliderState = sliderState,
                                 colors = SliderDefaults.colors(
-                                    activeTrackColor = com.example.superspan.ui.theme.LogoLeft,
+                                    activeTrackColor = if (tuttaItalia) Color.LightGray.copy(alpha = 0.5f) else com.example.superspan.ui.theme.LogoLeft,
                                     inactiveTrackColor = Color.LightGray.copy(alpha = 0.3f),
                                     disabledActiveTrackColor = Color.LightGray.copy(alpha = 0.5f),
                                     disabledInactiveTrackColor = Color.LightGray.copy(alpha = 0.2f)

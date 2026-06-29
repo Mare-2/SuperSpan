@@ -751,25 +751,40 @@ fun FilterPage(modifier: Modifier, filterData: FilterData, padding: PaddingValue
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(Color.White)
             .background(com.example.superspan.ui.theme.LogoRight.copy(alpha = 0.03f))
     ) {
         Column(
             Modifier
                 .fillMaxSize()
                 .verticalScroll(scrollState)
-                .padding(horizontal = 24.dp, vertical = 16.dp)
         ) {
-            Spacer(Modifier.height(padding.calculateTopPadding() + 64.dp))
-            
-            Text(
-                "Filtri",
-                fontSize = 32.sp,
-                fontWeight = FontWeight.ExtraBold,
-                modifier = Modifier.padding(bottom = 24.dp)
-            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = padding.calculateTopPadding())
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                Color.White,
+                                Color.White.copy(alpha = 0f)
+                            )
+                        )
+                    )
+            ) {
+                Column(Modifier.padding(horizontal = 24.dp)) {
+                    Spacer(Modifier.height(64.dp))
+                    Text(
+                        "Filtri",
+                        fontSize = 32.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    Spacer(Modifier.height(80.dp))
+                }
+            }
 
-            // --- 2. SEZIONE PREZZO (CARD MODERNA) ---
+            Column(Modifier.padding(horizontal = 24.dp)) {
+                // --- 2. SEZIONE PREZZO (CARD MODERNA) ---
             Text("Fascia di prezzo", fontSize = 18.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(16.dp))
 
@@ -897,6 +912,7 @@ fun FilterPage(modifier: Modifier, filterData: FilterData, padding: PaddingValue
             }
 
             Spacer(Modifier.height(100.dp + padding.calculateBottomPadding()))
+            }
         }
 
         Button(
