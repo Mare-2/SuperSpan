@@ -48,11 +48,7 @@ fun DraftsPage(navController: NavController?, padding: PaddingValues) {
         ) {
             item {
                 // Header
-                Row(Modifier.fillMaxWidth().padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = { navController?.popBackStack() }, modifier = Modifier.background(androidx.compose.ui.graphics.Color.White.copy(alpha = 0.7f), androidx.compose.foundation.shape.CircleShape)) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
-                    }
-                    Spacer(Modifier.width(8.dp))
+                Row(Modifier.fillMaxWidth().padding(top = 80.dp, bottom = 16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
                     Text("Le tue Candidature", fontSize = 20.sp, fontWeight = FontWeight.ExtraBold)
                 }
             }
@@ -151,21 +147,35 @@ fun DraftsPage(navController: NavController?, padding: PaddingValues) {
                     }
                 }
             }
+        } // End LazyColumn
+
+        // Floating Back Button
+        IconButton(
+            onClick = { navController?.popBackStack() },
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(top = 16.dp, start = 16.dp)
+                .background(Color.White.copy(alpha = 0.7f), CircleShape)
+                .size(48.dp)
+        ) {
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = Color.Black)
         }
 
         if (showDeleteConfirmFor != null) {
             val idToDelete = showDeleteConfirmFor!!
-            AlertDialog(
+            ModernAlertDialog(
                 onDismissRequest = { showDeleteConfirmFor = null },
-                title = { Text("Elimina bozza") },
-                text = { Text("Sei sicuro di eliminare la bozza per l'offerta #$idToDelete ?") },
-                confirmButton = {
-                    TextButton(onClick = {
-                        clearCandidacyDraftForOffer(actualUser, idToDelete)
-                        showDeleteConfirmFor = null
-                    }) { Text("Elimina", color = com.example.superspan.ui.theme.AppError) }
+                title = "Elimina bozza",
+                text = "Sei sicuro di eliminare la bozza per l'offerta #$idToDelete ?",
+                icon = Icons.Default.Delete,
+                isDestructive = true,
+                confirmText = "Elimina",
+                onConfirm = {
+                    clearCandidacyDraftForOffer(actualUser, idToDelete)
+                    showDeleteConfirmFor = null
                 },
-                dismissButton = { TextButton(onClick = { showDeleteConfirmFor = null }) { Text("Annulla") } }
+                dismissText = "Annulla",
+                onDismiss = { showDeleteConfirmFor = null }
             )
         }
     }

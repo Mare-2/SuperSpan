@@ -24,6 +24,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.ShoppingCart
@@ -97,9 +98,6 @@ fun AddCoupon(paddingValues: PaddingValues, navController: NavController?) {
                     .fillMaxWidth()
                     .padding(top = 80.dp, bottom = 16.dp)
             ) {
-                IconButton(onClick = { navController?.popBackStack() }, modifier = Modifier.align(Alignment.CenterStart).padding(start = 8.dp)) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = Color.Black)
-                }
                 Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(if (defaultTab == 0) "Aggiungi Coupon" else "Aggiungi Offerta", color = Color.Black, fontSize = 22.sp, fontWeight = FontWeight.Bold)
                     Text("I campi verdi sono completati", color = Color.DarkGray, fontSize = 12.sp)
@@ -131,6 +129,18 @@ fun AddCoupon(paddingValues: PaddingValues, navController: NavController?) {
                     }
                 )
             }
+        }
+
+        // Floating Back Button
+        IconButton(
+            onClick = { navController?.popBackStack() },
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(top = 16.dp + paddingValues.calculateTopPadding(), start = 16.dp)
+                .background(Color.White.copy(alpha = 0.7f), CircleShape)
+                .size(48.dp)
+        ) {
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = Color.Black)
         }
 
         if (isSelectionOpen) {
@@ -179,25 +189,22 @@ fun AddCoupon(paddingValues: PaddingValues, navController: NavController?) {
 
         if (pendingCouponSave != null) {
             val isCouponSave = pendingCouponSave!!.products.size == 3
-            AlertDialog(
+            ModernAlertDialog(
                 onDismissRequest = { pendingCouponSave = null },
-                title = { Text("Conferma Creazione") },
-                text = { Text(if (isCouponSave) "Vuoi salvare il nuovo coupon?" else "Vuoi salvare la nuova offerta?") },
-                confirmButton = {
-                    androidx.compose.material3.TextButton(onClick = {
-                        ListOfCoupon.add(pendingCouponSave!!)
-                        val code = pendingCouponSave!!.code
-                        pendingCouponSave = null
-                        Toast.makeText(context, "Salvato con successo", Toast.LENGTH_SHORT).show()
-                        navController?.previousBackStackEntry?.savedStateHandle?.set("added_coupon_code", code)
-                        navController?.popBackStack()
-                    }) {
-                        Text("Salva", color = Color(0xFF388E3C))
-                    }
+                title = "Conferma Creazione",
+                text = if (isCouponSave) "Vuoi salvare il nuovo coupon?" else "Vuoi salvare la nuova offerta?",
+                icon = Icons.Default.Save,
+                confirmText = "Salva",
+                onConfirm = {
+                    ListOfCoupon.add(pendingCouponSave!!)
+                    val code = pendingCouponSave!!.code
+                    pendingCouponSave = null
+                    Toast.makeText(context, "Salvato con successo", Toast.LENGTH_SHORT).show()
+                    navController?.previousBackStackEntry?.savedStateHandle?.set("added_coupon_code", code)
+                    navController?.popBackStack()
                 },
-                dismissButton = {
-                    androidx.compose.material3.TextButton(onClick = { pendingCouponSave = null }) { Text("Annulla", color = Color.Gray) }
-                }
+                dismissText = "Annulla",
+                onDismiss = { pendingCouponSave = null }
             )
         }
     }

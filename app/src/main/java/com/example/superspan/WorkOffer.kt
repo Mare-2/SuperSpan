@@ -61,181 +61,202 @@ import androidx.compose.material3.ButtonDefaults
 @Composable
 fun WorkOfferPage(offer: WorkOffer?, navController: NavController?, paddingValues: PaddingValues) {
     val scrollState = rememberScrollState()
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues)
-    ) {
-        // --- CONTENUTO ---
+
+    Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 60.dp) // Spazio per la freccia in alto
-                .verticalScroll(scrollState)
-                .padding(horizontal = 24.dp)
+                .padding(paddingValues)
         ) {
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // Titolo e Luogo
-            Text(
-                text = offer?.titolo ?: "",
-                fontSize = 28.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = Color(0xFF1A1A1A)
-            )
-            Text(
-                text = offer?.supermarket?.citta ?: "",
-                fontSize = 18.sp,
-                color = Color.Gray,
-                fontWeight = FontWeight.Medium
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Box Grigio con info rapide (Indirizzo, Contratto, ecc.)
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color(0xFFF9F9F9), RoundedCornerShape(16.dp))
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                InfoRowItem(Icons.Default.LocationOn, "Indirizzo:", offer?.supermarket?.indirizzo ?: "-")
-                InfoRowItem(Icons.Default.Schedule, "Orario:", offer?.orario?.nome ?: "-")
-                InfoRowItem(Icons.Default.WorkOutline, "Contratto:", offer?.tipoContratto?.nome ?: "-")
-            }
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // Descrizione
-            Text("Descrizione incarico", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFF1A1A1A))
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = offer?.descrizioneEstesa ?: "",
-                fontSize = 16.sp,
-                color = Color(0xFF444444),
-                lineHeight = 24.sp
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Requisiti
-            Text("Requisiti", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFF1A1A1A))
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = offer?.requisiti ?: "",
-                fontSize = 16.sp,
-                color = Color(0xFF444444),
-                lineHeight = 24.sp
-            )
-
-            Spacer(modifier = Modifier.height(120.dp)) // Spazio per il tasto
-        }
-
-        // --- TASTO INDIETRO E MODIFICA ---
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(12.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(
-                onClick = { navController?.popBackStack() },
-                modifier = Modifier.size(48.dp).background(Color.White.copy(alpha = 0.7f), CircleShape)
-            ) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = Color.Black)
-            }
-
-            if (actualUser.admin && offer != null) {
-                IconButton(
-                    onClick = { navController?.navigate("${Destination.EDIT_WORK_OFFER.route}/${offer.id}") },
-                    modifier = Modifier.size(48.dp)
-                ) {
-                    Icon(Icons.Default.Edit, contentDescription = "Modifica", tint = Color.Black)
-                }
-            }
-        }
-
-
-        // --- TASTO CANDIDATI (Fisso con ombra) - NASCOSTO PER GLI ADMIN ---
-        if (!actualUser.admin) {
-            val hasCandidacy = AllCandidacies.any { it.userEmail == actualUser.email && it.offerId == offer?.id }
-            val draft = offer?.let { getCandidacyDraftForOffer(actualUser, it.id) }
-            
+            // --- HEADER (Senza rettangolo bianco, testo scuro) ---
             Box(
                 modifier = Modifier
-                    .align(Alignment.BottomCenter)
                     .fillMaxWidth()
-                    .padding(vertical = 20.dp),
-                contentAlignment = Alignment.Center
+                    .padding(top = 16.dp, bottom = 16.dp)
             ) {
-                if (hasCandidacy) {
-                    Button(
-                        onClick = { },
+                Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("Dettaglio Offerta", color = Color.Black, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                    Text(offer?.supermarket?.citta ?: "", color = Color.DarkGray, fontSize = 12.sp)
+                }
+
+                if (actualUser.admin && offer != null) {
+                    IconButton(
+                        onClick = { navController?.navigate("${Destination.EDIT_WORK_OFFER.route}/${offer.id}") },
                         modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .padding(bottom = 24.dp)
-                            .height(56.dp),
-                        shape = CircleShape,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Gray,
-                            disabledContainerColor = Color.Gray,
-                            disabledContentColor = Color.White
-                        ),
-                        enabled = false,
-                        contentPadding = PaddingValues(horizontal = 32.dp)
+                            .align(Alignment.CenterEnd)
+                            .padding(end = 8.dp)
+                            .background(Color.White.copy(alpha = 0.7f), CircleShape)
                     ) {
-                        Text(
-                            text = "Candidatura Inviata",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                } else if (draft != null) {
-                    Button(
-                        onClick = { 
-                            currentOfferIdApplying = offer?.id ?: 0
-                            currentDraft = draft.copy()
-                            navController?.navigate(draft.lastStepRoute) 
-                        },
-                        modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .padding(bottom = 24.dp)
-                            .height(56.dp),
-                        shape = CircleShape,
-                        colors = ButtonDefaults.buttonColors(containerColor = androidx.compose.material3.MaterialTheme.colorScheme.secondary),
-                        contentPadding = PaddingValues(horizontal = 32.dp)
-                    ) {
-                        Text(
-                            text = "Continua la compilazione",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-                    }
-                } else {
-                    Button(
-                        onClick = { 
-                            currentOfferIdApplying = offer?.id ?: 0
-                            candidacySourceRoute = Destination.LAVORO.route
-                            navController?.navigate(Destination.APPLY_STEP_1.route)
-                        },
-                        modifier = Modifier
-                            .align(Alignment.BottomCenter) // Resta centrato in basso
-                            .padding(bottom = 24.dp)      // Distanza fissa dalla navbar
-                            .height(56.dp),               // Altezza fissa per un buon touch-target
-                        shape = CircleShape,               // Lo rende perfettamente stondato (pillola)
-                        contentPadding = PaddingValues(horizontal = 32.dp) // Aggiunge spazio a destra e sinistra del testo
-                    ) {
-                        Text(
-                            text = "Invia Candidatura",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+                        Icon(Icons.Default.Edit, contentDescription = "Modifica", tint = Color.Black)
                     }
                 }
             }
+
+        Box(modifier = Modifier.fillMaxSize()) {
+            // --- CONTENUTO ---
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 24.dp)
+                    .verticalScroll(scrollState),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(Modifier.height(8.dp))
+
+                Text(
+                    text = offer?.titolo ?: "",
+                    fontSize = 26.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color.Black,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(Modifier.height(24.dp))
+
+                androidx.compose.material3.Card(
+                    colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = Color.White),
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = androidx.compose.material3.CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(20.dp)) {
+                        Text("Informazioni Generali", Modifier.fillMaxWidth().padding(bottom = 16.dp), fontWeight = FontWeight.Bold, color = com.example.superspan.ui.theme.LogoLeft, fontSize = 14.sp)
+                        InfoRowItem(Icons.Default.LocationOn, "Indirizzo:", offer?.supermarket?.indirizzo ?: "-")
+                        Spacer(Modifier.height(8.dp))
+                        InfoRowItem(Icons.Default.Schedule, "Orario:", offer?.orario?.nome ?: "-")
+                        Spacer(Modifier.height(8.dp))
+                        InfoRowItem(Icons.Default.WorkOutline, "Contratto:", offer?.tipoContratto?.nome ?: "-")
+                    }
+                }
+
+                Spacer(Modifier.height(24.dp))
+
+                androidx.compose.material3.Card(
+                    colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = Color.White),
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = androidx.compose.material3.CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(20.dp)) {
+                        Text("Descrizione incarico", Modifier.fillMaxWidth().padding(bottom = 16.dp), fontWeight = FontWeight.Bold, color = com.example.superspan.ui.theme.LogoLeft, fontSize = 14.sp)
+                        Text(
+                            text = offer?.descrizioneEstesa ?: "",
+                            fontSize = 15.sp,
+                            color = Color.DarkGray,
+                            lineHeight = 22.sp
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(24.dp))
+
+                androidx.compose.material3.Card(
+                    colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = Color.White),
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = androidx.compose.material3.CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(20.dp)) {
+                        Text("Requisiti", Modifier.fillMaxWidth().padding(bottom = 16.dp), fontWeight = FontWeight.Bold, color = com.example.superspan.ui.theme.LogoLeft, fontSize = 14.sp)
+                        Text(
+                            text = offer?.requisiti ?: "",
+                            fontSize = 15.sp,
+                            color = Color.DarkGray,
+                            lineHeight = 22.sp
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(100.dp))
+            }
+
+            // --- TASTO CANDIDATI (Fisso in basso) ---
+            if (!actualUser.admin) {
+                val hasCandidacy = AllCandidacies.any { it.userEmail == actualUser.email && it.offerId == offer?.id }
+                val draft = offer?.let { getCandidacyDraftForOffer(actualUser, it.id) }
+                
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp, vertical = 24.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (hasCandidacy) {
+                        Button(
+                            onClick = { },
+                            modifier = Modifier.height(55.dp),
+                            shape = CircleShape,
+                            contentPadding = PaddingValues(horizontal = 32.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.Gray,
+                                disabledContainerColor = Color.Gray,
+                                disabledContentColor = Color.White
+                            ),
+                            enabled = false
+                        ) {
+                            Text(
+                                text = "Candidatura Inviata",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    } else if (draft != null) {
+                        Button(
+                            onClick = { 
+                                currentOfferIdApplying = offer?.id ?: 0
+                                currentDraft = draft.copy()
+                                navController?.navigate(draft.lastStepRoute) 
+                            },
+                            modifier = Modifier.height(55.dp),
+                            shape = CircleShape,
+                            contentPadding = PaddingValues(horizontal = 32.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = com.example.superspan.ui.theme.LogoCenter)
+                        ) {
+                            Text(
+                                text = "Continua la compilazione",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                        }
+                    } else {
+                        Button(
+                            onClick = { 
+                                currentOfferIdApplying = offer?.id ?: 0
+                                candidacySourceRoute = Destination.LAVORO.route
+                                navController?.navigate(Destination.APPLY_STEP_1.route)
+                            },
+                            modifier = Modifier.height(55.dp),
+                            shape = CircleShape,
+                            contentPadding = PaddingValues(horizontal = 32.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = com.example.superspan.ui.theme.LogoLeft)
+                        ) {
+                            Text(
+                                text = "Invia Candidatura",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                }
+            }
+            }
         }
-    }
+
+        // Floating Back Button
+        IconButton(
+            onClick = { navController?.popBackStack() },
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(top = 16.dp + paddingValues.calculateTopPadding(), start = 16.dp)
+                .background(Color.White.copy(alpha = 0.7f), CircleShape)
+                .size(48.dp)
+        ) {
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = Color.Black)
+        }
+    } // Chiude Box root
 }
 @Composable
 fun InfoRowItem(icon: ImageVector, label: String, value: String) {

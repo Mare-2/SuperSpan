@@ -22,6 +22,10 @@ import androidx.compose.material.icons.filled.LocalOffer
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,6 +43,27 @@ import androidx.navigation.NavController
 @Composable
 fun ProfilePage(user: User, navController: NavController?, paddingValues: PaddingValues) {
     val scrollState = rememberScrollState()
+    var showLogoutDialog by remember { mutableStateOf(false) }
+
+    if (showLogoutDialog) {
+        ModernAlertDialog(
+            onDismissRequest = { showLogoutDialog = false },
+            title = "Conferma Logout",
+            text = "Sei sicuro di voler uscire dal tuo account?",
+            icon = Icons.AutoMirrored.Filled.Logout,
+            isDestructive = true,
+            confirmText = "Esci",
+            onConfirm = {
+                showLogoutDialog = false
+                navController?.navigate(Destination.LOGIN.route) {
+                    popUpTo(0)
+                }
+            },
+            dismissText = "Annulla",
+            onDismiss = { showLogoutDialog = false }
+        )
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -47,6 +72,7 @@ fun ProfilePage(user: User, navController: NavController?, paddingValues: Paddin
         // --- 1. HEADER (Solo Logo, senza sfondo bianco) ---
         Box(
             modifier = Modifier
+            
                 .fillMaxWidth()
                 .padding(top = 60.dp, bottom = 8.dp),
             contentAlignment = Alignment.Center
@@ -134,11 +160,7 @@ fun ProfilePage(user: User, navController: NavController?, paddingValues: Paddin
                 // --- 3. TASTO ESCI ---
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                     Button(
-                        onClick = {
-                            navController?.navigate(Destination.LOGIN.route) {
-                                popUpTo(0)
-                            }
-                        },
+                        onClick = { showLogoutDialog = true },
                         modifier = Modifier.width(180.dp).height(56.dp),
                         shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(

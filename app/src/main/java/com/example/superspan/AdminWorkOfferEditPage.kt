@@ -29,6 +29,7 @@ import androidx.navigation.NavController
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.shape.CircleShape
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,9 +70,6 @@ fun AdminWorkOfferEditPage(
                         .fillMaxWidth()
                         .padding(top = 80.dp, bottom = 16.dp)
                 ) {
-                    IconButton(onClick = { navController?.popBackStack() }, modifier = Modifier.align(Alignment.CenterStart).padding(start = 8.dp)) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = Color.Black)
-                    }
                     Text(
                         text = if (offer == null) "Aggiungi Offerta" else "Modifica Offerta",
                         fontSize = 20.sp,
@@ -205,70 +203,78 @@ fun AdminWorkOfferEditPage(
                         }
                     }
                 }
-                
-            if (showSaveConfirm) {
-                AlertDialog(
-                    onDismissRequest = { showSaveConfirm = false },
-                    title = { Text(if (offer != null) "Conferma Modifica" else "Conferma Creazione") },
-                    text = { Text(if (offer != null) "Vuoi salvare le modifiche apportate all'offerta?" else "Vuoi salvare la nuova offerta di lavoro?") },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            showSaveConfirm = false
-                            val sp = selectedSupermarket ?: return@TextButton
-                            val enumRuolo = ruoloEnum ?: return@TextButton
-                            val dist = calcolaDistanzaSimulata(sp.citta)
-                            val newOffer = WorkOffer(
-                                id = offer?.id ?: ((WorkOfferSearchList.maxOfOrNull { it.id } ?: 0) + 1),
-                                titolo = titolo,
-                                ruoloEnum = enumRuolo,
-                                descrizioneBreve = descrizioneBreve,
-                                descrizioneEstesa = descrizioneEstesa,
-                                requisiti = requisiti,
-                                supermarket = sp,
-                                tipoContratto = tipoContratto,
-                                orario = orario,
-                                distanzaKm = dist
-                            )
 
-                            if (offer != null) {
-                                val index = WorkOfferSearchList.indexOf(offer)
-                                if (index != -1) {
-                                    WorkOfferSearchList[index] = newOffer
-                                }
-                            } else {
-                                WorkOfferSearchList.add(0, newOffer) // Aggiungiamo in cima per comodità
+            // Floating Back Button
+            IconButton(
+                onClick = { navController?.popBackStack() },
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(top = 16.dp + paddingValues.calculateTopPadding(), start = 16.dp)
+                    .background(Color.White.copy(alpha = 0.7f), CircleShape)
+                    .size(48.dp)
+            ) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = Color.Black)
+            }
+                
+
+            if (showSaveConfirm) {
+                ModernAlertDialog(
+                    onDismissRequest = { showSaveConfirm = false },
+                    title = if (offer != null) "Conferma Modifica" else "Conferma Creazione",
+                    text = if (offer != null) "Vuoi salvare le modifiche apportate all'offerta?" else "Vuoi salvare la nuova offerta di lavoro?",
+                    icon = Icons.Default.Save,
+                    confirmText = "Salva",
+                    onConfirm = {
+                        showSaveConfirm = false
+                        val sp = selectedSupermarket ?: return@ModernAlertDialog
+                        val enumRuolo = ruoloEnum ?: return@ModernAlertDialog
+                        val dist = calcolaDistanzaSimulata(sp.citta)
+                        val newOffer = WorkOffer(
+                            id = offer?.id ?: ((WorkOfferSearchList.maxOfOrNull { it.id } ?: 0) + 1),
+                            titolo = titolo,
+                            ruoloEnum = enumRuolo,
+                            descrizioneBreve = descrizioneBreve,
+                            descrizioneEstesa = descrizioneEstesa,
+                            requisiti = requisiti,
+                            supermarket = sp,
+                            tipoContratto = tipoContratto,
+                            orario = orario,
+                            distanzaKm = dist
+                        )
+
+                        if (offer != null) {
+                            val index = WorkOfferSearchList.indexOf(offer)
+                            if (index != -1) {
+                                WorkOfferSearchList[index] = newOffer
                             }
-                            highlightedWorkOfferId = newOffer.id
-                            Toast.makeText(context, "Salvato con successo", Toast.LENGTH_SHORT).show()
-                            navController?.popBackStack()
-                        }) {
-                            Text("Salva", color = androidx.compose.material3.MaterialTheme.colorScheme.primary)
+                        } else {
+                            WorkOfferSearchList.add(0, newOffer) // Aggiungiamo in cima per comodità
                         }
+                        highlightedWorkOfferId = newOffer.id
+                        Toast.makeText(context, "Salvato con successo", Toast.LENGTH_SHORT).show()
+                        navController?.popBackStack()
                     },
-                    dismissButton = {
-                        TextButton(onClick = { showSaveConfirm = false }) { Text("Annulla", color = Color.Gray) }
-                    }
+                    dismissText = "Annulla",
+                    onDismiss = { showSaveConfirm = false }
                 )
             }
 
             if (showDeleteConfirm) {
-                AlertDialog(
+                ModernAlertDialog(
                     onDismissRequest = { showDeleteConfirm = false },
-                    title = { Text("Conferma Eliminazione") },
-                    text = { Text("Sei sicuro di voler eliminare questa offerta di lavoro?") },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            showDeleteConfirm = false
-                            WorkOfferSearchList.remove(offer)
-                            Toast.makeText(context, "Eliminato con successo", Toast.LENGTH_SHORT).show()
-                            navController?.popBackStack()
-                        }) {
-                            Text("Elimina", color = com.example.superspan.ui.theme.AppError)
-                        }
+                    title = "Conferma Eliminazione",
+                    text = "Sei sicuro di voler eliminare questa offerta di lavoro?",
+                    icon = Icons.Default.Delete,
+                    isDestructive = true,
+                    confirmText = "Elimina",
+                    onConfirm = {
+                        showDeleteConfirm = false
+                        WorkOfferSearchList.remove(offer)
+                        Toast.makeText(context, "Eliminato con successo", Toast.LENGTH_SHORT).show()
+                        navController?.popBackStack()
                     },
-                    dismissButton = {
-                        TextButton(onClick = { showDeleteConfirm = false }) { Text("Annulla", color = Color.Gray) }
-                    }
+                    dismissText = "Annulla",
+                    onDismiss = { showDeleteConfirm = false }
                 )
             }
         }

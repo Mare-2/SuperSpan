@@ -198,73 +198,63 @@ fun CandidacyAdminCard(candidacy: Candidacy) {
     var showManagerConfirm by remember { mutableStateOf(false) }
 
     if (showDiscardDialog) {
-        AlertDialog(
+        ModernAlertDialog(
             onDismissRequest = { showDiscardDialog = false },
-            title = { Text("Scartare candidatura?") },
-            text = { Text("Sei sicuro di voler scartare la candidatura di ${candidacy.nome} ${candidacy.cognome}?") },
-            confirmButton = {
-                TextButton(onClick = {
-                    showDiscardDialog = false
-                    val index = AllCandidacies.indexOfFirst { it.id == candidacy.id }
-                    if (index != -1) {
-                        AllCandidacies[index] = candidacy.copy(stato = "Scartata")
-                    }
-                    android.widget.Toast.makeText(context, "Candidatura scartata", android.widget.Toast.LENGTH_SHORT).show()
-                }) {
-                    Text("Sì, scarta", color = com.example.superspan.ui.theme.AppError)
+            title = "Scartare candidatura?",
+            text = "Sei sicuro di voler scartare la candidatura di ${candidacy.nome} ${candidacy.cognome}?",
+            icon = Icons.Default.Delete,
+            isDestructive = true,
+            confirmText = "Sì, scarta",
+            onConfirm = {
+                showDiscardDialog = false
+                val index = AllCandidacies.indexOfFirst { it.id == candidacy.id }
+                if (index != -1) {
+                    AllCandidacies[index] = candidacy.copy(stato = "Scartata")
                 }
+                android.widget.Toast.makeText(context, "Candidatura scartata", android.widget.Toast.LENGTH_SHORT).show()
             },
-            dismissButton = {
-                TextButton(onClick = { showDiscardDialog = false }) {
-                    Text("Annulla")
-                }
-            }
+            dismissText = "Annulla",
+            onDismiss = { showDiscardDialog = false }
         )
     }
 
     if (showHRConfirm) {
-        AlertDialog(
+        ModernAlertDialog(
             onDismissRequest = { showHRConfirm = false },
-            title = { Text("Conferma Inoltro") },
-            text = { Text("Vuoi inoltrare la candidatura a HR?") },
-            confirmButton = {
-                TextButton(onClick = {
-                    showHRConfirm = false
-                    val index = AllCandidacies.indexOfFirst { it.id == candidacy.id }
-                    if (index != -1) {
-                        AllCandidacies[index] = candidacy.copy(stato = "Inoltrata a HR")
-                    }
-                    android.widget.Toast.makeText(context, "Candidatura inviata a HR con successo", android.widget.Toast.LENGTH_SHORT).show()
-                }) {
-                    Text("Inoltra", color = Color(0xFF1976D2))
+            title = "Conferma Inoltro",
+            text = "Vuoi inoltrare la candidatura a HR?",
+            icon = Icons.Default.Send,
+            confirmText = "Inoltra",
+            onConfirm = {
+                showHRConfirm = false
+                val index = AllCandidacies.indexOfFirst { it.id == candidacy.id }
+                if (index != -1) {
+                    AllCandidacies[index] = candidacy.copy(stato = "Inoltrata a HR")
                 }
+                android.widget.Toast.makeText(context, "Candidatura inviata a HR con successo", android.widget.Toast.LENGTH_SHORT).show()
             },
-            dismissButton = {
-                TextButton(onClick = { showHRConfirm = false }) { Text("Annulla", color = Color.Gray) }
-            }
+            dismissText = "Annulla",
+            onDismiss = { showHRConfirm = false }
         )
     }
 
     if (showManagerConfirm) {
-        AlertDialog(
+        ModernAlertDialog(
             onDismissRequest = { showManagerConfirm = false },
-            title = { Text("Conferma Inoltro") },
-            text = { Text("Vuoi inoltrare la candidatura al Responsabile?") },
-            confirmButton = {
-                TextButton(onClick = {
-                    showManagerConfirm = false
-                    val index = AllCandidacies.indexOfFirst { it.id == candidacy.id }
-                    if (index != -1) {
-                        AllCandidacies[index] = candidacy.copy(stato = "Inoltrata al Responsabile")
-                    }
-                    android.widget.Toast.makeText(context, "Candidatura inviata al Responsabile con successo", android.widget.Toast.LENGTH_SHORT).show()
-                }) {
-                    Text("Inoltra", color = Color(0xFF1976D2))
+            title = "Conferma Inoltro",
+            text = "Vuoi inoltrare la candidatura al Responsabile?",
+            icon = Icons.Default.Send,
+            confirmText = "Inoltra",
+            onConfirm = {
+                showManagerConfirm = false
+                val index = AllCandidacies.indexOfFirst { it.id == candidacy.id }
+                if (index != -1) {
+                    AllCandidacies[index] = candidacy.copy(stato = "Inoltrata al Responsabile")
                 }
+                android.widget.Toast.makeText(context, "Candidatura inviata al Responsabile con successo", android.widget.Toast.LENGTH_SHORT).show()
             },
-            dismissButton = {
-                TextButton(onClick = { showManagerConfirm = false }) { Text("Annulla", color = Color.Gray) }
-            }
+            dismissText = "Annulla",
+            onDismiss = { showManagerConfirm = false }
         )
     }
 

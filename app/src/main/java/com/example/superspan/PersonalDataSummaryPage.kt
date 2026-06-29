@@ -27,24 +27,11 @@ fun PersonalDataSummaryPage(navController: NavController?, padding: PaddingValue
             .padding(padding)
     ) {
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
         ) {
-            // --- NUOVO HEADER ---
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                // TASTO INDIETRO (A sinistra)
-                IconButton(
-                    onClick = { navController?.popBackStack() },
-                    modifier = Modifier
-                        .align(Alignment.CenterStart)
-                        .background(Color.White.copy(alpha = 0.7f), CircleShape)
-                ) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
-                }
-            }
+            Spacer(Modifier.height(80.dp))
 
             // TITOLI CENTRATI
             Column(
@@ -109,11 +96,23 @@ fun PersonalDataSummaryPage(navController: NavController?, padding: PaddingValue
                         SummaryDataRow(
                             icon = Icons.Default.Description,
                             label = "Curriculum Vitae (PDF)",
-                            value = actualUser.cvFileName ?: "Nessun file caricato"
+                            value = actualUser.cvFileName?.substringAfterLast('/') ?: "Nessun file caricato"
                         )
                     }
                 }
             }
+        }
+
+        // Floating Back Button
+        IconButton(
+            onClick = { navController?.popBackStack() },
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(top = 16.dp, start = 16.dp)
+                .background(Color.White.copy(alpha = 0.7f), CircleShape)
+                .size(48.dp)
+        ) {
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = Color.Black)
         }
 
         // TASTO MODIFICA FAB (In basso a destra, align nel root Box)
