@@ -1828,16 +1828,30 @@ fun ApplyStep3(navController: NavController?, padding: PaddingValues) {
             )
         }
 
-        Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text("Paolo, controlla un'ultima volta:", color = Color.Gray)
-            SummaryInteractiveRow(Icons.Default.Person, "Candidato", "${currentDraft.nome} ${currentDraft.cognome}", { showEditConfirm = "Dati" }) { previewContent = "Nome: ${currentDraft.nome}\nCognome: ${currentDraft.cognome}" }
-            SummaryInteractiveRow(Icons.Default.Email, "Email", currentDraft.emailLavoro, { showEditConfirm = "Dati" }) { previewContent = "Email: ${currentDraft.emailLavoro}" }
-            SummaryInteractiveRow(Icons.Default.Phone, "Telefono", currentDraft.telefono, { showEditConfirm = "Dati" }) { previewContent = "Telefono: ${currentDraft.telefono}" }
-            SummaryInteractiveRow(Icons.Default.Description, "CV", currentDraft.cvFileName.ifEmpty { "Nessun file" }, { showEditConfirm = "Dati" }) { showPreviewCV = true }
-            SummaryInteractiveRow(Icons.Default.Videocam, "Video", if (currentDraft.videoPath != null) "Registrato correttamente" else "Nessun video", { showEditConfirm = "Video" }) { showPreviewVideo = true }
-
-            Spacer(Modifier.weight(1f))
-            Button(onClick = { showSendConfirm = true }, Modifier.fillMaxWidth().height(60.dp), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary), shape = CircleShape) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(horizontal = 24.dp, vertical = 8.dp)
+        ) {
+            Text("Paolo, controlla un'ultima volta:", color = Color.Gray, modifier = Modifier.padding(bottom = 8.dp))
+            
+            Column(
+                Modifier.weight(1f),
+                verticalArrangement = Arrangement.SpaceEvenly
+            ) {
+                SummaryInteractiveRow(Icons.Default.Person, "Candidato", "${currentDraft.nome} ${currentDraft.cognome}", { showEditConfirm = "Dati" }) { previewContent = "Nome: ${currentDraft.nome}\nCognome: ${currentDraft.cognome}" }
+                SummaryInteractiveRow(Icons.Default.Email, "Email", currentDraft.emailLavoro, { showEditConfirm = "Dati" }) { previewContent = "Email: ${currentDraft.emailLavoro}" }
+                SummaryInteractiveRow(Icons.Default.Phone, "Telefono", currentDraft.telefono, { showEditConfirm = "Dati" }) { previewContent = "Telefono: ${currentDraft.telefono}" }
+                SummaryInteractiveRow(Icons.Default.Description, "CV", currentDraft.cvFileName.ifEmpty { "Nessun file" }, { showEditConfirm = "Dati" }) { showPreviewCV = true }
+                SummaryInteractiveRow(Icons.Default.Videocam, "Video", if (currentDraft.videoPath != null) "Registrato correttamente" else "Nessun video", { showEditConfirm = "Video" }) { showPreviewVideo = true }
+            }
+            
+            Button(
+                onClick = { showSendConfirm = true }, 
+                Modifier.fillMaxWidth().height(56.dp).padding(top = 8.dp), 
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary), 
+                shape = CircleShape
+            ) {
                 Text("CONFERMA E INVIA", fontWeight = FontWeight.Bold)
             }
         }
@@ -1855,21 +1869,21 @@ fun SummaryInteractiveRow(icon: ImageVector, label: String, value: String, onEdi
         border = androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.5f))
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
-                modifier = Modifier.size(40.dp).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), CircleShape),
+                modifier = Modifier.size(36.dp).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(icon, null, tint = MaterialTheme.colorScheme.primary)
+                Icon(icon, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
             }
             Spacer(Modifier.width(16.dp))
             Column(Modifier.weight(1f)) {
-                Text(label, fontSize = 12.sp, color = Color.Gray)
-                Text(value, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                Text(label, fontSize = 11.sp, color = Color.Gray)
+                Text(value, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
             }
-            IconButton(onClick = onEdit) { Icon(Icons.Default.Edit, "Modifica", Modifier.size(20.dp), tint = MaterialTheme.colorScheme.secondary) }
+            IconButton(onClick = onEdit, modifier = Modifier.size(36.dp)) { Icon(Icons.Default.Edit, "Modifica", Modifier.size(18.dp), tint = MaterialTheme.colorScheme.secondary) }
         }
     }
 }
