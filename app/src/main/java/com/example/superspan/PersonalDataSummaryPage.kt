@@ -36,14 +36,6 @@ fun PersonalDataSummaryPage(navController: NavController?, padding: PaddingValue
                     .padding(16.dp)
             ) {
                 // TASTO INDIETRO (A sinistra)
-                IconButton(
-                    onClick = { navController?.popBackStack() },
-                    modifier = Modifier
-                        .align(Alignment.CenterStart)
-                        .background(Color.White.copy(alpha = 0.7f), CircleShape)
-                ) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = com.example.superspan.ui.theme.LogoLeft)
-                }
             }
 
             // TITOLI CENTRATI
@@ -125,7 +117,7 @@ fun PersonalDataSummaryPage(navController: NavController?, padding: PaddingValue
                 .background(Color.White.copy(alpha = 0.7f), CircleShape)
                 .size(48.dp)
         ) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = Color.Black)
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = com.example.superspan.ui.theme.LogoLeft)
         }
 
         // TASTO MODIFICA FAB (In basso a destra, align nel root Box)

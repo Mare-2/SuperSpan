@@ -169,16 +169,7 @@ fun WorkOfferPage(offer: WorkOffer?, navController: NavController?, paddingValue
             }
         }
 
-        // --- BACK BUTTON (Float) ---
-        IconButton(
-            onClick = { navController?.popBackStack() }, 
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(start = 8.dp, top = 16.dp)
-                .background(Color.White.copy(alpha = 0.7f), CircleShape)
-        ) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = com.example.superspan.ui.theme.LogoLeft)
-        }
+
 
         // --- TASTO CANDIDATI (Fisso in basso) ---
         if (!actualUser.admin) {
@@ -189,7 +180,7 @@ fun WorkOfferPage(offer: WorkOffer?, navController: NavController?, paddingValue
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
-                    .padding(horizontal = 24.dp, vertical = 24.dp),
+                    .padding(start = 24.dp, end = 24.dp, bottom = 24.dp + paddingValues.calculateBottomPadding()),
                 contentAlignment = Alignment.Center
             ) {
                 if (hasCandidacy) {
@@ -261,7 +252,7 @@ fun WorkOfferPage(offer: WorkOffer?, navController: NavController?, paddingValue
                 .background(Color.White.copy(alpha = 0.7f), CircleShape)
                 .size(48.dp)
         ) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = Color.Black)
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = com.example.superspan.ui.theme.LogoLeft)
         }
     } // Chiude Box root
 }

@@ -99,7 +99,7 @@ fun AccountSummaryPage(user: User, navController: NavController?, padding: Paddi
                 .background(Color.White.copy(alpha = 0.7f), CircleShape)
                 .size(48.dp)
         ) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = Color.Black)
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = com.example.superspan.ui.theme.LogoLeft)
         }
 
         // TASTO MODIFICA FAB (In basso a destra)

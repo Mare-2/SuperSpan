@@ -68,15 +68,6 @@ fun PersonalDataEditPage(navController: NavController?, padding: PaddingValues) 
                 .fillMaxWidth()
                 .padding(vertical = 24.dp)
         ) {
-            IconButton(
-                onClick = { navController?.popBackStack() },
-                modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .padding(start = 8.dp)
-                    .background(Color.White.copy(alpha = 0.7f), CircleShape)
-            ) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = com.example.superspan.ui.theme.LogoLeft)
-            }
             Text(
                 text = "Modifica Dati",
                 color = Color.Black,
@@ -311,14 +302,6 @@ fun PersonalDataEditPage(navController: NavController?, padding: PaddingValues) 
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                IconButton(
-                    onClick = { navController?.popBackStack() },
-                    modifier = Modifier
-                        .align(Alignment.CenterStart)
-                        .background(Color.White.copy(alpha = 0.7f), CircleShape)
-                ) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = com.example.superspan.ui.theme.LogoLeft)
-                }
             }
 
             Column(
@@ -456,7 +439,7 @@ fun PersonalDataEditPage(navController: NavController?, padding: PaddingValues) 
                 .background(Color.White.copy(alpha = 0.7f), CircleShape)
                 .size(48.dp)
         ) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = Color.Black)
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = com.example.superspan.ui.theme.LogoLeft)
         }
     } // End Box
 }

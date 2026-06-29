@@ -126,15 +126,6 @@ fun AdminCouponEditPage(
                         .fillMaxWidth()
                         .padding(top = 16.dp, bottom = 16.dp)
                 ) {
-                    IconButton(
-                        onClick = { navController?.popBackStack() },
-                        modifier = Modifier
-                            .align(Alignment.CenterStart)
-                            .padding(start = 16.dp)
-                            .background(Color.White.copy(alpha = 0.7f), CircleShape)
-                    ) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = com.example.superspan.ui.theme.LogoLeft)
-                    }
                     
                     if (existingCoupon != null) {
                         IconButton(
@@ -338,7 +329,7 @@ fun AdminCouponEditPage(
                     .background(Color.White.copy(alpha = 0.7f), CircleShape)
                     .size(48.dp)
             ) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = Color.Black)
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = com.example.superspan.ui.theme.LogoLeft)
             }
 
             if (showSaveConfirm) {
