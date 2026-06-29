@@ -51,51 +51,25 @@ fun AccountSettingsPage(user: User, navController: NavController?, paddingValues
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        modifier = Modifier.fillMaxSize(),
-        containerColor = Color.Transparent
-    ) { _ ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(scrollState)
-        ) {
-            // Spazio per la barra di stato
-            Spacer(Modifier.height(paddingValues.calculateTopPadding()))
-
-            // --- HEADER ---
+        modifier = Modifier.padding(paddingValues)
+    ) { innerPadding ->
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ) {
+            // --- HEADER (Senza rettangolo bianco, testo scuro) ---
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(top = 80.dp, bottom = 16.dp)
             ) {
-                IconButton(
-                    onClick = { navController?.popBackStack() },
-                    modifier = Modifier
-                        .align(Alignment.CenterStart)
-                        .background(Color.White.copy(alpha = 0.7f), CircleShape)
-                ) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = com.example.superspan.ui.theme.LogoLeft)
-                }
+                Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("Modifica Account", color = Color.Black, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                Text("Email e password", color = Color.DarkGray, fontSize = 12.sp)
             }
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "Modifica Account",
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = Color(0xFF1A1A1A)
-                )
-                Text(
-                    text = "Credenziali e sicurezza",
-                    fontSize = 16.sp,
-                    color = Color.Gray
-                )
-            }
+        }
 
             // --- FORM ---
             Column(
@@ -197,7 +171,20 @@ fun AccountSettingsPage(user: User, navController: NavController?, paddingValues
                 
                 Spacer(Modifier.height(paddingValues.calculateBottomPadding() + 24.dp))
             }
-        }
+            } // End of Column
+
+            // Floating Back Button
+            IconButton(
+                onClick = { navController?.popBackStack() },
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(top = 16.dp + innerPadding.calculateTopPadding(), start = 16.dp)
+                    .background(Color.White.copy(alpha = 0.7f), CircleShape)
+                    .size(48.dp)
+            ) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = Color.Black)
+            }
+        } // End of Box
 
         if (showSaveConfirm) {
             ModernAlertDialog(

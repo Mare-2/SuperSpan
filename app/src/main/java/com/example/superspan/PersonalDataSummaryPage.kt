@@ -27,7 +27,7 @@ fun PersonalDataSummaryPage(navController: NavController?, padding: PaddingValue
             .padding(padding)
     ) {
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
         ) {
             // --- NUOVO HEADER ---
             Box(
@@ -109,11 +109,23 @@ fun PersonalDataSummaryPage(navController: NavController?, padding: PaddingValue
                         SummaryDataRow(
                             icon = Icons.Default.Description,
                             label = "Curriculum Vitae (PDF)",
-                            value = actualUser.cvFileName ?: "Nessun file caricato"
+                            value = actualUser.cvFileName?.substringAfterLast('/') ?: "Nessun file caricato"
                         )
                     }
                 }
             }
+        }
+
+        // Floating Back Button
+        IconButton(
+            onClick = { navController?.popBackStack() },
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(top = 16.dp, start = 16.dp)
+                .background(Color.White.copy(alpha = 0.7f), CircleShape)
+                .size(48.dp)
+        ) {
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = Color.Black)
         }
 
         // TASTO MODIFICA FAB (In basso a destra, align nel root Box)

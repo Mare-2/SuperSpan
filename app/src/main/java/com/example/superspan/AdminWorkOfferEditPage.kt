@@ -30,6 +30,7 @@ import androidx.navigation.NavController
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.shape.CircleShape
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -257,7 +258,20 @@ fun AdminWorkOfferEditPage(
                         }
                     }
                 }
+
+            // Floating Back Button
+            IconButton(
+                onClick = { navController?.popBackStack() },
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(top = 16.dp + paddingValues.calculateTopPadding(), start = 16.dp)
+                    .background(Color.White.copy(alpha = 0.7f), CircleShape)
+                    .size(48.dp)
+            ) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = Color.Black)
+            }
                 
+
             if (showSaveConfirm) {
                 ModernAlertDialog(
                     onDismissRequest = { showSaveConfirm = false },

@@ -62,30 +62,29 @@ import androidx.compose.material3.ButtonDefaults
 fun WorkOfferPage(offer: WorkOffer?, navController: NavController?, paddingValues: PaddingValues) {
     val scrollState = rememberScrollState()
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues)
-    ) {
-        // --- CONTENUTO SCORREVOLE ---
+    Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(scrollState),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(paddingValues)
         ) {
-            // Header fittizio per distanziare il contenuto e ospitare il tasto modifica
+            // --- HEADER (Senza rettangolo bianco, testo scuro) ---
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 16.dp, bottom = 16.dp, end = 8.dp)
-                    .height(48.dp)
+                    .padding(top = 16.dp, bottom = 16.dp)
             ) {
+                Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("Dettaglio Offerta", color = Color.Black, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                    Text(offer?.supermarket?.citta ?: "", color = Color.DarkGray, fontSize = 12.sp)
+                }
+
                 if (actualUser.admin && offer != null) {
                     IconButton(
                         onClick = { navController?.navigate("${Destination.EDIT_WORK_OFFER.route}/${offer.id}") },
                         modifier = Modifier
                             .align(Alignment.CenterEnd)
+                            .padding(end = 8.dp)
                             .background(Color.White.copy(alpha = 0.7f), CircleShape)
                     ) {
                         Icon(Icons.Default.Edit, contentDescription = "Modifica", tint = Color.Black)
@@ -250,8 +249,21 @@ fun WorkOfferPage(offer: WorkOffer?, navController: NavController?, paddingValue
                     }
                 }
             }
+            }
         }
-    }
+
+        // Floating Back Button
+        IconButton(
+            onClick = { navController?.popBackStack() },
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(top = 16.dp + paddingValues.calculateTopPadding(), start = 16.dp)
+                .background(Color.White.copy(alpha = 0.7f), CircleShape)
+                .size(48.dp)
+        ) {
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = Color.Black)
+        }
+    } // Chiude Box root
 }
 @Composable
 fun InfoRowItem(icon: ImageVector, label: String, value: String) {

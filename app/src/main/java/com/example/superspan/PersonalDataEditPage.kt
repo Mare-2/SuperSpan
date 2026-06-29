@@ -260,7 +260,7 @@ fun PersonalDataEditPage(navController: NavController?, padding: PaddingValues) 
     var cognome by remember { mutableStateOf(actualUser.cognome) }
     var emailLavoro by remember { mutableStateOf(actualUser.emailLavoro ?: "") }
     var prefisso by remember { mutableStateOf("+39") }
-    var cvName by remember { mutableStateOf(actualUser.cvFileName ?: "") }
+    var cvName by remember { mutableStateOf(actualUser.cvFileName?.substringAfterLast('/') ?: "") }
     var telefonoDigits by remember {
         mutableStateOf(
             actualUser.telefono
@@ -282,18 +282,28 @@ fun PersonalDataEditPage(navController: NavController?, padding: PaddingValues) 
             val savedPath = saveFileToInternalStorage(context, selectedUri, destinationName)
             if (savedPath != null) {
                 cvName = destinationName
-                actualUser.cvFileName = savedPath
+                actualUser.cvFileName = destinationName
+                actualUser.cvPath = savedPath
             }
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(scrollState)
-    ) {
-            // Spazio per la barra di stato
-            Spacer(Modifier.height(padding.calculateTopPadding()))
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+        ) {
+            // --- HEADER (Senza rettangolo bianco, testo scuro) ---
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 80.dp, bottom = 16.dp)
+            ) {
+                Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("Modifica Dati", color = Color.Black, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+            }
+        }
 
             // --- HEADER ---
             Box(
@@ -435,7 +445,20 @@ fun PersonalDataEditPage(navController: NavController?, padding: PaddingValues) 
 
             Spacer(Modifier.height(padding.calculateBottomPadding() + 24.dp))
         }
-    }
+        } // End Column
+
+        // Floating Back Button
+        IconButton(
+            onClick = { navController?.popBackStack() },
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(top = 16.dp + padding.calculateTopPadding(), start = 16.dp)
+                .background(Color.White.copy(alpha = 0.7f), CircleShape)
+                .size(48.dp)
+        ) {
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = Color.Black)
+        }
+    } // End Box
 }
 
 

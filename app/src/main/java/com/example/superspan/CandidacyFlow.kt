@@ -144,7 +144,7 @@ fun ApplyStep1(navController: NavController?, padding: PaddingValues) {
         val base = currentDraft.telefono.ifEmpty { draft.telefono.ifEmpty { actualUser.telefono ?: "" } }
         mutableStateOf(base.filter { it.isDigit() }.removePrefix("39"))
     }
-    var cvName by remember { mutableStateOf(currentDraft.cvFileName.ifEmpty { draft.cvFileName.ifEmpty { actualUser.cvFileName ?: "" } }) }
+    var cvName by remember { mutableStateOf(currentDraft.cvFileName.ifEmpty { draft.cvFileName.ifEmpty { actualUser.cvFileName?.substringAfterLast('/') ?: "" } }) }
     var cvPath by remember { mutableStateOf(currentDraft.cvPath.ifEmpty { draft.cvPath.ifEmpty { actualUser.cvPath ?: "" } }) }
 
     var showExitDialog by remember { mutableStateOf(false) }
@@ -218,7 +218,7 @@ fun ApplyStep1(navController: NavController?, padding: PaddingValues) {
                         Row(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
                             OutlinedTextField("+39", {}, readOnly = true, label = { Text("Pre") }, modifier = Modifier.width(80.dp), shape = RoundedCornerShape(20.dp))
                             Spacer(Modifier.width(8.dp))
-                            EditTextField("Telefono", telefonoDigits, KeyboardType.Phone, false, "", PhoneVisualTransformation(), Modifier.weight(1f)) {
+                            EditTextField("Telefono", telefonoDigits, KeyboardType.Phone, !isPhoneValid && telefonoDigits.isNotEmpty(), "Numero non valido", PhoneVisualTransformation(), Modifier.weight(1f)) {
                                 if (it.all { c -> c.isDigit() } && it.length <= 10) telefonoDigits = it
                             }
                         }
@@ -450,9 +450,9 @@ fun ApplyStep2Record(navController: NavController?, padding: PaddingValues) {
             while (seconds < 30 && isRecording) { delay(1000); seconds++ }
             if (seconds >= 30) {
                 activeRecording.value?.stop()
-                isRecording = false
                 delay(500)
                 navController?.popBackStack()
+                isRecording = false
             }
         }
     }
@@ -478,14 +478,49 @@ fun ApplyStep2Record(navController: NavController?, padding: PaddingValues) {
                 Text(countdown.toString(), fontSize = 100.sp, color = Color.White, fontWeight = FontWeight.Bold)
             }
         } else {
-            // BARRA DI SCORRIMENTO PIÙ SPESSA (12.dp)
-            LinearProgressIndicator(
-                progress = { seconds / 30f },
-                modifier = Modifier.fillMaxWidth().height(12.dp).padding(top = 10.dp),
-                color = com.example.superspan.ui.theme.AppError,
-                trackColor = Color.White.copy(0.2f)
-            )
-            Text("REC 00:${seconds.toString().padStart(2, '0')}", Modifier.padding(25.dp).align(Alignment.TopStart), color = com.example.superspan.ui.theme.AppError, fontWeight = FontWeight.Bold)
+            Column(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .fillMaxWidth()
+                    .background(Color.Black.copy(alpha = 0.6f))
+                    .padding(top = padding.calculateTopPadding())
+            ) {
+                LinearProgressIndicator(
+                    progress = { seconds / 30f },
+                    modifier = Modifier.fillMaxWidth().height(6.dp),
+                    color = com.example.superspan.ui.theme.AppError,
+                    trackColor = Color.White.copy(alpha = 0.3f)
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp, vertical = 12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            modifier = Modifier
+                                .size(10.dp)
+                                .clip(CircleShape)
+                                .background(com.example.superspan.ui.theme.AppError)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "00:${seconds.toString().padStart(2, '0')}",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp
+                        )
+                    }
+                    Text(
+                        text = "00:30",
+                        color = Color.White.copy(alpha = 0.7f),
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 16.sp
+                    )
+                }
+            }
         }
 
         if (isRecording) {
@@ -712,21 +747,21 @@ fun SummaryInteractiveRow(icon: ImageVector, label: String, value: String, onEdi
         border = androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.5f))
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
-                modifier = Modifier.size(40.dp).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), CircleShape),
+                modifier = Modifier.size(36.dp).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(icon, null, tint = MaterialTheme.colorScheme.primary)
+                Icon(icon, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
             }
             Spacer(Modifier.width(16.dp))
             Column(Modifier.weight(1f)) {
-                Text(label, fontSize = 12.sp, color = Color.Gray)
-                Text(value, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                Text(label, fontSize = 11.sp, color = Color.Gray)
+                Text(value, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
             }
-            IconButton(onClick = onEdit) { Icon(Icons.Default.Edit, "Modifica", Modifier.size(20.dp), tint = MaterialTheme.colorScheme.secondary) }
+            IconButton(onClick = onEdit, modifier = Modifier.size(36.dp)) { Icon(Icons.Default.Edit, "Modifica", Modifier.size(18.dp), tint = MaterialTheme.colorScheme.secondary) }
         }
     }
 }

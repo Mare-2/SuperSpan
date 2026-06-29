@@ -288,7 +288,7 @@ fun MainNavigation() {
 
     val showBar = currentRoute != Destination.LOGIN.route &&
             currentRoute != Destination.REGISTER.route &&
-            !currentRoute.startsWith("apply")
+            currentRoute != Destination.APPLY_STEP_2_RECORD.route
 
     Box(modifier = Modifier.fillMaxSize().background(com.example.superspan.ui.theme.AppBackgroundBrush)) {
         Scaffold(

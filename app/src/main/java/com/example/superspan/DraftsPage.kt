@@ -179,6 +179,18 @@ fun DraftsPage(navController: NavController?, padding: PaddingValues) {
                     }
                 }
             }
+        } // End LazyColumn
+
+        // Floating Back Button
+        IconButton(
+            onClick = { navController?.popBackStack() },
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(top = 16.dp, start = 16.dp)
+                .background(Color.White.copy(alpha = 0.7f), CircleShape)
+                .size(48.dp)
+        ) {
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = Color.Black)
         }
 
         if (showDeleteConfirmFor != null) {

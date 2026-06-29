@@ -72,6 +72,7 @@ fun ProfilePage(user: User, navController: NavController?, paddingValues: Paddin
         // --- 1. HEADER (Solo Logo, senza sfondo bianco) ---
         Box(
             modifier = Modifier
+            
                 .fillMaxWidth()
                 .padding(top = 60.dp, bottom = 8.dp),
             contentAlignment = Alignment.Center

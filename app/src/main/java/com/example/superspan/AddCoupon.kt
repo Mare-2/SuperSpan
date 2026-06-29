@@ -156,6 +156,18 @@ fun AddCoupon(paddingValues: PaddingValues, navController: NavController?) {
             }
         }
 
+        // Floating Back Button
+        IconButton(
+            onClick = { navController?.popBackStack() },
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(top = 16.dp + paddingValues.calculateTopPadding(), start = 16.dp)
+                .background(Color.White.copy(alpha = 0.7f), CircleShape)
+                .size(48.dp)
+        ) {
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = Color.Black)
+        }
+
         if (isSelectionOpen) {
             Box(
                 modifier = Modifier
