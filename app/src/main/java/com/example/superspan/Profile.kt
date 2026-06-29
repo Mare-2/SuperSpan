@@ -55,6 +55,9 @@ fun ProfilePage(user: User, navController: NavController?, paddingValues: Paddin
             confirmText = "Esci",
             onConfirm = {
                 showLogoutDialog = false
+                Destination.entries.forEach { dest ->
+                    navController?.clearBackStack(dest.route)
+                }
                 navController?.navigate(Destination.LOGIN.route) {
                     popUpTo(0)
                 }

@@ -51,13 +51,16 @@ fun AccountSettingsPage(user: User, navController: NavController?, paddingValues
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        modifier = Modifier.padding(paddingValues)
+        modifier = Modifier
+            .padding(top = paddingValues.calculateTopPadding())
+            .imePadding()
     ) { innerPadding ->
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
+                    .verticalScroll(scrollState)
             ) {
             // --- HEADER (Senza rettangolo bianco, testo scuro) ---
             Box(
@@ -169,7 +172,8 @@ fun AccountSettingsPage(user: User, navController: NavController?, paddingValues
                     Text("Salva Modifiche", fontSize = 18.sp, fontWeight = FontWeight.Bold)
                 }
                 
-                Spacer(Modifier.height(paddingValues.calculateBottomPadding() + 24.dp))
+                val isImeVisible = androidx.compose.foundation.layout.WindowInsets.ime.getBottom(androidx.compose.ui.platform.LocalDensity.current) > 0
+                Spacer(Modifier.height(if (isImeVisible) 24.dp else paddingValues.calculateBottomPadding() + 24.dp))
             }
             } // End of Column
 
@@ -182,7 +186,7 @@ fun AccountSettingsPage(user: User, navController: NavController?, paddingValues
                     .background(Color.White.copy(alpha = 0.7f), CircleShape)
                     .size(48.dp)
             ) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = com.example.superspan.ui.theme.LogoLeft)
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = Color.Black)
             }
         } // End of Box
 
