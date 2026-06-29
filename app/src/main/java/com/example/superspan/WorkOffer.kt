@@ -67,6 +67,7 @@ fun WorkOfferPage(offer: WorkOffer?, navController: NavController?, paddingValue
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .verticalScroll(scrollState)
         ) {
             // --- HEADER (Senza rettangolo bianco, testo scuro) ---
             Box(
@@ -248,7 +249,6 @@ fun WorkOfferPage(offer: WorkOffer?, navController: NavController?, paddingValue
                         )
                     }
                 }
-            }
             }
         }
 
