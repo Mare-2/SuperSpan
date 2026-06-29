@@ -31,6 +31,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.shape.CircleShape
+import androidx.activity.compose.BackHandler
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,6 +55,18 @@ fun AdminWorkOfferEditPage(
     var tipoContratto by remember { mutableStateOf(offer?.tipoContratto ?: TipoContratto.DETERMINATO) }
     var orario by remember { mutableStateOf(offer?.orario ?: OrarioLavoro.FULL_TIME) }
 
+    val hasUnsavedChanges = if (offer == null) {
+        titolo.isNotEmpty() || ruoloEnum != null || descrizioneBreve.isNotEmpty() || descrizioneEstesa.isNotEmpty() || requisiti.isNotEmpty() || selectedSupermarket != null
+    } else {
+        titolo != offer.titolo || ruoloEnum != offer.ruoloEnum || descrizioneBreve != offer.descrizioneBreve || descrizioneEstesa != offer.descrizioneEstesa || requisiti != offer.requisiti || selectedSupermarket != offer.supermarket || tipoContratto != offer.tipoContratto || orario != offer.orario
+    }
+
+    var showBackConfirm by remember { mutableStateOf(false) }
+
+    BackHandler(enabled = hasUnsavedChanges) {
+        showBackConfirm = true
+    }
+
     if (isSelectionOpen) {
         SupermarketSelectionScreen(
             onBack = { isSelectionOpen = false },
@@ -64,20 +77,24 @@ fun AdminWorkOfferEditPage(
         )
     } else {
         Box(modifier = Modifier.fillMaxSize()) {
-            Column(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp)
+            ) {
                 // --- HEADER ---
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 16.dp, bottom = 16.dp)
                 ) {
-                    
                     if (offer != null) {
                         IconButton(
                             onClick = { showDeleteConfirm = true },
                             modifier = Modifier
                                 .align(Alignment.CenterEnd)
-                                .padding(end = 16.dp)
                                 .background(Color.White.copy(alpha = 0.7f), CircleShape)
                         ) {
                             Icon(Icons.Default.Delete, contentDescription = "Elimina", tint = com.example.superspan.ui.theme.AppError)
@@ -97,19 +114,12 @@ fun AdminWorkOfferEditPage(
                         fontWeight = FontWeight.ExtraBold,
                         color = Color(0xFF1A1A1A)
                     )
-                    Text(
-                        text = "I campi verdi sono completati",
-                        fontSize = 16.sp,
-                        color = Color.Gray
-                    )
                 }
 
+                Spacer(modifier = Modifier.height(24.dp))
+
                 Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp)
-                        .padding(bottom = paddingValues.calculateBottomPadding() + 16.dp)
-                        .verticalScroll(rememberScrollState()),
+                    modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     // STEP 1: SEDE DI LAVORO
@@ -252,7 +262,13 @@ fun AdminWorkOfferEditPage(
 
             // Floating Back Button
             IconButton(
-                onClick = { navController?.popBackStack() },
+                onClick = { 
+                    if (hasUnsavedChanges) {
+                        showBackConfirm = true
+                    } else {
+                        navController?.popBackStack() 
+                    }
+                },
                 modifier = Modifier
                     .align(Alignment.TopStart)
                     .padding(top = 16.dp + paddingValues.calculateTopPadding(), start = 16.dp)
@@ -321,6 +337,23 @@ fun AdminWorkOfferEditPage(
                     },
                     dismissText = "Annulla",
                     onDismiss = { showDeleteConfirm = false }
+                )
+            }
+
+            if (showBackConfirm) {
+                ModernAlertDialog(
+                    onDismissRequest = { showBackConfirm = false },
+                    title = "Attenzione",
+                    text = "Hai delle modifiche non salvate. Vuoi uscire comunque senza salvare?",
+                    icon = Icons.Default.Close,
+                    isDestructive = true,
+                    confirmText = "Esci",
+                    onConfirm = {
+                        showBackConfirm = false
+                        navController?.popBackStack()
+                    },
+                    dismissText = "Annulla",
+                    onDismiss = { showBackConfirm = false }
                 )
             }
         }

@@ -70,6 +70,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.runtime.LaunchedEffect
 
 @Composable
 fun AddCoupon(paddingValues: PaddingValues, navController: NavController?) {
@@ -83,7 +84,13 @@ fun AddCoupon(paddingValues: PaddingValues, navController: NavController?) {
     var maxSelectionForMulti by remember { mutableIntStateOf(3) }
     
     var pendingCouponSave by remember { mutableStateOf<Coupon?>(null) }
+    var hasUnsavedChanges by remember { mutableStateOf(false) }
+    var showBackConfirm by remember { mutableStateOf(false) }
     val context = LocalContext.current
+
+    androidx.activity.compose.BackHandler(enabled = hasUnsavedChanges) {
+        showBackConfirm = true
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -113,11 +120,6 @@ fun AddCoupon(paddingValues: PaddingValues, navController: NavController?) {
                     fontWeight = FontWeight.ExtraBold,
                     color = Color(0xFF1A1A1A)
                 )
-                Text(
-                    text = "I campi verdi sono completati",
-                    fontSize = 16.sp,
-                    color = Color.Gray
-                )
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -132,7 +134,8 @@ fun AddCoupon(paddingValues: PaddingValues, navController: NavController?) {
                     },
                     onSave = { newCoupon ->
                         pendingCouponSave = newCoupon
-                    }
+                    },
+                    onFormDirty = { dirty -> hasUnsavedChanges = dirty }
                 )
             } else {
                 PromoForm(
@@ -142,14 +145,21 @@ fun AddCoupon(paddingValues: PaddingValues, navController: NavController?) {
                     },
                     onSave = { newPromo ->
                         pendingCouponSave = newPromo
-                    }
+                    },
+                    onFormDirty = { dirty -> hasUnsavedChanges = dirty }
                 )
             }
         }
 
         // Floating Back Button
         IconButton(
-            onClick = { navController?.popBackStack() },
+            onClick = { 
+                if (hasUnsavedChanges) {
+                    showBackConfirm = true
+                } else {
+                    navController?.popBackStack() 
+                }
+            },
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .padding(top = 16.dp + paddingValues.calculateTopPadding(), start = 16.dp)
@@ -221,6 +231,23 @@ fun AddCoupon(paddingValues: PaddingValues, navController: NavController?) {
                 onDismiss = { pendingCouponSave = null }
             )
         }
+
+        if (showBackConfirm) {
+            ModernAlertDialog(
+                onDismissRequest = { showBackConfirm = false },
+                title = "Attenzione",
+                text = "Hai delle modifiche non salvate. Vuoi uscire comunque senza salvare?",
+                icon = Icons.Default.Close,
+                isDestructive = true,
+                confirmText = "Esci",
+                onConfirm = {
+                    showBackConfirm = false
+                    navController?.popBackStack()
+                },
+                dismissText = "Annulla",
+                onDismiss = { showBackConfirm = false }
+            )
+        }
     }
 }
 
@@ -228,13 +255,19 @@ fun AddCoupon(paddingValues: PaddingValues, navController: NavController?) {
 @Composable
 private fun CouponForm(
     onMultiSelectProductRequest: (List<Product>, Int, (List<Product>) -> Unit) -> Unit,
-    onSave: (Coupon) -> Unit
+    onSave: (Coupon) -> Unit,
+    onFormDirty: (Boolean) -> Unit
 ) {
     var code by rememberSaveable { mutableStateOf("") }
     var discount by rememberSaveable { mutableStateOf("") }
     var description by rememberSaveable { mutableStateOf("") }
     var expirationDate by rememberSaveable { mutableStateOf("") }
     val selectedProducts = remember { mutableStateListOf<Product>() }
+
+    val isDirty = code.isNotEmpty() || discount.isNotEmpty() || description.isNotEmpty() || expirationDate.isNotEmpty() || selectedProducts.isNotEmpty()
+    LaunchedEffect(isDirty) {
+        onFormDirty(isDirty)
+    }
 
     val discountValue = discount.toFloatOrNull()
     
@@ -320,7 +353,9 @@ private fun CouponForm(
             label = "Scadenza (yyyy-MM-dd)",
             keyboardType = KeyboardType.Text,
             isError = isExpirationError,
-            errorMessage = "Formato non valido, usa AAAA-MM-GG",
+            errorMessage = "Il coupon deve avere una scadenza successiva all'odierna.",
+            readOnly = true,
+            onClick = { showDatePicker = true },
             trailingIcon = {
                 IconButton(onClick = { showDatePicker = true }) {
                     Icon(Icons.Default.DateRange, contentDescription = "Seleziona Data")
@@ -407,13 +442,19 @@ private fun CouponForm(
 @Composable
 private fun PromoForm(
     onSelectProductRequest: ((Product) -> Unit) -> Unit,
-    onSave: (Coupon) -> Unit
+    onSave: (Coupon) -> Unit,
+    onFormDirty: (Boolean) -> Unit
 ) {
     var code by rememberSaveable { mutableStateOf("") }
     var discount by rememberSaveable { mutableStateOf("") }
     var description by rememberSaveable { mutableStateOf("") }
     var expirationDate by rememberSaveable { mutableStateOf("") }
     var selectedProduct by remember { mutableStateOf<Product?>(null) }
+
+    val isDirty = code.isNotEmpty() || discount.isNotEmpty() || description.isNotEmpty() || expirationDate.isNotEmpty() || selectedProduct != null
+    LaunchedEffect(isDirty) {
+        onFormDirty(isDirty)
+    }
 
     val discountValue = discount.toFloatOrNull()
     
@@ -500,6 +541,8 @@ private fun PromoForm(
             keyboardType = KeyboardType.Text,
             isError = isExpirationError,
             errorMessage = "Formato non valido, usa AAAA-MM-GG",
+            readOnly = true,
+            onClick = { showDatePicker = true },
             trailingIcon = {
                 IconButton(onClick = { showDatePicker = true }) {
                     Icon(Icons.Default.DateRange, contentDescription = "Seleziona Data")

@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
@@ -34,8 +36,10 @@ import com.example.superspan.ui.theme.AppError
 @Composable
 fun AdminCandidaciesPage(navController: NavController?, paddingValues: PaddingValues, sliderContent: (@Composable () -> Unit)? = null) {
     // Stati per i filtri
-    var selectedRole by remember { mutableStateOf<Role?>(null) }
+    val selectedRoles = remember { androidx.compose.runtime.mutableStateListOf<Role>() }
     var selectedSupermarket by remember { mutableStateOf<Supermarket?>(null) }
+    var searchQuery by remember { mutableStateOf("") }
+    var showFiltersPage by remember { mutableStateOf(false) }
     
     // Ordine data (Crescente/Decrescente)
     var dateDescending by remember { mutableStateOf(true) }
@@ -43,9 +47,13 @@ fun AdminCandidaciesPage(navController: NavController?, paddingValues: PaddingVa
     // Dati filtrati
     val filteredCandidacies = AllCandidacies.filter { candidacy ->
         val offer = WorkOfferSearchList.find { it.id == candidacy.offerId }
-        val roleMatch = selectedRole == null || offer?.ruoloEnum == selectedRole
+        
+        val roleMatch = selectedRoles.isEmpty() || (offer?.ruoloEnum != null && selectedRoles.contains(offer.ruoloEnum))
         val superMatch = selectedSupermarket == null || offer?.supermarket?.id == selectedSupermarket?.id
-        roleMatch && superMatch
+        val searchMatch = searchQuery.isBlank() || 
+                          offer?.titolo?.contains(searchQuery, ignoreCase = true) == true ||
+                          "${candidacy.nome} ${candidacy.cognome}".contains(searchQuery, ignoreCase = true)
+        roleMatch && superMatch && searchMatch
     }.sortedWith { a, b ->
         val aInoltrata = a.stato != "Inviata"
         val bInoltrata = b.stato != "Inviata"
@@ -66,6 +74,15 @@ fun AdminCandidaciesPage(navController: NavController?, paddingValues: PaddingVa
                 selectedSupermarket = it
                 isSelectionOpen = false
             }
+        )
+    } else if (showFiltersPage) {
+        AdminCandidaciesFilterPage(
+            selectedRoles = selectedRoles,
+            selectedSupermarket = selectedSupermarket,
+            onSupermarketChange = { selectedSupermarket = it },
+            paddingValues = paddingValues,
+            onDismiss = { showFiltersPage = false },
+            onOpenSelection = { isSelectionOpen = true }
         )
     } else {
         LazyColumn(
@@ -91,97 +108,114 @@ fun AdminCandidaciesPage(navController: NavController?, paddingValues: PaddingVa
             }
 
             item {
-                // --- SEZIONE FILTRI ---
-                Card(
+                // --- BARRA DI RICERCA ---
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 8.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                    shape = RoundedCornerShape(20.dp),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column(Modifier.padding(20.dp)) {
-                        Row(
-                            Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text("Filtri di Ricerca", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = LogoLeft)
-                            if (selectedRole != null || selectedSupermarket != null) {
-                                TextButton(onClick = {
-                                    selectedRole = null
-                                    selectedSupermarket = null
-                                }, contentPadding = PaddingValues(0.dp)) {
-                                    Text("Azzera", color = AppError)
+                    androidx.compose.material3.Surface(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(56.dp),
+                        shape = RoundedCornerShape(28.dp),
+                        shadowElevation = 6.dp,
+                        color = Color.White
+                    ) {
+                        androidx.compose.material3.TextField(
+                            value = searchQuery,
+                            onValueChange = { searchQuery = it },
+                            placeholder = { Text("Cerca candidato o ruolo...", color = Color.Gray) },
+                            modifier = Modifier.fillMaxSize(),
+                            leadingIcon = { Icon(Icons.Default.Search, null, tint = Color.Gray) },
+                            trailingIcon = {
+                                IconButton(onClick = { showFiltersPage = true }) {
+                                    Icon(Icons.Default.Tune, contentDescription = "Filtri", tint = LogoLeft)
                                 }
+                            },
+                            singleLine = true,
+                            colors = androidx.compose.material3.TextFieldDefaults.colors(
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent,
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent,
+                                cursorColor = LogoLeft
+                            )
+                        )
+                    }
+                }
+            }
+
+            // --- CHIPS DEI FILTRI ATTIVI ---
+            val hasActiveFilters = selectedRoles.isNotEmpty() || selectedSupermarket != null
+            if (hasActiveFilters) {
+                item {
+                    androidx.compose.foundation.lazy.LazyRow(
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                        contentPadding = PaddingValues(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        if (selectedSupermarket != null) {
+                            item {
+                                FilterChipCustom(
+                                    text = selectedSupermarket!!.nome,
+                                    onRemove = { selectedSupermarket = null }
+                                )
                             }
                         }
+                        items(selectedRoles) { role ->
+                            FilterChipCustom(
+                                text = role.nome,
+                                onRemove = { selectedRoles.remove(role) }
+                            )
+                        }
+                    }
+                }
+            }
 
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        // Filtro Sede
-                        OutlinedButton(
-                            onClick = { isSelectionOpen = true },
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = ButtonDefaults.outlinedButtonColors(contentColor = LogoLeft)
+            // --- ORDINAMENTO DATA ---
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 4.dp),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    Button(
+                        onClick = { dateDescending = !dateDescending },
+                        modifier = Modifier
+                            .height(44.dp)
+                            .wrapContentWidth(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = LogoLeft,
+                            contentColor = Color.White
+                        ),
+                        border = null,
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 6.dp, pressedElevation = 2.dp),
+                        shape = androidx.compose.foundation.shape.CircleShape,
+                        contentPadding = PaddingValues(horizontal = 16.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
                         ) {
-                            Icon(Icons.Default.LocationOn, contentDescription = null, modifier = Modifier.size(20.dp))
+                            Icon(
+                                imageVector = Icons.Default.DateRange,
+                                contentDescription = null,
+                                modifier = Modifier.size(20.dp)
+                            )
                             Spacer(Modifier.width(8.dp))
-                            Text(selectedSupermarket?.nome ?: "Tutte le Sedi", fontWeight = FontWeight.Bold)
-                        }
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        // Filtro Ruolo
-                        ScrollableTabRow(
-                            selectedTabIndex = Role.entries.indexOf(selectedRole).takeIf { it >= 0 } ?: 0,
-                            edgePadding = 0.dp,
-                            containerColor = Color.Transparent,
-                            indicator = {},
-                            divider = {}
-                        ) {
-                            val chipColors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = LogoLeft.copy(alpha = 0.1f),
-                                selectedLabelColor = LogoLeft,
-                                selectedLeadingIconColor = LogoLeft
+                            Text(
+                                text = "Data",
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold
                             )
-                            FilterChip(
-                                selected = selectedRole == null,
-                                onClick = { selectedRole = null },
-                                label = { Text("Tutti i Ruoli") },
-                                modifier = Modifier.padding(end = 8.dp),
-                                colors = chipColors
-                            )
-                            Role.entries.forEach { role ->
-                                FilterChip(
-                                    selected = selectedRole == role,
-                                    onClick = { selectedRole = role },
-                                    label = { Text(role.nome) },
-                                    modifier = Modifier.padding(end = 8.dp),
-                                    colors = chipColors
-                                )
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        // Ordinamento Data
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text("Ordina per Data: ", fontSize = 14.sp, color = Color.Gray, fontWeight = FontWeight.Medium)
-                            Spacer(modifier = Modifier.width(8.dp))
-                            FilterChip(
-                                selected = true,
-                                onClick = { dateDescending = !dateDescending },
-                                label = { Text(if (dateDescending) "Più Recenti" else "Meno Recenti") },
-                                leadingIcon = {
-                                    Icon(if (dateDescending) Icons.Default.ArrowDownward else Icons.Default.ArrowUpward, null, modifier = Modifier.size(16.dp))
-                                },
-                                colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = LogoCenter.copy(alpha = 0.1f),
-                                    selectedLabelColor = LogoCenter,
-                                    selectedLeadingIconColor = LogoCenter
-                                )
+                            Spacer(Modifier.width(6.dp))
+                            Icon(
+                                imageVector = if (!dateDescending) Icons.Default.ArrowUpward else Icons.Default.ArrowDownward,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp)
                             )
                         }
                     }
@@ -467,6 +501,149 @@ fun CandidacyAdminCard(candidacy: Candidacy) {
                         fontWeight = FontWeight.Bold
                     )
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun AdminCandidaciesFilterPage(
+    selectedRoles: MutableList<Role>,
+    selectedSupermarket: Supermarket?,
+    onSupermarketChange: (Supermarket?) -> Unit,
+    paddingValues: PaddingValues,
+    onDismiss: () -> Unit,
+    onOpenSelection: () -> Unit
+) {
+    val scrollState = androidx.compose.foundation.rememberScrollState()
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(com.example.superspan.ui.theme.LogoRight.copy(alpha = 0.03f))
+    ) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .verticalScroll(scrollState)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = paddingValues.calculateTopPadding())
+                    .background(
+                        androidx.compose.ui.graphics.Brush.verticalGradient(
+                            colors = listOf(
+                                Color.White,
+                                Color.White.copy(alpha = 0f)
+                            )
+                        )
+                    )
+            ) {
+                Column(Modifier.padding(horizontal = 24.dp)) {
+                    Spacer(Modifier.height(64.dp))
+                    Text(
+                        "Filtri",
+                        fontSize = 32.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    Spacer(Modifier.height(80.dp))
+                }
+            }
+
+            Column(Modifier.padding(horizontal = 24.dp)) {
+                // Sede di Lavoro
+                Text("Sede di Lavoro", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Spacer(Modifier.height(16.dp))
+                OutlinedButton(
+                    onClick = onOpenSelection,
+                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = LogoLeft)
+                ) {
+                    Icon(Icons.Default.LocationOn, contentDescription = null, modifier = Modifier.size(20.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text(selectedSupermarket?.nome ?: "Tutte le Sedi", fontWeight = FontWeight.Bold)
+                }
+
+                Spacer(Modifier.height(32.dp))
+
+                // Ruoli
+                Text("Ruoli di interesse", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Spacer(Modifier.height(12.dp))
+
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    shape = RoundedCornerShape(20.dp),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.4f)),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                ) {
+                    Column(Modifier.padding(20.dp)) {
+                        Role.entries.chunked(2).forEach { pair ->
+                            Row(Modifier.fillMaxWidth()) {
+                                pair.forEach { role ->
+                                    Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
+                                        Checkbox(
+                                            checked = selectedRoles.contains(role),
+                                            onCheckedChange = { isChecked ->
+                                                if (isChecked) selectedRoles.add(role) else selectedRoles.remove(role)
+                                            },
+                                            colors = CheckboxDefaults.colors(checkedColor = LogoLeft)
+                                        )
+                                        Text(role.nome, fontSize = 14.sp)
+                                    }
+                                }
+                                if (pair.size == 1) Spacer(Modifier.weight(1f))
+                            }
+                        }
+                    }
+                }
+
+                Spacer(Modifier.height(100.dp + paddingValues.calculateBottomPadding()))
+            }
+        }
+
+        // Tasto Applica
+        Button(
+            onClick = onDismiss,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = paddingValues.calculateBottomPadding() + 16.dp),
+            shape = CircleShape,
+            colors = ButtonDefaults.buttonColors(containerColor = LogoLeft)
+        ) {
+            Text(
+                text = "Applica filtri",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
+            )
+        }
+
+        // Header actions
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = paddingValues.calculateTopPadding() + 16.dp, start = 16.dp, end = 16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(
+                onClick = onDismiss,
+                modifier = Modifier.background(Color.White.copy(alpha = 0.7f), CircleShape)
+            ) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = LogoLeft)
+            }
+            TextButton(
+                onClick = {
+                    selectedRoles.clear()
+                    onSupermarketChange(null)
+                },
+                modifier = Modifier.background(Color.White.copy(alpha = 0.7f), CircleShape)
+            ) {
+                Text("Reset", color = AppError, fontWeight = FontWeight.SemiBold)
             }
         }
     }

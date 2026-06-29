@@ -150,11 +150,6 @@ fun AdminCouponEditPage(
                         fontWeight = FontWeight.ExtraBold,
                         color = Color(0xFF1A1A1A)
                     )
-                    Text(
-                        text = "I campi verdi sono completati",
-                        fontSize = 16.sp,
-                        color = Color.Gray
-                    )
                 }
 
                 Column(

@@ -1,6 +1,8 @@
 package com.example.superspan
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -397,6 +399,7 @@ fun EditTextField(
     readOnly: Boolean = false,
     singleLine: Boolean = true,
     minLines: Int = 1,
+    onClick: (() -> Unit)? = null,
     onValueChange: (String) -> Unit
 ) {
     val containerColor = when {
@@ -412,25 +415,38 @@ fun EditTextField(
     }
 
     Column(modifier = modifier.padding(vertical = 4.dp)) {
-        OutlinedTextField(
-            value = value,
-            onValueChange = onValueChange,
-            visualTransformation = visualTransformation,
-            label = { Text(label) },
-            modifier = Modifier.fillMaxWidth().background(containerColor, RoundedCornerShape(20.dp)),
-            shape = RoundedCornerShape(20.dp),
-            singleLine = singleLine,
-            minLines = minLines,
-            isError = isError,
-            readOnly = readOnly,
-            trailingIcon = trailingIcon,
-            keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-            colors = OutlinedTextFieldDefaults.colors(
-                unfocusedBorderColor = borderColor,
-                focusedBorderColor = borderColor,
-                errorBorderColor = borderColor
+        Box {
+            OutlinedTextField(
+                value = value,
+                onValueChange = onValueChange,
+                visualTransformation = visualTransformation,
+                label = { Text(label) },
+                modifier = Modifier.fillMaxWidth().background(containerColor, RoundedCornerShape(20.dp)),
+                shape = RoundedCornerShape(20.dp),
+                singleLine = singleLine,
+                minLines = minLines,
+                isError = isError,
+                readOnly = readOnly,
+                trailingIcon = trailingIcon,
+                keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+                colors = OutlinedTextFieldDefaults.colors(
+                    unfocusedBorderColor = borderColor,
+                    focusedBorderColor = borderColor,
+                    errorBorderColor = borderColor
+                )
             )
-        )
+            if (onClick != null) {
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = onClick
+                        )
+                )
+            }
+        }
         if (isError) {
             Text(errorMessage, color = com.example.superspan.ui.theme.AppError, fontSize = 12.sp, modifier = Modifier.padding(start = 12.dp))
         }

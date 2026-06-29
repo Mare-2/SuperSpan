@@ -96,13 +96,8 @@ fun PersonalDataEditPage(navController: NavController?, padding: PaddingValues) 
                     .padding(horizontal = 20.dp, vertical = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = "I campi verdi sono completati",
-                    fontSize = 16.sp,
-                    color = Color.Gray
-                )
+                
             }
-
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
