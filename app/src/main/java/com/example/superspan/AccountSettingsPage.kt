@@ -69,7 +69,11 @@ fun AccountSettingsPage(user: User, navController: NavController?, paddingValues
                             fontSize = 22.sp,
                             fontWeight = FontWeight.Bold
                     )
-                    Text("Nome e password", color = Color.DarkGray, fontSize = 12.sp)
+                    if (user.admin) {
+                        Text("Password", color = Color.DarkGray, fontSize = 12.sp)
+                    } else {
+                        Text("Nome e password", color = Color.DarkGray, fontSize = 12.sp)
+                    }
                 }
             }
 
@@ -80,6 +84,7 @@ fun AccountSettingsPage(user: User, navController: NavController?, paddingValues
             ) {
                 Spacer(Modifier.height(8.dp))
 
+                if (!user.admin) {
                 Card(
                         colors = CardDefaults.cardColors(containerColor = Color.White),
                         shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
@@ -90,16 +95,26 @@ fun AccountSettingsPage(user: User, navController: NavController?, paddingValues
                             modifier = Modifier.fillMaxWidth().padding(20.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                     ) {
+                        
                         Text(
-                                "Modifica Dati Personali",
-                                Modifier.fillMaxWidth().padding(bottom = 16.dp),
-                                fontWeight = FontWeight.Bold,
-                                color = com.example.superspan.ui.theme.LogoLeft,
-                                fontSize = 14.sp
+                            "Modifica Dati Personali",
+                            Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                            fontWeight = FontWeight.Bold,
+                            color = com.example.superspan.ui.theme.LogoLeft,
+                            fontSize = 14.sp
                         )
-                        EditTextField("Nome", nome, KeyboardType.Text) { nome = it }
+                        EditTextField(
+                            "Nome", 
+                            nome, 
+                            KeyboardType.Text, 
+                        ) { nome = it }
                         Spacer(Modifier.height(16.dp))
-                        EditTextField("Cognome", cognome, KeyboardType.Text) { cognome = it }
+                        EditTextField(
+                            "Cognome", 
+                            cognome, 
+                            KeyboardType.Text, 
+                        ) { cognome = it }
+                        }
                     }
                 }
 

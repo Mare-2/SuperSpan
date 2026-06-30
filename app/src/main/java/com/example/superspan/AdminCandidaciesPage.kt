@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -276,7 +277,7 @@ fun CandidacyAdminCard(candidacy: Candidacy) {
             onDismissRequest = { showHRConfirm = false },
             title = "Conferma Inoltro",
             text = "Vuoi inoltrare la candidatura a HR?",
-            icon = Icons.Default.Send,
+            icon = Icons.AutoMirrored.Filled.Send,
             confirmText = "Inoltra",
             onConfirm = {
                 showHRConfirm = false
@@ -296,7 +297,7 @@ fun CandidacyAdminCard(candidacy: Candidacy) {
             onDismissRequest = { showManagerConfirm = false },
             title = "Conferma Inoltro",
             text = "Vuoi inoltrare la candidatura al Responsabile?",
-            icon = Icons.Default.Send,
+            icon = Icons.AutoMirrored.Filled.Send,
             confirmText = "Inoltra",
             onConfirm = {
                 showManagerConfirm = false
@@ -466,6 +467,8 @@ fun CandidacyAdminCard(candidacy: Candidacy) {
             // Bottoni Inoltro
             if (!isForwarded) {
                 Spacer(Modifier.height(16.dp))
+                Text("Invia a:", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.DarkGray)
+                Spacer(Modifier.height(8.dp))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     Button(
                         onClick = { showHRConfirm = true },
@@ -474,7 +477,7 @@ fun CandidacyAdminCard(candidacy: Candidacy) {
                         colors = ButtonDefaults.buttonColors(containerColor = LogoLeft, contentColor = Color.White),
                         contentPadding = PaddingValues(horizontal = 4.dp)
                     ) {
-                        Text("Invia a HR", fontSize = 13.sp, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold)
+                        Text("Risorse Umane", fontSize = 13.sp, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold)
                     }
                     Button(
                         onClick = { showManagerConfirm = true },
@@ -483,7 +486,7 @@ fun CandidacyAdminCard(candidacy: Candidacy) {
                         colors = ButtonDefaults.buttonColors(containerColor = LogoCenter, contentColor = Color.White),
                         contentPadding = PaddingValues(horizontal = 4.dp)
                     ) {
-                        Text("A Responsabile", fontSize = 13.sp, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold)
+                        Text("Responsabile Sede", fontSize = 13.sp, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold)
                     }
                 }
             } else {
