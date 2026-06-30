@@ -76,7 +76,7 @@ fun AdminWorkOfferEditPage(
             }
         )
     } else {
-        Box(modifier = Modifier.fillMaxSize()) {
+        AuraBackground(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier
                     .padding(paddingValues)

@@ -71,7 +71,7 @@ fun PersonalDataEditPage(navController: NavController?, padding: PaddingValues) 
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    AuraBackground(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -169,8 +169,8 @@ fun PersonalDataEditPage(navController: NavController?, padding: PaddingValues) 
                         // --- SEZIONE CV (Con conferma visiva per Paolo) ---
                         Text("Curriculum Vitae", Modifier.fillMaxWidth(), fontWeight = FontWeight.Bold, color = Color.Gray, fontSize = 14.sp)
 
-                        val cvBoxColor = if (cvName.isNotEmpty()) Color(0xFFE8F5E9) else Color(0xFFFFF3E0)
-                        val cvBorderColor = if (cvName.isNotEmpty()) Color(0xFF81C784) else Color(0xFFFFB74D)
+                        val cvBoxColor = if (cvName.isNotEmpty()) Color(0xFFE8F5E9) else Color(0xFFF5F5F5)
+                        val cvBorderColor = if (cvName.isNotEmpty()) Color(0xFF81C784) else Color.LightGray
 
                         Surface(
                             onClick = { launcher.launch("application/pdf") },

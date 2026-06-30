@@ -49,7 +49,7 @@ fun AccountSettingsPage(user: User, navController: NavController?, paddingValues
                     cognome.isNotBlank() &&
                     (newPassword.isEmpty() || isNewPasswordValid)
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    AuraBackground(modifier = Modifier.fillMaxSize()) {
         Column(
                 modifier = Modifier
                         .fillMaxSize()

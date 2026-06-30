@@ -33,7 +33,6 @@ fun AdminWorkMainPage(paddingValues: PaddingValues, navController: NavController
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = paddingValues.calculateTopPadding())
     ) {
         val sliderContent: @Composable () -> Unit = {
             Row(

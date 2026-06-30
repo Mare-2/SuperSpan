@@ -21,13 +21,15 @@ import androidx.navigation.NavController
 
 @Composable
 fun PersonalDataSummaryPage(navController: NavController?, padding: PaddingValues) {
-    Box(
+    AuraBackground(
         modifier = Modifier
             .fillMaxSize()
-            .padding(padding)
     ) {
         Column(
-            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .verticalScroll(rememberScrollState())
         ) {
             // --- NUOVO HEADER ---
             Spacer(modifier = Modifier.height(64.dp))
@@ -108,7 +110,7 @@ fun PersonalDataSummaryPage(navController: NavController?, padding: PaddingValue
             onClick = { navController?.popBackStack() },
             modifier = Modifier
                 .align(Alignment.TopStart)
-                .padding(top = 16.dp, start = 16.dp)
+                .padding(top = padding.calculateTopPadding() + 16.dp, start = 16.dp)
                 .background(Color.White.copy(alpha = 0.7f), CircleShape)
                 .size(48.dp)
         ) {
@@ -120,7 +122,7 @@ fun PersonalDataSummaryPage(navController: NavController?, padding: PaddingValue
             onClick = { navController?.navigate(Destination.PERSONAL_DATA_EDIT.route) },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(24.dp),
+                .padding(bottom = padding.calculateBottomPadding() + 24.dp, end = 24.dp),
             containerColor = com.example.superspan.ui.theme.LogoLeft,
             contentColor = Color.White,
             shape = CircleShape

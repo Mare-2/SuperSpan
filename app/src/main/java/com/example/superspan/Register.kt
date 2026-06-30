@@ -43,14 +43,14 @@ fun Register(
     var check by rememberSaveable { mutableStateOf(false) }
     var text by rememberSaveable { mutableStateOf("Registrati") }
     
-    Box(
+    AuraBackground(
         modifier = Modifier
             .fillMaxSize()
-            .padding(padding)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(padding)
                 .verticalScroll(androidx.compose.foundation.rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween

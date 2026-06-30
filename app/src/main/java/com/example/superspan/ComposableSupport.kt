@@ -18,13 +18,17 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -52,7 +56,38 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.geometry.Offset
 
+import androidx.compose.foundation.layout.BoxScope
+
+@Composable
+fun AuraBackground(modifier: Modifier = Modifier, content: @Composable BoxScope.() -> Unit) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color(0xFFF7FBF8)) // Option 2 base (very light mint white)
+            .drawBehind {
+                drawRect(
+                    brush = Brush.radialGradient(
+                        colors = listOf(com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.20f), Color.Transparent),
+                        center = Offset(0f, 0f),
+                        radius = size.width * 0.8f
+                    )
+                )
+                drawRect(
+                    brush = Brush.radialGradient(
+                        colors = listOf(Color(0xFF388E3C).copy(alpha = 0.15f), Color.Transparent),
+                        center = Offset(size.width, size.height),
+                        radius = size.width * 0.8f
+                    )
+                )
+            }
+    ) {
+        content()
+    }
+}
 
 
 
@@ -63,42 +98,105 @@ fun ProfileIcon() {
 
 @Composable
 fun Header(modifier: Modifier = Modifier) {
-    Column(modifier = modifier.fillMaxWidth()) {
-        // La "Top Bar" vera e propria col logo (senza rettangolo bianco)
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 60.dp, bottom = 8.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            // Effetto bagliore (glow) dietro al logo per farlo risaltare sullo sfondo sfumato
-            androidx.compose.foundation.Image(
-                painter = androidx.compose.ui.res.painterResource(id = R.drawable.superspan),
-                contentDescription = "Logo SuperSpan",
-                modifier = Modifier.height(48.dp),
-                contentScale = androidx.compose.ui.layout.ContentScale.Fit
-            )
-        }
-        
-        // Il testo del saluto, fuori dal rettangolo bianco e immerso nello sfondo grigio
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp, start = 24.dp, end = 24.dp, bottom = 8.dp)
-        ) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(com.example.superspan.ui.theme.AppHeaderFadeBrush)
+            .padding(top = 60.dp, bottom = 32.dp, start = 24.dp, end = 24.dp)
+    ) {
+        Column {
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                androidx.compose.foundation.Image(
+                    painter = androidx.compose.ui.res.painterResource(id = R.drawable.superspan),
+                    contentDescription = "Logo SuperSpan",
+                    modifier = Modifier.height(48.dp),
+                    contentScale = androidx.compose.ui.layout.ContentScale.Fit
+                )
+            }
+            Spacer(modifier = Modifier.height(24.dp))
             Text(
                 text = "Ciao ${actualUser.nome}!",
-                fontSize = 32.sp,
-                fontWeight = FontWeight.ExtraBold,
+                style = MaterialTheme.typography.displayLarge,
                 color = com.example.superspan.ui.theme.LogoLeft
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = "Cosa cerchi oggi?",
-                fontSize = 16.sp,
-                color = Color.Gray,
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.DarkGray,
                 fontWeight = FontWeight.Medium
             )
+        }
+    }
+}
+
+@Composable
+fun FilterTitle(
+    modifier: Modifier = Modifier,
+    title: String = "Filtri",
+    paddingValues: PaddingValues
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(top = paddingValues.calculateTopPadding())
+            .background(com.example.superspan.ui.theme.AppHeaderFadeBrush)
+            .padding(top = 64.dp, bottom = 32.dp, start = 24.dp, end = 24.dp)
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.displayLarge,
+            color = com.example.superspan.ui.theme.LogoLeft
+        )
+    }
+}
+
+@Composable
+fun FloatingFilterActions(
+    onDismiss: () -> Unit,
+    onReset: (() -> Unit)?,
+    paddingValues: PaddingValues
+) {
+    Column(Modifier.fillMaxWidth()) {
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .height(paddingValues.calculateTopPadding())
+                .background(com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.30f))
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(
+                onClick = onDismiss,
+                modifier = Modifier
+                    .size(45.dp)
+                    .background(Color.White.copy(alpha = 0.9f), CircleShape)
+            ) {
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Indietro",
+                    modifier = Modifier.size(24.dp),
+                    tint = com.example.superspan.ui.theme.LogoLeft
+                )
+            }
+
+            if (onReset != null) {
+                TextButton(
+                    onClick = onReset,
+                    modifier = Modifier
+                        .background(Color.White.copy(alpha = 0.9f), CircleShape)
+                        .height(45.dp)
+                ) {
+                    Text("Reset", color = com.example.superspan.ui.theme.AppError, fontWeight = FontWeight.Bold)
+                }
+            } else {
+                Spacer(Modifier.size(45.dp))
+            }
         }
     }
 }
@@ -209,7 +307,7 @@ fun CheckPassword(
 
     androidx.compose.material3.Surface(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(16.dp),
         color = Color(0xFFF9F9F9),
         border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFE0E0E0))
     ) {
@@ -321,62 +419,52 @@ fun TestoAdattabile(testo: String, modifier: Modifier = Modifier, fontSize: Text
 
 @Composable
 fun HeaderHomeAlt(modifier: Modifier, navController: NavController?) {
-    Column(modifier = modifier.fillMaxWidth()) {
-        // Top Bar
-        androidx.compose.material3.Surface(
-            modifier = Modifier.fillMaxWidth(),
-            color = Color.White,
-            shadowElevation = 4.dp,
-            shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 36.dp, bottom = 12.dp, start = 16.dp, end = 16.dp)
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(com.example.superspan.ui.theme.AppHeaderFadeBrush)
+            .padding(top = 60.dp, bottom = 32.dp, start = 24.dp, end = 24.dp)
+    ) {
+        Column {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                // Logo al centro
                 androidx.compose.foundation.Image(
                     painter = androidx.compose.ui.res.painterResource(id = R.drawable.superspan),
                     contentDescription = "Logo SuperSpan",
-                    modifier = Modifier.height(36.dp).align(Alignment.Center),
+                    modifier = Modifier.height(36.dp),
                     contentScale = androidx.compose.ui.layout.ContentScale.Fit
                 )
                 
-                // Profilo a destra
                 IconButton(
                     onClick = { navController?.navigateTopLevel(Destination.PROFILO.route) },
                     modifier = Modifier
                         .size(45.dp)
-                        .align(Alignment.CenterEnd)
-                        .background(androidx.compose.material3.MaterialTheme.colorScheme.primary.copy(alpha = 0.08f), androidx.compose.foundation.shape.CircleShape)
+                        .background(Color.White.copy(alpha = 0.5f), CircleShape)
                 ) {
                     Icon(
                         Icons.Default.AccountCircle,
                         contentDescription = "Profilo",
                         modifier = Modifier.size(28.dp),
-                        tint = androidx.compose.material3.MaterialTheme.colorScheme.primary
+                        tint = com.example.superspan.ui.theme.LogoLeft
                     )
                 }
             }
-        }
-        
-        // Testo fuori dal rettangolo
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 28.dp, start = 24.dp, end = 24.dp, bottom = 8.dp)
-        ) {
+            
+            Spacer(modifier = Modifier.height(24.dp))
+            
             Text(
                 text = "Ciao ${actualUser?.nome ?: "Ospite"}!",
-                fontSize = 32.sp,
-                fontWeight = FontWeight.ExtraBold,
+                style = MaterialTheme.typography.displayLarge,
                 color = com.example.superspan.ui.theme.LogoLeft
             )
-            Spacer(modifier = Modifier.height(2.dp))
+            Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = "Bentornato in SuperSpan",
-                fontSize = 16.sp,
-                color = Color.Gray,
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.DarkGray,
                 fontWeight = FontWeight.Medium
             )
         }
@@ -421,8 +509,8 @@ fun EditTextField(
                 onValueChange = onValueChange,
                 visualTransformation = visualTransformation,
                 label = { Text(label) },
-                modifier = Modifier.fillMaxWidth().background(containerColor, RoundedCornerShape(20.dp)),
-                shape = RoundedCornerShape(20.dp),
+                modifier = Modifier.fillMaxWidth().background(containerColor, RoundedCornerShape(12.dp)),
+                shape = RoundedCornerShape(12.dp),
                 singleLine = singleLine,
                 minLines = minLines,
                 isError = isError,
@@ -431,8 +519,11 @@ fun EditTextField(
                 keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedBorderColor = borderColor,
-                    focusedBorderColor = borderColor,
-                    errorBorderColor = borderColor
+                    focusedBorderColor = com.example.superspan.ui.theme.LogoLeft,
+                    errorBorderColor = com.example.superspan.ui.theme.AppError,
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    errorContainerColor = Color.Transparent
                 )
             )
             if (onClick != null) {

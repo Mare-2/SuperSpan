@@ -92,7 +92,7 @@ fun AddCoupon(paddingValues: PaddingValues, navController: NavController?) {
         showBackConfirm = true
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    AuraBackground(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .padding(paddingValues)

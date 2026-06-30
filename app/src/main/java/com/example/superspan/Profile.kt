@@ -72,12 +72,12 @@ fun ProfilePage(user: User, navController: NavController?, paddingValues: Paddin
             .fillMaxSize()
             .verticalScroll(scrollState)
     ) {
-        // --- 1. HEADER (Solo Logo, senza sfondo bianco) ---
+        // --- 1. HEADER CON GRADIENTE SFUMATO ---
         Box(
             modifier = Modifier
-            
                 .fillMaxWidth()
-                .padding(top = 60.dp, bottom = 8.dp),
+                .background(com.example.superspan.ui.theme.AppHeaderFadeBrush)
+                .padding(top = 60.dp, bottom = 32.dp, start = 24.dp, end = 24.dp),
             contentAlignment = Alignment.Center
         ) {
             androidx.compose.foundation.Image(
@@ -99,7 +99,7 @@ fun ProfilePage(user: User, navController: NavController?, paddingValues: Paddin
                     .padding(top = 8.dp), 
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("${user.nome} ${user.cognome}", fontSize = 28.sp, fontWeight = FontWeight.ExtraBold)
+                Text("${user.nome} ${user.cognome}", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.ExtraBold)
                 Spacer(modifier = Modifier.height(4.dp))
                 Surface(
                     shape = RoundedCornerShape(12.dp),
@@ -121,8 +121,7 @@ fun ProfilePage(user: User, navController: NavController?, paddingValues: Paddin
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 24.dp)
-                    .padding(bottom = paddingValues.calculateBottomPadding() + 24.dp), 
+                    .padding(horizontal = 24.dp), 
                 verticalArrangement = Arrangement.Top
             ) {
                 // Sezione Comune
@@ -177,6 +176,8 @@ fun ProfilePage(user: User, navController: NavController?, paddingValues: Paddin
                         Text("Esci", fontSize = 18.sp, fontWeight = FontWeight.Bold)
                     }
                 }
+                
+                Spacer(Modifier.height(paddingValues.calculateBottomPadding() + 24.dp))
             }
         }
     }
@@ -186,7 +187,7 @@ fun ProfilePage(user: User, navController: NavController?, paddingValues: Paddin
 fun ProfileSectionTitle(title: String) {
     Text(
         text = title,
-        fontSize = 18.sp,
+        style = MaterialTheme.typography.titleMedium,
         fontWeight = FontWeight.Bold,
         color = com.example.superspan.ui.theme.LogoLeft,
         modifier = Modifier

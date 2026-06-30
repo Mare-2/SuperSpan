@@ -366,7 +366,8 @@ fun Home(paddingValues: PaddingValues, navController: NavController?) {
         )
     )
 
-    Column(Modifier.padding(paddingValues)) {
+    AuraBackground(Modifier.padding(paddingValues)) {
+        Column {
         // Manteniamo lo stesso peso usato nelle altre schermate
         Header(Modifier.weight(1f))
 
@@ -438,23 +439,26 @@ import com.example.superspan.ui.theme.LogoRight
 
 @Composable
 fun Home(paddingValues: PaddingValues, navController: NavController?) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(bottom = paddingValues.calculateBottomPadding())
-            .verticalScroll(rememberScrollState())
-    ) {
-        // 1. HEADER
-        Header()
+    AuraBackground(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+        ) {
+            // 1. HEADER
+            Header()
 
-        // 2. SEZIONE AZIONI RAPIDE
-        QuickActionsSection(actualUser.admin, navController)
+            // 2. SEZIONE AZIONI RAPIDE
+            QuickActionsSection(actualUser.admin, navController)
 
-        // 3. DASHBOARD DINAMICA
-        if (actualUser.admin) {
-            AdminDashboard(navController)
-        } else {
-            UserDashboard(navController)
+            // 3. DASHBOARD DINAMICA
+            if (actualUser.admin) {
+                AdminDashboard(navController)
+            } else {
+                UserDashboard(navController)
+            }
+            
+            Spacer(Modifier.height(paddingValues.calculateBottomPadding() + 16.dp))
         }
     }
 }
@@ -600,19 +604,27 @@ fun AdminDashboard(navController: NavController?) {
                     .padding(horizontal = 20.dp, vertical = 8.dp)
                     .clickable { navController?.navigateTopLevel(Destination.ADMIN_CANDIDACIES.route) },
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFFFEBEE)),
-                elevation = CardDefaults.cardElevation(2.dp)
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
                 Row(
                     modifier = Modifier.padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Default.Warning, contentDescription = null, tint = Color(0xFFD32F2F), modifier = Modifier.size(32.dp))
-                    Spacer(Modifier.width(16.dp))
-                    Column {
-                        Text("Attenzione Richiesta", color = Color(0xFFD32F2F), fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                        Text("Hai $pendingCandidacies candidature in sospeso da visionare.", color = Color(0xFFB71C1C), fontSize = 14.sp)
+                    Box(
+                        modifier = Modifier
+                            .size(48.dp)
+                            .background(LogoRight.copy(alpha = 0.15f), CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(Icons.Default.NotificationsActive, contentDescription = null, tint = LogoRight, modifier = Modifier.size(24.dp))
                     }
+                    Spacer(Modifier.width(16.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text("Nuove Candidature", color = Color.Black, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
+                        Text("$pendingCandidacies candidature in attesa di revisione.", color = Color.Gray, fontSize = 14.sp)
+                    }
+                    Icon(Icons.Default.KeyboardArrowRight, contentDescription = null, tint = Color.LightGray)
                 }
             }
             Spacer(Modifier.height(16.dp))

@@ -53,14 +53,14 @@ fun Login(
     var loginError by rememberSaveable { mutableStateOf(false) }
     var _user : User? = actualUser
     
-    Box(
+    AuraBackground(
         modifier = Modifier
             .fillMaxSize()
-            .padding(padding)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(padding)
                 .verticalScroll(androidx.compose.foundation.rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween

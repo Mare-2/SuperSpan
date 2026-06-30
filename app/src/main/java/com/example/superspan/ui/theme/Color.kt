@@ -19,3 +19,11 @@ val AppBackgroundBrush = Brush.verticalGradient(
 val BackgroundLight = Color(0xFFF8F9FA)
 val SurfaceWhite = Color(0xFFFFFFFF)
 val TextPrimary = Color(0xFF1E1E1E)
+
+val AppHeaderFadeBrush = Brush.verticalGradient(
+    colors = listOf(
+        LogoLeft.copy(alpha = 0.30f),
+        LogoCenter.copy(alpha = 0.10f),
+        Color.Transparent
+    )
+)

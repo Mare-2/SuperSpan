@@ -11,8 +11,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -30,6 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import kotlinx.coroutines.launch
 
 
 val globalWorkFilterData = WorkFilterData().apply {
@@ -120,6 +121,9 @@ fun WorkSearchPage(
     
     var highlightCurrentId by remember { mutableStateOf<Int?>(null) }
     val context = androidx.compose.ui.platform.LocalContext.current
+    val deletingWorkOfferIds = remember { mutableStateListOf<Int>() }
+    var offerToDelete by remember { mutableStateOf<WorkOffer?>(null) }
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(highlightedWorkOfferId) {
         val targetId = highlightedWorkOfferId
@@ -135,6 +139,30 @@ fun WorkSearchPage(
             highlightCurrentId = null
             highlightedWorkOfferId = null
         }
+    }
+
+    if (offerToDelete != null) {
+        val offer = offerToDelete!!
+        ModernAlertDialog(
+            onDismissRequest = { offerToDelete = null },
+            title = "Elimina Offerta",
+            text = "Sei sicuro di voler eliminare l'offerta di lavoro \"${offer.titolo}\"?",
+            icon = Icons.Default.Delete,
+            isDestructive = true,
+            confirmText = "Elimina",
+            onConfirm = {
+                val id = offer.id
+                offerToDelete = null
+                scope.launch {
+                    deletingWorkOfferIds.add(id)
+                    kotlinx.coroutines.delay(400)
+                    WorkOfferSearchList.removeAll { it.id == id }
+                    deletingWorkOfferIds.remove(id)
+                }
+            },
+            dismissText = "Annulla",
+            onDismiss = { offerToDelete = null }
+        )
     }
 
     LazyColumn(
@@ -259,13 +287,21 @@ fun WorkSearchPage(
             
             val badgeText = if (hasCandidacy) "Inviata" else if (hasDraft) "Bozza" else if (hasViewed) null else "Nuova"
             
-            WorkOfferCompose(
-                workOffer = offer, 
-                navController = navController, 
-                isHighlighted = (highlightCurrentId == offer.id),
-                isDisabled = hasCandidacy || hasDraft,
-                badgeText = badgeText
-            )
+            val isDeleting = deletingWorkOfferIds.contains(offer.id)
+            AnimatedVisibility(
+                visible = !isDeleting,
+                enter = fadeIn(),
+                exit = slideOutHorizontally(targetOffsetX = { it }, animationSpec = tween(400)) + fadeOut(animationSpec = tween(400))
+            ) {
+                WorkOfferCompose(
+                    workOffer = offer, 
+                    navController = navController, 
+                    isHighlighted = (highlightCurrentId == offer.id),
+                    isDisabled = hasCandidacy || hasDraft,
+                    badgeText = badgeText,
+                    onDeleteClick = { offerToDelete = offer }
+                )
+            }
         }
     }
 }
@@ -273,9 +309,9 @@ fun WorkSearchPage(
 
 
 @Composable
-fun WorkOfferCompose(workOffer: WorkOffer, navController: NavController?, isHighlighted: Boolean = false, isDisabled: Boolean = false, badgeText: String? = null) {
+fun WorkOfferCompose(workOffer: WorkOffer, navController: NavController?, isHighlighted: Boolean = false, isDisabled: Boolean = false, badgeText: String? = null, onDeleteClick: () -> Unit = {}) {
     val backgroundColor by animateColorAsState(
-        targetValue = if (isHighlighted) androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer else Color.White,
+        targetValue = if (isHighlighted) Color(0xFFE0E0E0) else Color.White,
         animationSpec = tween(durationMillis = 500)
     )
 
@@ -293,11 +329,12 @@ fun WorkOfferCompose(workOffer: WorkOffer, navController: NavController?, isHigh
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = backgroundColor),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp, pressedElevation = 8.dp),
-        border = if (isHighlighted) BorderStroke(2.dp, com.example.superspan.ui.theme.LogoLeft) else BorderStroke(1.dp, Color(0xFFEAEAEA))
+        border = BorderStroke(1.dp, Color(0xFFEAEAEA))
     ) {
-        Column(
-            modifier = Modifier.padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
+        Column {
+            Column(
+                modifier = Modifier.padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             // RIGA SUPERIORE: Titolo e Badge Status
             Row(
@@ -381,6 +418,32 @@ fun WorkOfferCompose(workOffer: WorkOffer, navController: NavController?, isHigh
                     )
                 }
             }
+            }
+            if (actualUser.admin) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color(0xFFF9F9F9))
+                        .padding(horizontal = 8.dp, vertical = 2.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        TextButton(onClick = { navController?.navigate("edit_work_offer/${workOffer.id}") }) {
+                            Icon(Icons.Default.Edit, contentDescription = "Modifica", modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("Modifica")
+                        }
+                        TextButton(onClick = onDeleteClick, colors = ButtonDefaults.textButtonColors(contentColor = Color.Red)) {
+                            Icon(Icons.Default.Delete, contentDescription = "Elimina", modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("Elimina")
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -403,30 +466,10 @@ fun WorkFilterPage(modifier: Modifier, filterData: WorkFilterData, padding: Padd
                 .fillMaxSize()
                 .verticalScroll(scrollState)
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = padding.calculateTopPadding())
-                    .background(
-                        androidx.compose.ui.graphics.Brush.verticalGradient(
-                            colors = listOf(
-                                Color.White,
-                                Color.White.copy(alpha = 0f)
-                            )
-                        )
-                    )
-            ) {
-                Column(Modifier.padding(horizontal = 24.dp)) {
-                    Spacer(Modifier.height(64.dp))
-                    Text(
-                        "Filtri",
-                        fontSize = 32.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                    Spacer(Modifier.height(80.dp))
-                }
-            }
+            FilterTitle(
+                title = "Filtri Lavoro",
+                paddingValues = padding
+            )
 
             Column(Modifier.padding(horizontal = 24.dp)) {
 
@@ -610,33 +653,17 @@ fun WorkFilterPage(modifier: Modifier, filterData: WorkFilterData, padding: Padd
             )
         }
 
-        // Tasti fissi in alto
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(top = padding.calculateTopPadding() + 16.dp, start = 16.dp, end = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(
-                onClick = onDismiss,
-                modifier = Modifier.background(Color.White.copy(alpha = 0.7f), CircleShape)
-            ) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = com.example.superspan.ui.theme.LogoLeft)
-            }
-            TextButton(
-                onClick = {
-                    filterData.ruoli.clear()
-                    filterData.tipiContratto.clear()
-                    filterData.orari.clear()
-                    filterData.distanzaMax = 1000f
-                    tuttaItalia = true
-                },
-                modifier = Modifier.background(Color.White.copy(alpha = 0.7f), CircleShape)
-            ) {
-                Text("Reset", color = com.example.superspan.ui.theme.AppError, fontWeight = FontWeight.SemiBold)
-            }
-        }
+        FloatingFilterActions(
+            onDismiss = onDismiss,
+            onReset = {
+                filterData.ruoli.clear()
+                filterData.tipiContratto.clear()
+                filterData.orari.clear()
+                filterData.distanzaMax = 1000f
+                tuttaItalia = true
+            },
+            paddingValues = padding
+        )
     }
 }
 

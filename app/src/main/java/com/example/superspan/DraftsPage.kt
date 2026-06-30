@@ -41,9 +41,9 @@ fun DraftsPage(navController: NavController?, padding: PaddingValues) {
 
     var showDeleteConfirmFor by remember { mutableStateOf<Int?>(null) }
 
-    Box(Modifier.fillMaxSize().padding(padding)) {
+    AuraBackground(Modifier.fillMaxSize()) {
         LazyColumn(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().padding(padding),
             contentPadding = PaddingValues(bottom = 120.dp)
         ) {
             item {
@@ -108,39 +108,58 @@ fun DraftsPage(navController: NavController?, padding: PaddingValues) {
                         val offer = WorkOfferSearchList.find { it.id == offerId }
 
                         Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                            Surface(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 8.dp),
-                                shape = RoundedCornerShape(12.dp),
-                                color = Color.White,
-                                shadowElevation = 2.dp
+                            Card(
+                                modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
+                                colors = CardDefaults.cardColors(containerColor = Color.White),
+                                shape = RoundedCornerShape(20.dp),
+                                border = androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.4f)),
+                                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                             ) {
-                                Column(Modifier.padding(12.dp)) {
-                                    Text(offer?.titolo ?: "Offerta #$offerId", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                                    Text(offer?.supermarket?.citta ?: "-", color = Color.Gray, fontSize = 13.sp)
-                                    Spacer(Modifier.height(8.dp))
-                                    Text("Nome: ${draft.nome} ${draft.cognome}", fontSize = 14.sp)
-                                    Text("Email: ${draft.emailLavoro}", fontSize = 14.sp)
-                                    Text("Telefono: ${draft.telefono}", fontSize = 14.sp)
+                                Column(Modifier.padding(20.dp)) {
+                                    Text(offer?.titolo ?: "Offerta #$offerId", fontWeight = FontWeight.ExtraBold, fontSize = 18.sp, color = com.example.superspan.ui.theme.LogoLeft)
+                                    Spacer(Modifier.height(4.dp))
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(Icons.Default.LocationOn, null, tint = Color.Gray, modifier = Modifier.size(16.dp))
+                                        Spacer(Modifier.width(6.dp))
+                                        Text(offer?.supermarket?.nome ?: "-", color = Color.Gray, fontSize = 14.sp)
+                                    }
+                                    
+                                    Spacer(Modifier.height(16.dp))
+                                    androidx.compose.material3.HorizontalDivider(color = Color(0xFFEEEEEE))
+                                    Spacer(Modifier.height(16.dp))
 
-                                    Spacer(Modifier.height(12.dp))
+                                    Text("I tuoi dati salvati:", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color.DarkGray)
+                                    Spacer(Modifier.height(8.dp))
+                                    Text("• Nome: ${draft.nome} ${draft.cognome}", fontSize = 14.sp, color = Color.DarkGray)
+                                    Text("• Email: ${draft.emailLavoro}", fontSize = 14.sp, color = Color.DarkGray)
+                                    Text("• Telefono: ${draft.telefono}", fontSize = 14.sp, color = Color.DarkGray)
+
+                                    Spacer(Modifier.height(20.dp))
                                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                                        TextButton(onClick = {
-                                            currentDraft = draft.copy()
-                                            currentOfferIdApplying = offerId
-                                            candidacySourceRoute = Destination.DRAFTS.route
-                                            navController?.navigate(draft.lastStepRoute)
-                                        }) {
-                                            Icon(Icons.Default.Edit, null)
+                                        OutlinedButton(
+                                            onClick = { showDeleteConfirmFor = offerId },
+                                            colors = ButtonDefaults.outlinedButtonColors(contentColor = com.example.superspan.ui.theme.AppError),
+                                            shape = RoundedCornerShape(12.dp),
+                                            border = androidx.compose.foundation.BorderStroke(1.dp, com.example.superspan.ui.theme.AppError.copy(alpha = 0.5f))
+                                        ) {
+                                            Icon(Icons.Default.Delete, null, tint = com.example.superspan.ui.theme.AppError, modifier = Modifier.size(18.dp))
                                             Spacer(Modifier.width(6.dp))
-                                            Text("Continua")
+                                            Text("Elimina", color = com.example.superspan.ui.theme.AppError, fontWeight = FontWeight.Bold)
                                         }
                                         Spacer(Modifier.width(8.dp))
-                                        OutlinedButton(onClick = { showDeleteConfirmFor = offerId }, colors = ButtonDefaults.outlinedButtonColors(contentColor = com.example.superspan.ui.theme.AppError)) {
-                                            Icon(Icons.Default.Delete, null, tint = com.example.superspan.ui.theme.AppError)
+                                        Button(
+                                            onClick = {
+                                                currentDraft = draft.copy()
+                                                currentOfferIdApplying = offerId
+                                                candidacySourceRoute = Destination.DRAFTS.route
+                                                navController?.navigate(draft.lastStepRoute)
+                                            },
+                                            colors = ButtonDefaults.buttonColors(containerColor = com.example.superspan.ui.theme.LogoLeft),
+                                            shape = RoundedCornerShape(12.dp)
+                                        ) {
+                                            Icon(Icons.Default.Edit, null, modifier = Modifier.size(18.dp))
                                             Spacer(Modifier.width(6.dp))
-                                            Text("Elimina", color = com.example.superspan.ui.theme.AppError)
+                                            Text("Continua", fontWeight = FontWeight.Bold)
                                         }
                                     }
                                 }
@@ -173,7 +192,7 @@ fun DraftsPage(navController: NavController?, padding: PaddingValues) {
             onClick = { navController?.popBackStack() },
             modifier = Modifier
                 .align(Alignment.TopStart)
-                .padding(top = 16.dp, start = 16.dp)
+                .padding(top = padding.calculateTopPadding() + 16.dp, start = 16.dp)
                 .background(Color.White.copy(alpha = 0.7f), CircleShape)
                 .size(48.dp)
         ) {
@@ -206,7 +225,7 @@ fun SubmittedCandidacyCard(candidacy: Candidacy) {
     
     // Determinazione del badge di stato
     val (statusText, statusColor, bgColor) = when (candidacy.stato) {
-        "Inviata" -> Triple("Non ancora visualizzata", Color(0xFFE65100), Color(0xFFFFF3E0)) // Orange
+        "Inviata" -> Triple("Non visualizzata", Color(0xFFE65100), Color(0xFFFFF3E0)) // Orange
         "Scartata" -> Triple("Rifiutata", Color(0xFFD32F2F), Color(0xFFFFEBEE)) // Red
         "Inoltrata a HR" -> Triple("In valutazione", Color(0xFF2E7D32), Color(0xFFE8F5E9)) // Green
         "Inoltrata al Responsabile" -> Triple("In valutazione", Color(0xFF2E7D32), Color(0xFFE8F5E9)) // Green
@@ -214,56 +233,52 @@ fun SubmittedCandidacyCard(candidacy: Candidacy) {
     }
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(2.dp),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(20.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.4f)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column(Modifier.padding(16.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = offer?.titolo ?: "Posizione non disponibile",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp,
-                        color = Color(0xFF1565C0)
-                    )
-                    Spacer(Modifier.height(4.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.LocationOn, null, tint = Color.Gray, modifier = Modifier.size(14.dp))
-                        Spacer(Modifier.width(4.dp))
-                        Text(offer?.supermarket?.nome ?: "-", fontSize = 13.sp, color = Color.Gray)
-                    }
-                    Spacer(Modifier.height(4.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.DateRange, null, tint = Color.Gray, modifier = Modifier.size(14.dp))
-                        Spacer(Modifier.width(4.dp))
-                        Text("Inviata il: ${candidacy.dataInvio}", fontSize = 13.sp, color = Color.Gray)
-                    }
-                }
+        Column(Modifier.padding(20.dp)) {
+            Text(
+                text = offer?.titolo ?: "Posizione non disponibile",
+                fontWeight = FontWeight.ExtraBold,
+                fontSize = 18.sp,
+                color = com.example.superspan.ui.theme.LogoLeft
+            )
+            Spacer(Modifier.height(8.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.LocationOn, null, tint = Color.Gray, modifier = Modifier.size(16.dp))
+                Spacer(Modifier.width(6.dp))
+                Text(offer?.supermarket?.nome ?: "-", fontSize = 14.sp, color = Color.Gray)
+            }
+            Spacer(Modifier.height(4.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.DateRange, null, tint = Color.Gray, modifier = Modifier.size(16.dp))
+                Spacer(Modifier.width(6.dp))
+                Text("Inviata il: ${candidacy.dataInvio}", fontSize = 14.sp, color = Color.Gray)
             }
             
             Spacer(Modifier.height(16.dp))
-            Divider(color = Color(0xFFEEEEEE))
-            Spacer(Modifier.height(12.dp))
+            androidx.compose.material3.HorizontalDivider(color = Color(0xFFEEEEEE))
+            Spacer(Modifier.height(16.dp))
             
-            // Badge di stato
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(bgColor)
-                    .padding(horizontal = 12.dp, vertical = 6.dp)
-            ) {
-                Text(
-                    text = statusText,
-                    color = statusColor,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold
-                )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("Stato attuale:", fontSize = 14.sp, color = Color.DarkGray, fontWeight = FontWeight.SemiBold)
+                Spacer(Modifier.weight(1f))
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(bgColor)
+                        .padding(horizontal = 12.dp, vertical = 6.dp)
+                ) {
+                    Text(
+                        text = statusText,
+                        color = statusColor,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
         }
     }

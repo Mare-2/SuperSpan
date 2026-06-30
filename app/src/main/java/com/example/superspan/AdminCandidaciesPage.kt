@@ -527,30 +527,10 @@ fun AdminCandidaciesFilterPage(
                 .fillMaxSize()
                 .verticalScroll(scrollState)
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = paddingValues.calculateTopPadding())
-                    .background(
-                        androidx.compose.ui.graphics.Brush.verticalGradient(
-                            colors = listOf(
-                                Color.White,
-                                Color.White.copy(alpha = 0f)
-                            )
-                        )
-                    )
-            ) {
-                Column(Modifier.padding(horizontal = 24.dp)) {
-                    Spacer(Modifier.height(64.dp))
-                    Text(
-                        "Filtri",
-                        fontSize = 32.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                    Spacer(Modifier.height(80.dp))
-                }
-            }
+            FilterTitle(
+                title = "Filtri Candidature",
+                paddingValues = paddingValues
+            )
 
             Column(Modifier.padding(horizontal = 24.dp)) {
                 // Sede di Lavoro
@@ -622,29 +602,13 @@ fun AdminCandidaciesFilterPage(
             )
         }
 
-        // Header actions
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(top = paddingValues.calculateTopPadding() + 16.dp, start = 16.dp, end = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(
-                onClick = onDismiss,
-                modifier = Modifier.background(Color.White.copy(alpha = 0.7f), CircleShape)
-            ) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = LogoLeft)
-            }
-            TextButton(
-                onClick = {
-                    selectedRoles.clear()
-                    onSupermarketChange(null)
-                },
-                modifier = Modifier.background(Color.White.copy(alpha = 0.7f), CircleShape)
-            ) {
-                Text("Reset", color = AppError, fontWeight = FontWeight.SemiBold)
-            }
-        }
+        FloatingFilterActions(
+            onDismiss = onDismiss,
+            onReset = {
+                selectedRoles.clear()
+                onSupermarketChange(null)
+            },
+            paddingValues = paddingValues
+        )
     }
 }

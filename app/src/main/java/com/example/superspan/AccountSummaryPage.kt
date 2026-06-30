@@ -20,14 +20,14 @@ import androidx.navigation.NavController
 
 @Composable
 fun AccountSummaryPage(user: User, navController: NavController?, padding: PaddingValues) {
-    Box(
+    AuraBackground(
         modifier = Modifier
             .fillMaxSize()
-            .padding(padding)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(padding)
                 .verticalScroll(rememberScrollState())
         ) {
 
@@ -42,13 +42,12 @@ fun AccountSummaryPage(user: User, navController: NavController?, padding: Paddi
             ) {
                 Text(
                     text = "Il mio account",
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = Color(0xFF1A1A1A)
+                    style = MaterialTheme.typography.displayLarge,
+                    color = MaterialTheme.colorScheme.onBackground
                 )
                 Text(
                     text = "Credenziali e accessi",
-                    fontSize = 16.sp,
+                    style = MaterialTheme.typography.bodyLarge,
                     color = Color.Gray
                 )
             }
@@ -95,7 +94,7 @@ fun AccountSummaryPage(user: User, navController: NavController?, padding: Paddi
             onClick = { navController?.popBackStack() },
             modifier = Modifier
                 .align(Alignment.TopStart)
-                .padding(top = 16.dp, start = 16.dp)
+                .padding(top = padding.calculateTopPadding() + 16.dp, start = 16.dp)
                 .background(Color.White.copy(alpha = 0.7f), CircleShape)
                 .size(48.dp)
         ) {
@@ -107,7 +106,7 @@ fun AccountSummaryPage(user: User, navController: NavController?, padding: Paddi
             onClick = { navController?.navigate(Destination.ACCOUNT_EDIT.route) },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(24.dp),
+                .padding(bottom = padding.calculateBottomPadding() + 24.dp, end = 24.dp),
             containerColor = com.example.superspan.ui.theme.LogoLeft,
             contentColor = Color.White,
             shape = CircleShape

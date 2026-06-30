@@ -290,9 +290,8 @@ fun MainNavigation() {
             currentRoute != Destination.REGISTER.route &&
             currentRoute != Destination.APPLY_STEP_2_RECORD.route
 
-    Box(modifier = Modifier.fillMaxSize().background(com.example.superspan.ui.theme.AppBackgroundBrush)) {
+    Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
-            containerColor = Color.Transparent,
             contentWindowInsets = WindowInsets.safeDrawing,
             bottomBar = {
                 if (showBar) {
@@ -376,9 +375,9 @@ fun CustomAnimatedBottomBar(currentRoute: String, onNavigate: (String, Boolean) 
     ) {
         Surface(
             modifier = Modifier.fillMaxWidth().height(70.dp),
-            color = Color.White,
+            color = Color.White.copy(alpha = 0.85f),
             shape = RoundedCornerShape(35.dp),
-            shadowElevation = 10.dp
+            shadowElevation = 8.dp
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
                 // BOLLA ANIMATA

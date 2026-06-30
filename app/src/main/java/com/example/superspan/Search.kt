@@ -758,30 +758,10 @@ fun FilterPage(modifier: Modifier, filterData: FilterData, padding: PaddingValue
                 .fillMaxSize()
                 .verticalScroll(scrollState)
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = padding.calculateTopPadding())
-                    .background(
-                        Brush.verticalGradient(
-                            colors = listOf(
-                                Color.White,
-                                Color.White.copy(alpha = 0f)
-                            )
-                        )
-                    )
-            ) {
-                Column(Modifier.padding(horizontal = 24.dp)) {
-                    Spacer(Modifier.height(64.dp))
-                    Text(
-                        "Filtri",
-                        fontSize = 32.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                    Spacer(Modifier.height(80.dp))
-                }
-            }
+            FilterTitle(
+                title = "Filtri Prodotti",
+                paddingValues = padding
+            )
 
             Column(Modifier.padding(horizontal = 24.dp)) {
                 // --- 2. SEZIONE PREZZO (CARD MODERNA) ---
@@ -931,32 +911,16 @@ fun FilterPage(modifier: Modifier, filterData: FilterData, padding: PaddingValue
             )
         }
 
-        // Tasti fissi in alto
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(top = padding.calculateTopPadding() + 16.dp, start = 16.dp, end = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(
-                onClick = onDismiss,
-                modifier = Modifier.background(Color.White.copy(alpha = 0.7f), CircleShape)
-            ) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = com.example.superspan.ui.theme.LogoLeft)
-            }
-            TextButton(
-                onClick = {
-                    filterData.categorie.clear()
-                    sliderPosition = 0f..absoluteMax
-                    minPriceText = "0.00"
-                    maxPriceText = "%.2f".format(absoluteMax)
-                },
-                modifier = Modifier.background(Color.White.copy(alpha = 0.7f), CircleShape)
-            ) {
-                Text("Reset", color = com.example.superspan.ui.theme.AppError, fontWeight = FontWeight.SemiBold)
-            }
-        }
+        FloatingFilterActions(
+            onDismiss = onDismiss,
+            onReset = {
+                filterData.categorie.clear()
+                sliderPosition = 0f..absoluteMax
+                minPriceText = "0.00"
+                maxPriceText = "%.2f".format(absoluteMax)
+            },
+            paddingValues = padding
+        )
     }
 }
 

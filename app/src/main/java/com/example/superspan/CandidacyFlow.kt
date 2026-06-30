@@ -227,11 +227,11 @@ fun ApplyStep1(navController: NavController?, padding: PaddingValues) {
                             onClick = { launcher.launch("application/pdf") },
                             modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
                             shape = RoundedCornerShape(16.dp),
-                            color = if (cvPath.isNotEmpty()) MaterialTheme.colorScheme.primary.copy(alpha = 0.1f) else Color(0xFFFFF3E0),
-                            border = androidx.compose.foundation.BorderStroke(1.dp, if (cvPath.isNotEmpty()) MaterialTheme.colorScheme.primary else Color(0xFFFFB74D))
+                            color = if (cvPath.isNotEmpty()) MaterialTheme.colorScheme.primary.copy(alpha = 0.1f) else Color(0xFFF5F5F5),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, if (cvPath.isNotEmpty()) MaterialTheme.colorScheme.primary else Color.LightGray)
                         ) {
                             Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                                Icon(if (cvPath.isNotEmpty()) Icons.Default.CheckCircle else Icons.Default.FileUpload, null, tint = if (cvPath.isNotEmpty()) MaterialTheme.colorScheme.primary else Color(0xFFFFB74D))
+                                Icon(if (cvPath.isNotEmpty()) Icons.Default.CheckCircle else Icons.Default.FileUpload, null, tint = if (cvPath.isNotEmpty()) MaterialTheme.colorScheme.primary else Color.Gray)
                                 Spacer(Modifier.width(12.dp))
                                 Text(if (cvName.isEmpty()) "Scegli il tuo CV (PDF)" else cvName, Modifier.weight(1f))
                             }

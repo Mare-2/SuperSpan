@@ -784,7 +784,7 @@ fun OfferPromoCard(coupon: Coupon, isHighlighted: Boolean = false, navController
 
 @Composable
 fun OfferDetailPage(coupon: Coupon, navController: NavController? = null, onBack: () -> Unit) {
-    Box(Modifier.fillMaxSize()) {
+    AuraBackground(Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp).verticalScroll(rememberScrollState())) {
             Spacer(Modifier.height(80.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -821,7 +821,7 @@ fun OfferDetailPage(coupon: Coupon, navController: NavController? = null, onBack
             onClick = onBack,
             modifier = Modifier
                 .align(Alignment.TopStart)
-                .padding(top = 16.dp, start = 16.dp)
+                .padding(top = androidx.compose.foundation.layout.WindowInsets.statusBars.asPaddingValues().calculateTopPadding() + 16.dp, start = 16.dp)
                 .background(Color.White.copy(alpha = 0.7f), CircleShape)
                 .size(48.dp)
         ) {
