@@ -116,14 +116,23 @@ fun AdminCouponEditPage(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues)
+                    .padding(top = paddingValues.calculateTopPadding())
+                    .verticalScroll(rememberScrollState())
             ) {
                 // --- HEADER ---
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 16.dp, bottom = 16.dp)
+                        .padding(top = 80.dp, bottom = 16.dp)
                 ) {
+                    Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = if (isCoupon) "Modifica Coupon" else "Modifica Offerta",
+                            color = Color.Black, 
+                            fontSize = 22.sp, 
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                     
                     if (existingCoupon != null) {
                         IconButton(
@@ -141,25 +150,24 @@ fun AdminCouponEditPage(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 8.dp),
+                        .padding(horizontal = 24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(
-                        text = if (isCoupon) "Modifica Coupon" else "Modifica Offerta",
-                        fontSize = 32.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = Color(0xFF1A1A1A)
-                    )
-                }
+                    Spacer(Modifier.height(8.dp))
 
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 25.dp)
-                        .verticalScroll(rememberScrollState()),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Spacer(modifier = Modifier.height(20.dp))
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        shape = RoundedCornerShape(16.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(20.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(14.dp)
+                        ) {
                     EditTextField(
                         value = code,
                         onValueChange = { code = it },
@@ -295,23 +303,25 @@ fun AdminCouponEditPage(
                             Spacer(Modifier.width(8.dp))
                             Text("Seleziona Prodotto")
                         }
-                    }
+                    } // closes else if
+                } // closes inner column
+            } // closes Card
 
-                    Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(30.dp))
 
-                    Button(
-                        onClick = { showSaveConfirm = true },
-                        enabled = isFormValid,
-                        modifier = Modifier.height(55.dp).width(220.dp),
-                        shape = CircleShape,
-                        colors = ButtonDefaults.buttonColors(containerColor = com.example.superspan.ui.theme.LogoLeft)
-                    ) {
-                        Text("Salva Modifiche", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                    }
-                    
-                    Spacer(modifier = Modifier.height(100.dp))
-                }
+            Button(
+                onClick = { showSaveConfirm = true },
+                enabled = isFormValid,
+                modifier = Modifier.height(55.dp),
+                shape = CircleShape,
+                colors = ButtonDefaults.buttonColors(containerColor = com.example.superspan.ui.theme.LogoLeft)
+            ) {
+                Text("Salva Modifiche", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
             }
+            
+            Spacer(modifier = Modifier.height(paddingValues.calculateBottomPadding() + 24.dp))
+        } // closes Form Wrapper Column
+    } // closes Very Outer Column
 
             // Floating Back Button
             IconButton(

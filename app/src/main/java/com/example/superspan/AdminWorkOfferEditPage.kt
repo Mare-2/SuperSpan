@@ -79,22 +79,31 @@ fun AdminWorkOfferEditPage(
         AuraBackground(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier
-                    .padding(paddingValues)
                     .fillMaxSize()
+                    .padding(top = paddingValues.calculateTopPadding())
                     .verticalScroll(rememberScrollState())
-                    .padding(16.dp)
             ) {
                 // --- HEADER ---
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 16.dp, bottom = 16.dp)
+                        .padding(top = 80.dp, bottom = 16.dp)
                 ) {
+                    Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = if (offer == null) "Aggiungi Offerta" else "Modifica Offerta",
+                            color = Color.Black,
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
                     if (offer != null) {
                         IconButton(
                             onClick = { showDeleteConfirm = true },
                             modifier = Modifier
                                 .align(Alignment.CenterEnd)
+                                .padding(end = 16.dp)
                                 .background(Color.White.copy(alpha = 0.7f), CircleShape)
                         ) {
                             Icon(Icons.Default.Delete, contentDescription = "Elimina", tint = com.example.superspan.ui.theme.AppError)
@@ -105,7 +114,7 @@ fun AdminWorkOfferEditPage(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 8.dp),
+                        .padding(horizontal = 24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
@@ -116,149 +125,192 @@ fun AdminWorkOfferEditPage(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
                     // STEP 1: SEDE DI LAVORO
-                    Text("Sede di Lavoro", fontWeight = FontWeight.Bold)
-                    if (selectedSupermarket == null) {
-                        OutlinedButton(
-                            onClick = { isSelectionOpen = true },
-                            modifier = Modifier.fillMaxWidth().height(56.dp),
-                            shape = CircleShape,
-                            border = androidx.compose.foundation.BorderStroke(2.dp, Color(0xFF81C784)),
-                            colors = androidx.compose.material3.ButtonDefaults.outlinedButtonColors(containerColor = Color.White)
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        shape = RoundedCornerShape(16.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth().padding(20.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
-                            Icon(Icons.Default.LocationOn, contentDescription = null)
-                            Spacer(Modifier.width(8.dp))
-                            Text("Seleziona Supermercato")
-                        }
-                    } else {
-                        selectedSupermarket?.let { s ->
-                            Card(
-                                modifier = Modifier.fillMaxWidth().clickable { isSelectionOpen = true },
-                                shape = RoundedCornerShape(20.dp),
-                                colors = CardDefaults.cardColors(containerColor = Color.White),
-                                elevation = CardDefaults.cardElevation(2.dp)
-                            ) {
-                                Row(Modifier.padding(16.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(Icons.Default.LocationOn, null, tint = androidx.compose.material3.MaterialTheme.colorScheme.primary, modifier = Modifier.size(32.dp))
-                                    Spacer(Modifier.width(12.dp))
-                                    Column(Modifier.weight(1f)) {
-                                        Text(s.nome, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = androidx.compose.material3.MaterialTheme.colorScheme.primary)
-                                        Text("${s.indirizzo}, ${s.citta}", fontSize = 14.sp, color = androidx.compose.material3.MaterialTheme.colorScheme.primary)
+                            Text("Sede di Lavoro", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFF1A1A1A))
+                            if (selectedSupermarket == null) {
+                                OutlinedButton(
+                                    onClick = { isSelectionOpen = true },
+                                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                                    shape = RoundedCornerShape(12.dp),
+                                    border = androidx.compose.foundation.BorderStroke(2.dp, com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.5f)),
+                                    colors = androidx.compose.material3.ButtonDefaults.outlinedButtonColors(containerColor = Color.White)
+                                ) {
+                                    Icon(Icons.Default.LocationOn, contentDescription = null, tint = com.example.superspan.ui.theme.LogoLeft)
+                                    Spacer(Modifier.width(8.dp))
+                                    Text("Seleziona Supermercato", color = com.example.superspan.ui.theme.LogoLeft)
+                                }
+                            } else {
+                                selectedSupermarket?.let { s ->
+                                    Card(
+                                        modifier = Modifier.fillMaxWidth().clickable { isSelectionOpen = true },
+                                        shape = RoundedCornerShape(16.dp),
+                                        colors = CardDefaults.cardColors(containerColor = com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.05f)),
+                                        border = androidx.compose.foundation.BorderStroke(1.dp, com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.2f)),
+                                        elevation = CardDefaults.cardElevation(0.dp)
+                                    ) {
+                                        Row(Modifier.padding(16.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                                            Icon(Icons.Default.LocationOn, null, tint = com.example.superspan.ui.theme.LogoLeft, modifier = Modifier.size(32.dp))
+                                            Spacer(Modifier.width(12.dp))
+                                            Column(Modifier.weight(1f)) {
+                                                Text(s.nome, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = com.example.superspan.ui.theme.LogoLeft)
+                                                Text("${s.indirizzo}, ${s.citta}", fontSize = 14.sp, color = Color.DarkGray)
+                                            }
+                                            Text("Modifica", color = com.example.superspan.ui.theme.LogoLeft, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                                        }
                                     }
-                                    Text("Modifica", color = androidx.compose.material3.MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, fontSize = 12.sp)
                                 }
                             }
                         }
                     }
 
+                    Spacer(modifier = Modifier.height(16.dp))
+
                     Spacer(modifier = Modifier.height(8.dp))
 
                     // STEP 2: CATEGORIA / RUOLO
-                    Text("Ruolo (Categoria)", fontWeight = FontWeight.Bold)
-                    @OptIn(ExperimentalLayoutApi::class)
-                    FlowRow(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        shape = RoundedCornerShape(16.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Role.entries.forEach { role ->
-                            Surface(
-                                selected = ruoloEnum == role,
-                                onClick = { ruoloEnum = role },
-                                shape = CircleShape,
-                                color = if (ruoloEnum == role) com.example.superspan.ui.theme.LogoLeft else Color.White,
-                                border = if (ruoloEnum == role) null else androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF81C784)),
-                                modifier = Modifier.padding(2.dp)
+                        Column(
+                            modifier = Modifier.fillMaxWidth().padding(20.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Text("Ruolo (Categoria)", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFF1A1A1A))
+                            @OptIn(ExperimentalLayoutApi::class)
+                            FlowRow(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                Text(
-                                    text = role.nome,
-                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
-                                    fontWeight = FontWeight.Bold,
-                                    color = if (ruoloEnum == role) Color.White else com.example.superspan.ui.theme.LogoLeft
-                                )
+                                Role.entries.forEach { role ->
+                                    val isSelected = ruoloEnum == role
+                                    Surface(
+                                        selected = isSelected,
+                                        onClick = { ruoloEnum = role },
+                                        shape = RoundedCornerShape(12.dp),
+                                        color = if (isSelected) com.example.superspan.ui.theme.LogoLeft else com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.08f),
+                                        modifier = Modifier.padding(2.dp)
+                                    ) {
+                                        Text(
+                                            text = role.nome,
+                                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+                                            fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.SemiBold,
+                                            fontSize = 14.sp,
+                                            color = if (isSelected) Color.White else com.example.superspan.ui.theme.LogoLeft
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
 
+                    Spacer(modifier = Modifier.height(16.dp))
+
                     // STEP 3: DETTAGLI
-                    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        EditTextField(value = titolo, onValueChange = { titolo = it }, label = "Titolo Offerta", modifier = Modifier.fillMaxWidth())
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        shape = RoundedCornerShape(16.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth().padding(20.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            Text("Dettagli dell'Offerta", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFF1A1A1A))
+                            
+                            EditTextField(value = titolo, onValueChange = { titolo = it }, label = "Titolo Offerta", modifier = Modifier.fillMaxWidth())
+                            EditTextField(value = descrizioneBreve, onValueChange = { descrizioneBreve = it }, label = "Descrizione Breve", modifier = Modifier.fillMaxWidth())
+                            EditTextField(value = descrizioneEstesa, onValueChange = { descrizioneEstesa = it }, label = "Descrizione Estesa", modifier = Modifier.fillMaxWidth(), minLines = 3)
+                            EditTextField(value = requisiti, onValueChange = { requisiti = it }, label = "Requisiti", modifier = Modifier.fillMaxWidth(), minLines = 2)
 
-                        EditTextField(value = descrizioneBreve, onValueChange = { descrizioneBreve = it }, label = "Descrizione Breve", modifier = Modifier.fillMaxWidth())
-                        EditTextField(value = descrizioneEstesa, onValueChange = { descrizioneEstesa = it }, label = "Descrizione Estesa", modifier = Modifier.fillMaxWidth(), minLines = 3)
-                        EditTextField(value = requisiti, onValueChange = { requisiti = it }, label = "Requisiti", modifier = Modifier.fillMaxWidth(), minLines = 2)
-
-                            Text("Tipo Contratto", fontWeight = FontWeight.Bold)
+                            Spacer(Modifier.height(4.dp))
+                            
+                            Text("Tipo Contratto", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF1A1A1A))
                             @OptIn(ExperimentalLayoutApi::class)
                             FlowRow(
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 TipoContratto.entries.forEach { tipo ->
+                                    val isSelected = tipoContratto == tipo
                                     Surface(
-                                        selected = tipoContratto == tipo,
+                                        selected = isSelected,
                                         onClick = { tipoContratto = tipo },
-                                        shape = CircleShape,
-                                        color = if (tipoContratto == tipo) com.example.superspan.ui.theme.LogoLeft else Color.White,
-                                        border = if (tipoContratto == tipo) null else androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF81C784)),
+                                        shape = RoundedCornerShape(12.dp),
+                                        color = if (isSelected) com.example.superspan.ui.theme.LogoLeft else com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.08f),
                                         modifier = Modifier.padding(2.dp)
                                     ) {
                                         Text(
                                             text = tipo.nome,
                                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
-                                            fontWeight = FontWeight.Bold,
-                                            color = if (tipoContratto == tipo) Color.White else com.example.superspan.ui.theme.LogoLeft
+                                            fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.SemiBold,
+                                            fontSize = 14.sp,
+                                            color = if (isSelected) Color.White else com.example.superspan.ui.theme.LogoLeft
                                         )
                                     }
                                 }
                             }
 
-                            Text("Orario Lavoro", fontWeight = FontWeight.Bold)
+                            Spacer(Modifier.height(4.dp))
+
+                            Text("Orario Lavoro", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF1A1A1A))
                             @OptIn(ExperimentalLayoutApi::class)
                             FlowRow(
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 OrarioLavoro.entries.forEach { o ->
+                                    val isSelected = orario == o
                                     Surface(
-                                        selected = orario == o,
+                                        selected = isSelected,
                                         onClick = { orario = o },
-                                        shape = CircleShape,
-                                        color = if (orario == o) com.example.superspan.ui.theme.LogoLeft else Color.White,
-                                        border = if (orario == o) null else androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF81C784)),
+                                        shape = RoundedCornerShape(12.dp),
+                                        color = if (isSelected) com.example.superspan.ui.theme.LogoLeft else com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.08f),
                                         modifier = Modifier.padding(2.dp)
                                     ) {
                                         Text(
                                             text = o.nome,
                                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
-                                            fontWeight = FontWeight.Bold,
-                                            color = if (orario == o) Color.White else com.example.superspan.ui.theme.LogoLeft
+                                            fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.SemiBold,
+                                            fontSize = 14.sp,
+                                            color = if (isSelected) Color.White else com.example.superspan.ui.theme.LogoLeft
                                         )
                                     }
                                 }
                             }
-
-                            Spacer(modifier = Modifier.height(24.dp))
-
-                            Button(
-                                onClick = { showSaveConfirm = true },
-                                modifier = Modifier.height(55.dp).width(220.dp).align(Alignment.CenterHorizontally),
-                                shape = CircleShape,
-                                colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = com.example.superspan.ui.theme.LogoLeft),
-                                enabled = titolo.isNotBlank() && descrizioneBreve.isNotBlank() && selectedSupermarket != null && ruoloEnum != null
-                            ) {
-                                Text("Salva Offerta", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                            }
-                            
-                            Spacer(modifier = Modifier.height(100.dp))
                         }
-                    }
+                    } // closes inner column of step 3
+                Spacer(modifier = Modifier.height(30.dp))
+
+                Button(
+                    onClick = { showSaveConfirm = true },
+                    modifier = Modifier.height(55.dp),
+                    shape = CircleShape,
+                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = com.example.superspan.ui.theme.LogoLeft),
+                    enabled = titolo.isNotBlank() && descrizioneBreve.isNotBlank() && selectedSupermarket != null && ruoloEnum != null
+                ) {
+                    Text("Salva Offerta", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 }
+                
+                Spacer(modifier = Modifier.height(paddingValues.calculateBottomPadding() + 24.dp))
+            } // closes form wrapper column
+        } // closes very outer column
 
             // Floating Back Button
             IconButton(

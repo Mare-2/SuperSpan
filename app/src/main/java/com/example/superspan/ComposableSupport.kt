@@ -63,7 +63,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.foundation.layout.BoxScope
 
 @Composable
-fun AuraBackground(modifier: Modifier = Modifier, content: @Composable BoxScope.() -> Unit) {
+fun AuraBackground(modifier: Modifier = Modifier, alphaMultiplier: Float = 1f, content: @Composable BoxScope.() -> Unit) {
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -71,14 +71,14 @@ fun AuraBackground(modifier: Modifier = Modifier, content: @Composable BoxScope.
             .drawBehind {
                 drawRect(
                     brush = Brush.radialGradient(
-                        colors = listOf(com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.20f), Color.Transparent),
+                        colors = listOf(com.example.superspan.ui.theme.LogoLeft.copy(alpha = (0.20f * alphaMultiplier).coerceAtMost(1f)), Color.Transparent),
                         center = Offset(0f, 0f),
                         radius = size.width * 0.8f
                     )
                 )
                 drawRect(
                     brush = Brush.radialGradient(
-                        colors = listOf(Color(0xFF388E3C).copy(alpha = 0.15f), Color.Transparent),
+                        colors = listOf(Color(0xFF388E3C).copy(alpha = (0.15f * alphaMultiplier).coerceAtMost(1f)), Color.Transparent),
                         center = Offset(size.width, size.height),
                         radius = size.width * 0.8f
                     )

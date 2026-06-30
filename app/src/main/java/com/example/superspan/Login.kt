@@ -55,7 +55,8 @@ fun Login(
     
     AuraBackground(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxSize(),
+        alphaMultiplier = 3f
     ) {
         Column(
             modifier = Modifier

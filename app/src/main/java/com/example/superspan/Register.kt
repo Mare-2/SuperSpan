@@ -45,7 +45,8 @@ fun Register(
     
     AuraBackground(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxSize(),
+        alphaMultiplier = 3f
     ) {
         Column(
             modifier = Modifier
