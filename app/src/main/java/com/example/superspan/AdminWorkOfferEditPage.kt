@@ -109,7 +109,7 @@ fun AdminWorkOfferEditPage(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = if (offer == null) "Aggiungi Offerta" else "Modifica Offerta",
+                        text = if (offer == null) "Aggiungi Offerta di lavoro" else "Modifica Offerta di lavoro",
                         fontSize = 32.sp,
                         fontWeight = FontWeight.ExtraBold,
                         color = Color(0xFF1A1A1A)

@@ -376,8 +376,8 @@ data class ExpirationStatus(val label: String, val color: Color)
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CouponPageComplete(paddingValues: PaddingValues, navController: NavController?, initialCouponCode: String? = null) {
-    var selectedTab by remember { mutableIntStateOf(0) }
+fun CouponPageComplete(paddingValues: PaddingValues, navController: NavController?, initialCouponCode: String? = null, initialTab: Int = 0) {
+    var selectedTab by remember { mutableIntStateOf(initialTab) }
     var selectedOffer: Coupon? by remember { mutableStateOf(ListOfCoupon.find { it.code == initialCouponCode }) }
     var searchQuery by remember { mutableStateOf("") }
 
@@ -571,7 +571,7 @@ fun CouponPageComplete(paddingValues: PaddingValues, navController: NavControlle
             OfferDetailPage(currentSelectedOffer!!, navController) { selectedOffer = null }
         }
 
-        if (actualUser.admin) {
+        if (actualUser.admin && currentSelectedOffer == null) {
             FloatingActionButton(
                 onClick = {
                     navController?.currentBackStackEntry?.savedStateHandle?.set("add_type", selectedTab)

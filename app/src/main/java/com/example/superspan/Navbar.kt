@@ -89,7 +89,8 @@ enum class Destination (
     EDIT_WORK_OFFER("edit_work_offer", "Modifica Lavoro", null),
     ACCOUNT_SUMMARY("account_summary", "Il mio account", null),
     ACCOUNT_EDIT("account_edit", "Modifica Account", null),
-    ADMIN_CANDIDACIES("admin_candidacies", "Revisione Candidature", Icons.Default.Badge)
+    ADMIN_CANDIDACIES("admin_candidacies", "Revisione Candidature", Icons.Default.Badge),
+    PROMOZIONI("promotions", "Promozioni", Icons.Default.Star)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -111,6 +112,7 @@ fun Navigation(navController: NavHostController, startDestination: Destination, 
                     Destination.SEARCH -> SearchPageComplete(navController, paddingValues)
                     Destination.HOME -> Home(paddingValues, navController)
                     Destination.OFFERTE -> CouponPageComplete(paddingValues, navController)
+                    Destination.PROMOZIONI -> CouponPageComplete(paddingValues, navController, initialTab = 1)
                     Destination.ADD_COUPON -> AddCoupon(paddingValues, navController)
                     Destination.LAVORO -> {
                         if (actualUser.admin) {
