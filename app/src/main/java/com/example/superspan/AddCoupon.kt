@@ -95,34 +95,33 @@ fun AddCoupon(paddingValues: PaddingValues, navController: NavController?) {
     AuraBackground(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
-                .padding(paddingValues)
                 .fillMaxSize()
+                .padding(top = paddingValues.calculateTopPadding())
                 .verticalScroll(rememberScrollState())
-                .padding(16.dp)
         ) {
             // --- HEADER ---
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 16.dp, bottom = 16.dp)
+                    .padding(top = 80.dp, bottom = 16.dp)
             ) {
+                Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = if (defaultTab == 0) "Aggiungi Coupon" else "Aggiungi Offerta",
+                        color = Color.Black,
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
 
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 8.dp),
+                    .padding(horizontal = 24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = if (defaultTab == 0) "Aggiungi Coupon" else "Aggiungi Offerta",
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = Color(0xFF1A1A1A)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
+                Spacer(Modifier.height(8.dp))
 
             if (defaultTab == 0) {
                 CouponForm(
@@ -149,6 +148,8 @@ fun AddCoupon(paddingValues: PaddingValues, navController: NavController?) {
                     onFormDirty = { dirty -> hasUnsavedChanges = dirty }
                 )
             }
+            Spacer(modifier = Modifier.height(paddingValues.calculateBottomPadding() + 24.dp))
+        }
         }
 
         // Floating Back Button
@@ -289,7 +290,19 @@ private fun CouponForm(
         discountValue != null &&
         discountValue in 0f..100f
 
-    Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Card(
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            shape = RoundedCornerShape(16.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
         EditTextField(
             value = code,
             onValueChange = { code = it },
@@ -413,7 +426,10 @@ private fun CouponForm(
             Text(if (selectedProducts.isEmpty()) "Seleziona Prodotti" else "Modifica Selezione")
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+            }
+        }
+
+        Spacer(modifier = Modifier.height(30.dp))
 
         Button(
             onClick = {
@@ -429,7 +445,7 @@ private fun CouponForm(
                 )
             },
             enabled = isFormValid,
-            modifier = Modifier.height(55.dp).width(220.dp).align(Alignment.CenterHorizontally),
+            modifier = Modifier.height(55.dp),
             shape = CircleShape,
             colors = ButtonDefaults.buttonColors(containerColor = com.example.superspan.ui.theme.LogoLeft)
         ) {
@@ -476,7 +492,19 @@ private fun PromoForm(
         discountValue != null &&
         discountValue in 0f..100f
 
-    Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Card(
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            shape = RoundedCornerShape(16.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
         EditTextField(
             value = code,
             onValueChange = { code = it },
@@ -603,7 +631,10 @@ private fun PromoForm(
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+            }
+        }
+
+        Spacer(modifier = Modifier.height(30.dp))
 
         Button(
             onClick = {
@@ -620,7 +651,7 @@ private fun PromoForm(
                 )
             },
             enabled = isFormValid,
-            modifier = Modifier.height(55.dp).width(220.dp).align(Alignment.CenterHorizontally),
+            modifier = Modifier.height(55.dp),
             shape = CircleShape,
             colors = ButtonDefaults.buttonColors(containerColor = com.example.superspan.ui.theme.LogoLeft)
         ) {

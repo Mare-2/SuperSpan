@@ -73,9 +73,9 @@ fun PersonalDataEditPage(navController: NavController?, padding: PaddingValues) 
 
     AuraBackground(modifier = Modifier.fillMaxSize()) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = padding.calculateTopPadding())
                 .verticalScroll(scrollState)
         ) {
             // --- HEADER (Senza rettangolo bianco, testo scuro) ---
