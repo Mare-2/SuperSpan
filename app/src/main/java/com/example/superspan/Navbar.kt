@@ -108,7 +108,7 @@ fun Navigation(navController: NavHostController, startDestination: Destination, 
                 when(destination) {
                     Destination.LOGIN -> Login(paddingValues, navController)
                     Destination.REGISTER -> Register(paddingValues, navController)
-                    Destination.SEARCH -> SearchPageComplete(paddingValues, navController)
+                    Destination.SEARCH -> SearchPageComplete(navController, paddingValues)
                     Destination.HOME -> Home(paddingValues, navController)
                     Destination.OFFERTE -> CouponPageComplete(paddingValues, navController)
                     Destination.ADD_COUPON -> AddCoupon(paddingValues, navController)

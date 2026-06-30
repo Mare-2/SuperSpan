@@ -32,6 +32,7 @@ import com.example.superspan.ui.theme.LogoLeft
 import com.example.superspan.ui.theme.LogoCenter
 import com.example.superspan.ui.theme.AppError
 
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class, androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun AdminCandidaciesPage(navController: NavController?, paddingValues: PaddingValues, sliderContent: (@Composable () -> Unit)? = null) {

@@ -176,7 +176,7 @@ enum class Role(val id: Int, val nome: String, val icon: ImageVector) {
     PESCHERIA(7, "Pescheria", Icons.Default.Image),
 }
 
-val ListOfProduct = mutableListOf<Product>(
+val ListOfProduct = mutableStateListOf<Product>(
     Product("Pane Fresco", 1.20f, R.drawable.pane_fresco, Category.PANETTERIA, "Prodotto da forno preparato quotidianamente dai nostri mastri fornai. Crosta dorata e croccante con una mollica soffice, ideale per la tavola di tutti i giorni. Da conservare in luogo fresco e asciutto.", "Farina di grano tenero tipo '0', acqua, lievito madre, sale, malto d'orzo."),
     Product("Latte Intero 1L", 1.50f, R.drawable.latte_intero, Category.LATTICINI, "Latte bovino intero pastorizzato, proveniente al 100% da allevamenti italiani selezionati. Un alimento completo e genuino, perfetto per la colazione di tutta la famiglia.", null),
     Product("Pasta Barilla 500g", 0.99f, R.drawable.pasta, Category.DISPENSA, "Le Penne Rigate Barilla sono tra i formati di pasta corta più amati dagli italiani. Grazie alla loro rigatura esterna trattengono al meglio ogni sugo, garantendo una tenuta in cottura sempre perfetta.", "Semola di grano duro, acqua. Può contenere tracce di soia e senape."),
