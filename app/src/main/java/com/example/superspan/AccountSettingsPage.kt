@@ -31,7 +31,7 @@ fun AccountSettingsPage(user: User, navController: NavController?, paddingValues
 
     var nome by remember { mutableStateOf(user.nome) }
     var cognome by remember { mutableStateOf(user.cognome) }
-    var email by remember { mutableStateOf(user.email) }
+    // L'email non è modificabile per scelta di progetto (identifica l'account).
     var oldPassword by remember { mutableStateOf("") }
     var newPassword by remember { mutableStateOf("") }
 

@@ -232,10 +232,6 @@ class Coupon(
         return product.prezzo - (product.prezzo * (_discount / 100))
     }
 
-    fun isExpired(): Boolean {
-        return false
-    }
-
     override fun toString(): String {
         return "$_code, $_discount"
     }

@@ -273,11 +273,12 @@ private fun CouponForm(
     }
 
     val discountValue = discount.toFloatOrNull()
-    
-    val isCodeError = code.isNotEmpty() && code.length < 3
+
+    val isCodeDuplicate = code.trim().isNotEmpty() && ListOfCoupon.any { it.code.equals(code.trim(), ignoreCase = true) }
+    val isCodeError = code.isNotEmpty() && (code.length < 3 || isCodeDuplicate)
     val isDiscountError = discount.isNotEmpty() && (discountValue == null || discountValue !in 0f..100f)
     val isDescriptionError = description.isNotEmpty() && description.length < 5
-    
+
     val isExpirationValid = try {
         val d = java.time.LocalDate.parse(expirationDate)
         !d.isBefore(java.time.LocalDate.now())
@@ -286,6 +287,7 @@ private fun CouponForm(
 
     val isFormValid =
         code.length >= 3 &&
+        !isCodeDuplicate &&
         description.length >= 5 &&
         isExpirationValid &&
         selectedProducts.size == 3 &&
@@ -311,7 +313,7 @@ private fun CouponForm(
             label = "Codice coupon",
             keyboardType = KeyboardType.Text,
             isError = isCodeError,
-            errorMessage = "Il codice deve avere almeno 3 caratteri"
+            errorMessage = if (isCodeDuplicate) "Esiste già un coupon con questo codice" else "Il codice deve avere almeno 3 caratteri"
         )
 
         EditTextField(
@@ -475,8 +477,9 @@ private fun PromoForm(
     }
 
     val discountValue = discount.toFloatOrNull()
-    
-    val isCodeError = code.isNotEmpty() && code.length < 3
+
+    val isCodeDuplicate = code.trim().isNotEmpty() && ListOfCoupon.any { it.code.equals(code.trim(), ignoreCase = true) }
+    val isCodeError = code.isNotEmpty() && (code.length < 3 || isCodeDuplicate)
     val isDiscountError = discount.isNotEmpty() && (discountValue == null || discountValue !in 0f..100f)
     val isDescriptionError = description.isNotEmpty() && description.length < 5
 
@@ -488,6 +491,7 @@ private fun PromoForm(
 
     val isFormValid =
         code.length >= 3 &&
+        !isCodeDuplicate &&
         description.length >= 5 &&
         isExpirationValid &&
         selectedProduct != null &&
@@ -513,7 +517,7 @@ private fun PromoForm(
             label = "Codice offerta (interno)",
             keyboardType = KeyboardType.Text,
             isError = isCodeError,
-            errorMessage = "Il codice deve avere almeno 3 caratteri"
+            errorMessage = if (isCodeDuplicate) "Esiste già un'offerta con questo codice" else "Il codice deve avere almeno 3 caratteri"
         )
 
         EditTextField(

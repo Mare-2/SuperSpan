@@ -723,7 +723,7 @@ fun ApplyStep3(navController: NavController?, padding: PaddingValues) {
 
         Box(modifier = Modifier.fillMaxSize()) {
             Column(Modifier.fillMaxSize().padding(horizontal = 24.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text("Paolo, controlla un'ultima volta:", color = Color.Gray)
+                Text("${currentDraft.nome.ifEmpty { actualUser.nome }}, controlla un'ultima volta:", color = Color.Gray)
                 SummaryInteractiveRow(Icons.Default.Person, "Candidato", "${currentDraft.nome} ${currentDraft.cognome}", { showEditConfirm = "Dati" }) { previewContent = "Nome: ${currentDraft.nome}\nCognome: ${currentDraft.cognome}" }
                 SummaryInteractiveRow(Icons.Default.Email, "Email", currentDraft.emailLavoro, { showEditConfirm = "Dati" }) { previewContent = "Email: ${currentDraft.emailLavoro}" }
                 SummaryInteractiveRow(Icons.Default.Phone, "Telefono", currentDraft.telefono, { showEditConfirm = "Dati" }) { previewContent = "Telefono: ${currentDraft.telefono}" }

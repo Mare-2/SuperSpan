@@ -223,9 +223,12 @@ fun WorkOfferPage(offer: WorkOffer?, navController: NavController?, paddingValue
                     }
                 } else {
                     Button(
-                        onClick = { 
+                        onClick = {
                             currentOfferIdApplying = offer?.id ?: 0
                             candidacySourceRoute = Destination.LAVORO.route
+                            // Partiamo sempre da una bozza pulita per evitare che dati o video
+                            // di una candidatura precedente (scartata) vengano trascinati qui.
+                            currentDraft = CandidacyDraft()
                             navController?.navigate(Destination.APPLY_STEP_1.route)
                         },
                         modifier = Modifier.height(55.dp),

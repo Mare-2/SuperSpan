@@ -5,7 +5,7 @@
 ### 👤 Profilo Utente
 - [x] fare la pagina dei dati personali con area di modifica del profilo utente
 - [x] fare pagina del riepilogo delle candidature nel profilo utente con storico 
-- [ ] fare pagina dati account nel profilo utente con possibile modifica di email e password (da controllare se mail cambiata funziona )
+- [x] fare pagina dati account nel profilo utente con possibile modifica di nome e password (email NON modificabile per scelta: identifica l'account)
 - [x] nella pagina candidature far vedere se la candidatura viene scartata o mandata all'hr/ responsabile 
 
 
@@ -13,7 +13,7 @@
 - [x] nel profilo admin mettere le sezioni per gestione 
   - [x] offerte e coupon e pagina relativa quando ci schiacci, 
   - [x] candidature e pagina relativa quando ci schiacci
-- [ ] fare pagina dati account nel profilo admin con possibile modifica password (da verificare)
+- [x] fare pagina dati account nel profilo admin con possibile modifica password
 - [x] togliere username dalla card mio account nel profilo
 
 ### Profilo Generico
@@ -85,7 +85,7 @@
 
 ### ⚙️ Logica e Contenuti
 - [x] fare partire l'app dalla home
-- [ ] far partire dal login
+- [x] far partire dal login
 - [ ] gestire i messaggi di errore per aiutare nella compilazione di dati e form
 - [ ] guardare di aver inserito tutte le feature aggiuntive che abbiamo dedotto con gli scenari
 - [x] controllare che la navbar sia sempre evidenziata la sezione corretta 
@@ -95,3 +95,12 @@
 
 
 - [ ] metti popup di errore o di conferma uguali a quelli dell'invio candidature da daniela 
+
+### 🐛 Bug risolti (revisione codice)
+- [x] reset della bozza quando si avvia una nuova candidatura (i dati/video di una candidatura scartata non vengono più trascinati in quella nuova)
+- [x] validazione codice coupon/offerta univoco (prima due codici uguali facevano crashare la lista)
+- [x] filtro prezzo prodotti: ora funziona anche scrivendo a mano nei campi Min/Max, non solo con lo slider
+- [x] rimosso metodo morto Coupon.isExpired() (la scadenza è gestita da getExpirationStatus)
+- [x] riepilogo candidatura: nome del candidato dinamico (non più "Paolo" fisso)
+- [x] corretta rotta di default della bozza (lastStepRoute) per evitare crash latenti
+- [x] rimossa la vecchia versione commentata in cima a Coupon.kt

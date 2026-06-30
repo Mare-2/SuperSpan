@@ -605,7 +605,14 @@ fun FilterPage(modifier: Modifier, filterData: FilterData, padding: PaddingValue
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         OutlinedTextField(
                             value = minPriceText,
-                            onValueChange = { minPriceText = it },
+                            onValueChange = { newText ->
+                                minPriceText = newText
+                                // Aggiorniamo lo slider (e quindi il filtro) solo se il testo è un numero valido
+                                newText.replace(',', '.').toFloatOrNull()?.let { parsed ->
+                                    val newMin = parsed.coerceIn(0f, sliderPosition.endInclusive)
+                                    sliderPosition = newMin..sliderPosition.endInclusive
+                                }
+                            },
                             label = { Text("Min") },
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(12.dp),
@@ -614,7 +621,13 @@ fun FilterPage(modifier: Modifier, filterData: FilterData, padding: PaddingValue
                         )
                         OutlinedTextField(
                             value = maxPriceText,
-                            onValueChange = { maxPriceText = it },
+                            onValueChange = { newText ->
+                                maxPriceText = newText
+                                newText.replace(',', '.').toFloatOrNull()?.let { parsed ->
+                                    val newMax = parsed.coerceIn(sliderPosition.start, absoluteMax)
+                                    sliderPosition = sliderPosition.start..newMax
+                                }
+                            },
                             label = { Text("Max") },
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(12.dp),
