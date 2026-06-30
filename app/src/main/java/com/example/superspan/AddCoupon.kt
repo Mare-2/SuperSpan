@@ -27,6 +27,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Search
@@ -40,6 +41,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -380,11 +382,11 @@ private fun CouponForm(
 
         selectedProducts.forEach { p ->
             Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                border = androidx.compose.foundation.BorderStroke(2.dp, Color(0xFF81C784)),
-                elevation = CardDefaults.cardElevation(2.dp)
+                modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.05f)),
+                border = androidx.compose.foundation.BorderStroke(1.dp, com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.2f)),
+                elevation = CardDefaults.cardElevation(0.dp)
             ) {
                 Row(Modifier.padding(16.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     if (p.image != null) {
@@ -395,15 +397,15 @@ private fun CouponForm(
                             contentScale = androidx.compose.ui.layout.ContentScale.Crop
                         )
                     } else {
-                        Icon(Icons.Default.ShoppingCart, null, tint = Color(0xFF388E3C), modifier = Modifier.size(32.dp))
+                        Icon(Icons.Default.ShoppingCart, null, tint = com.example.superspan.ui.theme.LogoLeft, modifier = Modifier.size(32.dp))
                     }
                     Spacer(Modifier.width(12.dp))
                     Column(Modifier.weight(1f)) {
-                        Text(p.nome, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF1B5E20))
-                        Text("Prezzo originario: €${p.prezzo}", fontSize = 14.sp, color = Color(0xFF2E7D32))
+                        Text(p.nome, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = com.example.superspan.ui.theme.LogoLeft)
+                        Text("Prezzo originario: €${p.prezzo}", fontSize = 14.sp, color = Color.DarkGray)
                     }
                     IconButton(onClick = { selectedProducts.remove(p) }) {
-                        Icon(Icons.Default.Close, "Rimuovi", tint = com.example.superspan.ui.theme.AppError)
+                        Icon(Icons.Default.Delete, "Rimuovi", tint = Color.Gray)
                     }
                 }
             }
@@ -417,13 +419,13 @@ private fun CouponForm(
                 }
             },
             modifier = Modifier.fillMaxWidth().height(56.dp),
-            shape = CircleShape,
-            border = androidx.compose.foundation.BorderStroke(2.dp, Color(0xFF81C784)),
+            shape = RoundedCornerShape(12.dp),
+            border = androidx.compose.foundation.BorderStroke(2.dp, com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.5f)),
             colors = androidx.compose.material3.ButtonDefaults.outlinedButtonColors(containerColor = Color.White)
         ) {
-            Icon(Icons.Default.ShoppingCart, contentDescription = null)
+            Icon(Icons.Default.ShoppingCart, contentDescription = null, tint = com.example.superspan.ui.theme.LogoLeft)
             Spacer(Modifier.width(8.dp))
-            Text(if (selectedProducts.isEmpty()) "Seleziona Prodotti" else "Modifica Selezione")
+            Text(if (selectedProducts.isEmpty()) "Seleziona Prodotti" else "Modifica Selezione", color = com.example.superspan.ui.theme.LogoLeft)
         }
 
             }
@@ -588,13 +590,13 @@ private fun PromoForm(
                     }
                 },
                 modifier = Modifier.fillMaxWidth().height(56.dp),
-                shape = CircleShape,
-                border = androidx.compose.foundation.BorderStroke(2.dp, Color(0xFF81C784)),
+                shape = RoundedCornerShape(12.dp),
+                border = androidx.compose.foundation.BorderStroke(2.dp, com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.5f)),
                 colors = androidx.compose.material3.ButtonDefaults.outlinedButtonColors(containerColor = Color.White)
             ) {
-                Icon(Icons.Default.ShoppingCart, contentDescription = null)
+                Icon(Icons.Default.ShoppingCart, contentDescription = null, tint = com.example.superspan.ui.theme.LogoLeft)
                 Spacer(Modifier.width(8.dp))
-                Text("Seleziona Prodotto")
+                Text("Seleziona Prodotto", color = com.example.superspan.ui.theme.LogoLeft)
             }
         } else {
             selectedProduct?.let { p ->
@@ -604,10 +606,10 @@ private fun PromoForm(
                             selectedProduct = product
                         }
                     },
-                    shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                    border = androidx.compose.foundation.BorderStroke(2.dp, Color(0xFF81C784)),
-                    elevation = CardDefaults.cardElevation(2.dp)
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.05f)),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.2f)),
+                    elevation = CardDefaults.cardElevation(0.dp)
                 ) {
                     Row(Modifier.padding(16.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         if (p.image != null) {
@@ -618,14 +620,14 @@ private fun PromoForm(
                             contentScale = androidx.compose.ui.layout.ContentScale.Crop
                         )
                     } else {
-                        Icon(Icons.Default.ShoppingCart, null, tint = Color(0xFF388E3C), modifier = Modifier.size(32.dp))
+                        Icon(Icons.Default.ShoppingCart, null, tint = com.example.superspan.ui.theme.LogoLeft, modifier = Modifier.size(32.dp))
                     }
                         Spacer(Modifier.width(12.dp))
                         Column(Modifier.weight(1f)) {
-                            Text(p.nome, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF1B5E20))
-                            Text("Prezzo originario: €${p.prezzo}", fontSize = 14.sp, color = Color(0xFF2E7D32))
+                            Text(p.nome, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = com.example.superspan.ui.theme.LogoLeft)
+                            Text("Prezzo originario: €${p.prezzo}", fontSize = 14.sp, color = Color.DarkGray)
                         }
-                        Text("Modifica", color = Color(0xFF388E3C), fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                        Text("Modifica", color = com.example.superspan.ui.theme.LogoLeft, fontWeight = FontWeight.Bold, fontSize = 12.sp)
                     }
                 }
             }
@@ -680,142 +682,133 @@ fun MultiProductSelectionScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 220.dp, bottom = 100.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-                items(filteredList) { p ->
-                    val isSelected = currentSelection.contains(p)
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                if (isSelected) {
-                                    currentSelection.remove(p)
-                                } else if (currentSelection.size < maxSelection) {
-                                    currentSelection.add(p)
-                                } else {
-                                    // optional toast, doing nothing is fine
-                                }
-                            },
-                        colors = CardDefaults.cardColors(containerColor = if (isSelected) Color(0xFFE8F5E9) else Color.White),
-                        border = if (isSelected) androidx.compose.foundation.BorderStroke(2.dp, Color(0xFF388E3C)) else null,
-                        elevation = CardDefaults.cardElevation(defaultElevation = if (isSelected) 4.dp else 2.dp),
-                        shape = RoundedCornerShape(16.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            if (p.image != null) {
-                                androidx.compose.foundation.Image(
-                                    painter = androidx.compose.ui.res.painterResource(id = p.image!!),
-                                    contentDescription = p.nome,
-                                    modifier = Modifier.size(48.dp).clip(RoundedCornerShape(12.dp)),
-                                    contentScale = androidx.compose.ui.layout.ContentScale.Crop
-                                )
-                            } else {
-                                Box(
-                                    modifier = Modifier
-                                        .size(48.dp)
-                                        .background(com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.1f), shape = RoundedCornerShape(12.dp)),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Icon(Icons.Default.ShoppingCart, contentDescription = null, tint = com.example.superspan.ui.theme.LogoLeft)
+    AuraBackground(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            topBar = {
+                CenterAlignedTopAppBar(
+                    title = {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text("Seleziona Prodotti", fontWeight = FontWeight.Bold)
+                            Text("Selezionati ${currentSelection.size} su $maxSelection", fontSize = 14.sp, color = Color.Gray)
+                        }
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = onBack, modifier = androidx.compose.ui.Modifier.background(androidx.compose.ui.graphics.Color.White.copy(alpha = 0.7f), androidx.compose.foundation.shape.CircleShape)) { Icon(androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = com.example.superspan.ui.theme.LogoLeft) }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+                )
+            },
+            containerColor = Color.Transparent
+        ) { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ) {
+                androidx.compose.material3.Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .height(56.dp),
+                    shape = RoundedCornerShape(28.dp),
+                    shadowElevation = 6.dp,
+                    color = Color.White
+                ) {
+                    TextField(
+                        value = query,
+                        onValueChange = { query = it },
+                        modifier = Modifier.fillMaxSize(),
+                        placeholder = { Text("Cerca prodotto per nome...") },
+                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = Color.Gray) },
+                        trailingIcon = {
+                            if (query.isNotEmpty()) {
+                                IconButton(onClick = { query = "" }) {
+                                    Icon(Icons.Default.Close, contentDescription = "Cancella", tint = Color.Gray)
                                 }
                             }
-                            Spacer(Modifier.width(16.dp))
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(p.nome, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF1A1A1A))
-                                Spacer(Modifier.height(4.dp))
-                                Text("€${p.prezzo} • ${p.categoria.nome}", fontSize = 14.sp, color = Color.Gray)
+                        },
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            disabledIndicatorColor = Color.Transparent,
+                            cursorColor = com.example.superspan.ui.theme.LogoLeft
+                        ),
+                        singleLine = true
+                    )
+                }
+
+                LazyColumn(
+                    modifier = Modifier.weight(1f),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(filteredList) { p ->
+                        val isSelected = currentSelection.contains(p)
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    if (isSelected) {
+                                        currentSelection.remove(p)
+                                    } else if (currentSelection.size < maxSelection) {
+                                        currentSelection.add(p)
+                                    }
+                                },
+                            colors = CardDefaults.cardColors(containerColor = if (isSelected) com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.05f) else Color.White),
+                            border = if (isSelected) androidx.compose.foundation.BorderStroke(1.dp, com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.2f)) else null,
+                            elevation = CardDefaults.cardElevation(defaultElevation = if (isSelected) 0.dp else 2.dp),
+                            shape = RoundedCornerShape(16.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                if (p.image != null) {
+                                    androidx.compose.foundation.Image(
+                                        painter = androidx.compose.ui.res.painterResource(id = p.image!!),
+                                        contentDescription = p.nome,
+                                        modifier = Modifier.size(48.dp).clip(RoundedCornerShape(12.dp)),
+                                        contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                                    )
+                                } else {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(48.dp)
+                                            .background(com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.1f), shape = RoundedCornerShape(12.dp)),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(Icons.Default.ShoppingCart, contentDescription = null, tint = com.example.superspan.ui.theme.LogoLeft)
+                                    }
+                                }
+                                Spacer(Modifier.width(16.dp))
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(p.nome, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF1A1A1A))
+                                    Spacer(Modifier.height(4.dp))
+                                    Text("€${p.prezzo} • ${p.categoria.nome}", fontSize = 14.sp, color = Color.Gray)
+                                }
                             }
                         }
                     }
                 }
-            }
 
-        // --- TRANSLUCENT HEADER ---
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.White)
-                .align(Alignment.TopCenter)
-        ) {
-            Spacer(modifier = Modifier.height(64.dp))
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "Seleziona Prodotti",
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = Color(0xFF1A1A1A)
-                )
-                Text(
-                    text = "Selezionati ${currentSelection.size} su $maxSelection",
-                    fontSize = 16.sp,
-                    color = Color.Gray
-                )
-            }
-            TextField(
-                value = query,
-                onValueChange = { query = it },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                placeholder = { Text("Cerca prodotto per nome...") },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = Color.Gray) },
-                trailingIcon = {
-                    if (query.isNotEmpty()) {
-                        IconButton(onClick = { query = "" }) {
-                            Icon(Icons.Default.Close, contentDescription = "Cancella", tint = Color.Gray)
-                        }
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Button(
+                        onClick = { onConfirm(currentSelection.toList()) },
+                        enabled = currentSelection.size == maxSelection,
+                        modifier = Modifier.wrapContentWidth().height(55.dp),
+                        shape = CircleShape,
+                        colors = ButtonDefaults.buttonColors(containerColor = com.example.superspan.ui.theme.LogoLeft)
+                    ) {
+                        Text("Conferma Selezione", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
                     }
-                },
-                shape = RoundedCornerShape(24.dp),
-                colors = TextFieldDefaults.colors(
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    disabledIndicatorColor = Color.Transparent
-                ),
-                singleLine = true
-            )
-        }
-
-        // Floating Back Button
-        IconButton(
-            onClick = onBack,
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(top = 16.dp, start = 16.dp)
-                .background(Color.White.copy(alpha = 0.7f), CircleShape)
-                .size(48.dp)
-        ) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = com.example.superspan.ui.theme.LogoLeft)
-        }
-
-        // Floating Bottom Confirm Button
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 100.dp, start = 16.dp, end = 16.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Button(
-                onClick = { onConfirm(currentSelection.toList()) },
-                enabled = currentSelection.size == maxSelection,
-                modifier = Modifier.wrapContentWidth().height(55.dp),
-                shape = CircleShape,
-                colors = ButtonDefaults.buttonColors(containerColor = com.example.superspan.ui.theme.LogoLeft)
-            ) {
-                Text("Conferma Selezione", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                }
             }
         }
     }
@@ -836,109 +829,106 @@ fun ProductSelectionScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 220.dp, bottom = 100.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-                items(filteredList) { p ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { onSelected(p) },
-                        colors = CardDefaults.cardColors(containerColor = Color.White),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                        shape = RoundedCornerShape(16.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            if (p.image != null) {
-                                androidx.compose.foundation.Image(
-                                    painter = androidx.compose.ui.res.painterResource(id = p.image!!),
-                                    contentDescription = p.nome,
-                                    modifier = Modifier.size(48.dp).clip(RoundedCornerShape(12.dp)),
-                                    contentScale = androidx.compose.ui.layout.ContentScale.Crop
-                                )
-                            } else {
-                                Box(
-                                    modifier = Modifier
-                                        .size(48.dp)
-                                        .background(com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.1f), shape = RoundedCornerShape(12.dp)),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Icon(Icons.Default.ShoppingCart, contentDescription = null, tint = com.example.superspan.ui.theme.LogoLeft)
+    AuraBackground(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            topBar = {
+                CenterAlignedTopAppBar(
+                    title = {
+                        Text("Seleziona Prodotto", fontWeight = FontWeight.ExtraBold, fontSize = 24.sp)
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = onBack, modifier = androidx.compose.ui.Modifier.background(androidx.compose.ui.graphics.Color.White.copy(alpha = 0.7f), androidx.compose.foundation.shape.CircleShape)) { Icon(androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = com.example.superspan.ui.theme.LogoLeft) }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+                )
+            },
+            containerColor = Color.Transparent
+        ) { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ) {
+                androidx.compose.material3.Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .height(56.dp),
+                    shape = RoundedCornerShape(28.dp),
+                    shadowElevation = 6.dp,
+                    color = Color.White
+                ) {
+                    TextField(
+                        value = query,
+                        onValueChange = { query = it },
+                        modifier = Modifier.fillMaxSize(),
+                        placeholder = { Text("Cerca prodotto per nome...") },
+                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = Color.Gray) },
+                        trailingIcon = {
+                            if (query.isNotEmpty()) {
+                                IconButton(onClick = { query = "" }) {
+                                    Icon(Icons.Default.Close, contentDescription = "Cancella", tint = Color.Gray)
                                 }
                             }
-                            Spacer(Modifier.width(16.dp))
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(p.nome, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF1A1A1A))
-                                Spacer(Modifier.height(4.dp))
-                                Text("€${p.prezzo} • ${p.categoria.nome}", fontSize = 14.sp, color = Color.Gray)
+                        },
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            disabledIndicatorColor = Color.Transparent,
+                            cursorColor = com.example.superspan.ui.theme.LogoLeft
+                        ),
+                        singleLine = true
+                    )
+                }
+
+                LazyColumn(
+                    modifier = Modifier.weight(1f),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(filteredList) { p ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { onSelected(p) },
+                            colors = CardDefaults.cardColors(containerColor = Color.White),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                            shape = RoundedCornerShape(16.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                if (p.image != null) {
+                                    androidx.compose.foundation.Image(
+                                        painter = androidx.compose.ui.res.painterResource(id = p.image!!),
+                                        contentDescription = p.nome,
+                                        modifier = Modifier.size(48.dp).clip(RoundedCornerShape(12.dp)),
+                                        contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                                    )
+                                } else {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(48.dp)
+                                            .background(com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.1f), shape = RoundedCornerShape(12.dp)),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(Icons.Default.ShoppingCart, contentDescription = null, tint = com.example.superspan.ui.theme.LogoLeft)
+                                    }
+                                }
+                                Spacer(Modifier.width(16.dp))
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(p.nome, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF1A1A1A))
+                                    Spacer(Modifier.height(4.dp))
+                                    Text("€${p.prezzo} • ${p.categoria.nome}", fontSize = 14.sp, color = Color.Gray)
+                                }
                             }
                         }
                     }
                 }
             }
-
-        // --- TRANSLUCENT HEADER ---
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.White)
-                .align(Alignment.TopCenter)
-        ) {
-            Spacer(modifier = Modifier.height(64.dp))
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "Seleziona Prodotto",
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = Color(0xFF1A1A1A)
-                )
-            }
-            TextField(
-                value = query,
-                onValueChange = { query = it },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                placeholder = { Text("Cerca prodotto per nome...") },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = Color.Gray) },
-                trailingIcon = {
-                    if (query.isNotEmpty()) {
-                        IconButton(onClick = { query = "" }) {
-                            Icon(Icons.Default.Close, contentDescription = "Cancella", tint = Color.Gray)
-                        }
-                    }
-                },
-                shape = RoundedCornerShape(24.dp),
-                colors = TextFieldDefaults.colors(
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    disabledIndicatorColor = Color.Transparent
-                ),
-                singleLine = true
-            )
-        }
-
-        // Floating Back Button
-        IconButton(
-            onClick = onBack,
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(top = 16.dp, start = 16.dp)
-                .background(Color.White.copy(alpha = 0.7f), CircleShape)
-                .size(48.dp)
-        ) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = com.example.superspan.ui.theme.LogoLeft)
         }
     }
 }

@@ -369,7 +369,7 @@ fun ApplyStep2Intro(navController: NavController?, padding: PaddingValues) {
                     Column(Modifier.padding(24.dp)) {
                         Text("${actualUser.nome}, ecco cosa dire:", fontWeight = FontWeight.Bold, fontSize = 18.sp)
                         Text("• Presentati\n• Esperienze lavorative\n• Perché SuperSpan?", Modifier.padding(vertical = 10.dp), lineHeight = 24.sp)
-                        Text("Hai 30 secondi di tempo.", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                        Text("Il video deve durare tra i 15 e i 30 secondi", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                     }
                 }
                 Spacer(Modifier.height(40.dp))

@@ -244,10 +244,10 @@ fun AdminCouponEditPage(
                     selectedProducts.forEach { p ->
                         Card(
                             modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
-                            shape = RoundedCornerShape(20.dp),
-                            colors = CardDefaults.cardColors(containerColor = Color.White),
-                            border = androidx.compose.foundation.BorderStroke(2.dp, Color(0xFF81C784)),
-                            elevation = CardDefaults.cardElevation(2.dp)
+                            shape = RoundedCornerShape(16.dp),
+                            colors = CardDefaults.cardColors(containerColor = com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.05f)),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.2f)),
+                            elevation = CardDefaults.cardElevation(0.dp)
                         ) {
                             Row(Modifier.padding(16.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                                 if (p.image != null) {
@@ -258,15 +258,15 @@ fun AdminCouponEditPage(
                                         contentScale = androidx.compose.ui.layout.ContentScale.Crop
                                     )
                                 } else {
-                                    Icon(Icons.Default.ShoppingCart, null, tint = Color(0xFF388E3C), modifier = Modifier.size(32.dp))
+                                    Icon(Icons.Default.ShoppingCart, null, tint = com.example.superspan.ui.theme.LogoLeft, modifier = Modifier.size(32.dp))
                                 }
                                 Spacer(Modifier.width(12.dp))
                                 Column(Modifier.weight(1f)) {
-                                    Text(p.nome, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF1B5E20))
-                                    Text("Prezzo originario: €${p.prezzo}", fontSize = 14.sp, color = Color(0xFF2E7D32))
+                                    Text(p.nome, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = com.example.superspan.ui.theme.LogoLeft)
+                                    Text("Prezzo originario: €${p.prezzo}", fontSize = 14.sp, color = Color.DarkGray)
                                 }
                                 IconButton(onClick = { selectedProducts.remove(p) }) {
-                                    Icon(Icons.Default.Close, "Rimuovi", tint = com.example.superspan.ui.theme.AppError)
+                                    Icon(Icons.Default.Delete, "Rimuovi", tint = Color.Gray)
                                 }
                             }
                         }
@@ -276,13 +276,13 @@ fun AdminCouponEditPage(
                         OutlinedButton(
                             onClick = { isMultiSelectionOpen = true },
                             modifier = Modifier.fillMaxWidth().height(56.dp),
-                            shape = CircleShape,
-                            border = androidx.compose.foundation.BorderStroke(2.dp, Color(0xFF81C784)),
+                            shape = RoundedCornerShape(12.dp),
+                            border = androidx.compose.foundation.BorderStroke(2.dp, com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.5f)),
                             colors = androidx.compose.material3.ButtonDefaults.outlinedButtonColors(containerColor = Color.White)
                         ) {
-                            Icon(Icons.Default.ShoppingCart, contentDescription = null)
+                            Icon(Icons.Default.ShoppingCart, contentDescription = null, tint = com.example.superspan.ui.theme.LogoLeft)
                             Spacer(Modifier.width(8.dp))
-                            Text(if (selectedProducts.isEmpty()) "Seleziona Prodotti" else "Modifica Selezione")
+                            Text(if (selectedProducts.isEmpty()) "Seleziona Prodotti" else "Modifica Selezione", color = com.example.superspan.ui.theme.LogoLeft)
                         }
                     } else if (selectedProducts.size < requiredProductsCount) {
                         OutlinedButton(
@@ -295,13 +295,13 @@ fun AdminCouponEditPage(
                                 isSelectionOpen = true
                             },
                             modifier = Modifier.fillMaxWidth().height(56.dp),
-                            shape = CircleShape,
-                            border = androidx.compose.foundation.BorderStroke(2.dp, Color(0xFF81C784)),
+                            shape = RoundedCornerShape(12.dp),
+                            border = androidx.compose.foundation.BorderStroke(2.dp, com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.5f)),
                             colors = androidx.compose.material3.ButtonDefaults.outlinedButtonColors(containerColor = Color.White)
                         ) {
-                            Icon(Icons.Default.ShoppingCart, contentDescription = null)
+                            Icon(Icons.Default.ShoppingCart, contentDescription = null, tint = com.example.superspan.ui.theme.LogoLeft)
                             Spacer(Modifier.width(8.dp))
-                            Text("Seleziona Prodotto")
+                            Text("Seleziona Prodotto", color = com.example.superspan.ui.theme.LogoLeft)
                         }
                     } // closes else if
                 } // closes inner column

@@ -436,57 +436,68 @@ fun SupermarketSelectionScreen(
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Scegli la Sede", fontWeight = FontWeight.Bold) },
-                navigationIcon = {
-                    IconButton(onClick = onBack, modifier = androidx.compose.ui.Modifier.background(androidx.compose.ui.graphics.Color.White.copy(alpha = 0.7f), androidx.compose.foundation.shape.CircleShape)) { Icon(androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = com.example.superspan.ui.theme.LogoLeft)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
-            )
-        },
-        containerColor = Color(0xFFF8F9FA)
-    ) { innerPadding ->
+    AuraBackground(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            topBar = {
+                CenterAlignedTopAppBar(
+                    title = { Text("Scegli la Sede", fontWeight = FontWeight.Bold) },
+                    navigationIcon = {
+                        IconButton(onClick = onBack, modifier = androidx.compose.ui.Modifier.background(androidx.compose.ui.graphics.Color.White.copy(alpha = 0.7f), androidx.compose.foundation.shape.CircleShape)) { Icon(androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = com.example.superspan.ui.theme.LogoLeft)
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+                )
+            },
+            containerColor = Color.Transparent
+        ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            TextField(
-                value = query,
-                onValueChange = { query = it },
+            androidx.compose.material3.Surface(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
-                placeholder = { Text("Cerca per città, via o nome...") },
-                leadingIcon = {
-                    Icon(
-                        Icons.Default.Search,
-                        contentDescription = null,
-                        tint = Color.Gray
-                    )
-                },
-                trailingIcon = {
-                    if (query.isNotEmpty()) {
-                        IconButton(onClick = { query = "" }) {
-                            Icon(
-                                Icons.Default.Close,
-                                contentDescription = "Cancella",
-                                tint = Color.Gray
-                            )
+                    .padding(16.dp)
+                    .height(56.dp),
+                shape = RoundedCornerShape(28.dp),
+                shadowElevation = 6.dp,
+                color = Color.White
+            ) {
+                TextField(
+                    value = query,
+                    onValueChange = { query = it },
+                    modifier = Modifier.fillMaxSize(),
+                    placeholder = { Text("Cerca per città, via o nome...") },
+                    leadingIcon = {
+                        Icon(
+                            Icons.Default.Search,
+                            contentDescription = null,
+                            tint = Color.Gray
+                        )
+                    },
+                    trailingIcon = {
+                        if (query.isNotEmpty()) {
+                            IconButton(onClick = { query = "" }) {
+                                Icon(
+                                    Icons.Default.Close,
+                                    contentDescription = "Cancella",
+                                    tint = Color.Gray
+                                )
+                            }
                         }
-                    }
-                },
-                shape = RoundedCornerShape(24.dp),
-                colors = TextFieldDefaults.colors(
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    disabledIndicatorColor = Color.Transparent
-                ),
-                singleLine = true
-            )
+                    },
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        disabledIndicatorColor = Color.Transparent,
+                        cursorColor = com.example.superspan.ui.theme.LogoLeft
+                    ),
+                    singleLine = true
+                )
+            }
 
             LazyColumn(
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
@@ -509,7 +520,7 @@ fun SupermarketSelectionScreen(
                                 modifier = Modifier
                                     .size(48.dp)
                                     .background(
-                                        androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant,
+                                        com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.1f),
                                         shape = RoundedCornerShape(12.dp)
                                     ),
                                 contentAlignment = Alignment.Center
@@ -517,7 +528,7 @@ fun SupermarketSelectionScreen(
                                 Icon(
                                     Icons.Default.LocationOn,
                                     contentDescription = null,
-                                    tint = androidx.compose.material3.MaterialTheme.colorScheme.tertiary
+                                    tint = com.example.superspan.ui.theme.LogoLeft
                                 )
                             }
                             Spacer(Modifier.width(16.dp))
@@ -541,4 +552,5 @@ fun SupermarketSelectionScreen(
             }
         }
     }
+}
 }
