@@ -272,19 +272,23 @@ fun ApplyStep2Intro(navController: NavController?, padding: PaddingValues) {
     val videoFile = File(currentDraft.videoPath ?: "")
     val hasVideo = currentDraft.videoPath != null && videoFile.exists()
     
-    val exoPlayer = remember(currentDraft.videoPath) {
-        androidx.media3.exoplayer.ExoPlayer.Builder(context).build().apply {
-            if (hasVideo) {
-                setMediaItem(androidx.media3.common.MediaItem.fromUri(android.net.Uri.fromFile(videoFile)))
-                prepare()
-            }
-        }
+    val exoPlayer = remember {
+        androidx.media3.exoplayer.ExoPlayer.Builder(context).build()
     }
     DisposableEffect(Unit) { onDispose { exoPlayer.release() } }
 
+    LaunchedEffect(currentDraft.videoPath) {
+        if (hasVideo) {
+            exoPlayer.setMediaItem(androidx.media3.common.MediaItem.fromUri(android.net.Uri.fromFile(videoFile)))
+            exoPlayer.prepare()
+        } else {
+            exoPlayer.clearMediaItems()
+        }
+    }
+
     val videoPickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let { selectedUri ->
-            val destinationName = "video_galleria_${actualUser.nome.lowercase()}_${currentOfferIdApplying}.mp4"
+            val destinationName = "video_galleria_${actualUser.nome.lowercase()}_${currentOfferIdApplying}_${System.currentTimeMillis()}.mp4"
             val savedPath = saveFileToInternalStorage(context, selectedUri, destinationName)
             if (savedPath != null) {
                 currentDraft = currentDraft.copy(videoPath = savedPath)
@@ -423,7 +427,7 @@ fun ApplyStep2Record(navController: NavController?, padding: PaddingValues) {
         }
     }
     
-    val videoFile = remember { File(context.filesDir, "video_${actualUser.email.replace("@", "_")}_off${currentOfferIdApplying}.mp4") }
+    val videoFile = remember { File(context.filesDir, "video_${actualUser.email.replace("@", "_")}_off${currentOfferIdApplying}_${System.currentTimeMillis()}.mp4") }
 
     var hasPermissions by remember {
         mutableStateOf(ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED &&
