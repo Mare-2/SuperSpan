@@ -87,7 +87,7 @@ fun AdminWorkOfferEditPage(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 80.dp, bottom = 16.dp)
+                        .padding(top = 16.dp, bottom = 16.dp)
                 ) {
                     Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
@@ -116,21 +116,14 @@ fun AdminWorkOfferEditPage(
                         .fillMaxWidth()
                         .padding(horizontal = 24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = if (offer == null) "Aggiungi Offerta di lavoro" else "Modifica Offerta di lavoro",
-                        fontSize = 32.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = Color(0xFF1A1A1A)
-                    )
-                }
+                ) {}
 
                     // STEP 1: SEDE DI LAVORO
                     Card(
                         colors = CardDefaults.cardColors(containerColor = Color.White),
                         shape = RoundedCornerShape(16.dp),
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp)
                     ) {
                         Column(
                             modifier = Modifier.fillMaxWidth().padding(20.dp),
@@ -182,7 +175,7 @@ fun AdminWorkOfferEditPage(
                         colors = CardDefaults.cardColors(containerColor = Color.White),
                         shape = RoundedCornerShape(16.dp),
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp)
                     ) {
                         Column(
                             modifier = Modifier.fillMaxWidth().padding(20.dp),
@@ -224,7 +217,7 @@ fun AdminWorkOfferEditPage(
                         colors = CardDefaults.cardColors(containerColor = Color.White),
                         shape = RoundedCornerShape(16.dp),
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp)
                     ) {
                         Column(
                             modifier = Modifier.fillMaxWidth().padding(20.dp),
@@ -237,8 +230,23 @@ fun AdminWorkOfferEditPage(
                             EditTextField(value = descrizioneEstesa, onValueChange = { descrizioneEstesa = it }, label = "Descrizione Estesa", modifier = Modifier.fillMaxWidth(), minLines = 3)
                             EditTextField(value = requisiti, onValueChange = { requisiti = it }, label = "Requisiti", modifier = Modifier.fillMaxWidth(), minLines = 2)
 
-                            Spacer(Modifier.height(4.dp))
-                            
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        shape = RoundedCornerShape(16.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth().padding(20.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            Text("Condizioni di Lavoro", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFF1A1A1A))
+
                             Text("Tipo Contratto", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF1A1A1A))
                             @OptIn(ExperimentalLayoutApi::class)
                             FlowRow(
@@ -300,7 +308,7 @@ fun AdminWorkOfferEditPage(
 
                 Button(
                     onClick = { showSaveConfirm = true },
-                    modifier = Modifier.height(55.dp),
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp).height(55.dp),
                     shape = CircleShape,
                     colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = com.example.superspan.ui.theme.LogoLeft),
                     enabled = titolo.isNotBlank() && descrizioneBreve.isNotBlank() && selectedSupermarket != null && ruoloEnum != null
@@ -310,7 +318,6 @@ fun AdminWorkOfferEditPage(
                 
                 Spacer(modifier = Modifier.height(paddingValues.calculateBottomPadding() + 24.dp))
             } // closes form wrapper column
-        } // closes very outer column
 
             // Floating Back Button
             IconButton(

@@ -532,8 +532,8 @@ fun CouponPageComplete(paddingValues: PaddingValues, navController: NavControlle
                             .background(Color(0xFFEDF7E7), CircleShape)
                             .padding(4.dp)
                     ) {
-                        TabButton("I tuoi Coupon", selectedTab == 0, Modifier.weight(1f)) { selectedTab = 0 }
-                        TabButton("Promozioni", selectedTab == 1, Modifier.weight(1f)) { selectedTab = 1 }
+                        TabButton("Coupon", selectedTab == 0, Modifier.weight(1f)) { selectedTab = 0 }
+                        TabButton("Offerte", selectedTab == 1, Modifier.weight(1f)) { selectedTab = 1 }
                     }
                 }
 
