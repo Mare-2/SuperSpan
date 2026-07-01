@@ -387,7 +387,7 @@ private fun CouponForm(
             Card(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.05f)),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFEAF4F6)),
                 border = androidx.compose.foundation.BorderStroke(1.dp, com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.2f)),
                 elevation = CardDefaults.cardElevation(0.dp)
             ) {
@@ -606,13 +606,16 @@ private fun PromoForm(
         } else {
             selectedProduct?.let { p ->
                 Card(
-                    modifier = Modifier.fillMaxWidth().clickable {
+                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) {
                         onSelectProductRequest { product ->
                             selectedProduct = product
                         }
                     },
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.05f)),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFEAF4F6)),
                     border = androidx.compose.foundation.BorderStroke(1.dp, com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.2f)),
                     elevation = CardDefaults.cardElevation(0.dp)
                 ) {
@@ -757,14 +760,18 @@ fun MultiProductSelectionScreen(
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable {
+                                .clip(RoundedCornerShape(16.dp))
+                                .clickable(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = null
+                                ) {
                                     if (isSelected) {
                                         currentSelection.remove(p)
                                     } else if (currentSelection.size < maxSelection) {
                                         currentSelection.add(p)
                                     }
                                 },
-                            colors = CardDefaults.cardColors(containerColor = if (isSelected) com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.05f) else Color.White),
+                            colors = CardDefaults.cardColors(containerColor = if (isSelected) Color(0xFFEAF4F6) else Color.White),
                             border = if (isSelected) androidx.compose.foundation.BorderStroke(1.dp, com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.2f)) else null,
                             elevation = CardDefaults.cardElevation(defaultElevation = if (isSelected) 0.dp else 2.dp),
                             shape = RoundedCornerShape(16.dp)
@@ -902,7 +909,11 @@ fun ProductSelectionScreen(
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable { onSelected(p) },
+                                .clip(RoundedCornerShape(16.dp))
+                                .clickable(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = null
+                                ) { onSelected(p) },
                             colors = CardDefaults.cardColors(containerColor = Color.White),
                             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                             shape = RoundedCornerShape(16.dp)
