@@ -130,13 +130,19 @@ class FilterData() {
     fun minPossiblePrice(): Float {
         // Aggiunto un controllo di sicurezza se la lista è vuota
         if (ListOfProduct.isEmpty()) return 0f
-        return ListOfProduct.minOf { product -> product.prezzo }
+        return ListOfProduct.minOf { product -> 
+            val discount = ListOfCoupon.filter { it.products.contains(product) }.maxOfOrNull { it.discount } ?: 0f
+            product.prezzo * (1 - discount / 100)
+        }
     }
 
     fun maxPossiblePrice(): Float {
         // Aggiunto un controllo di sicurezza se la lista è vuota
         if (ListOfProduct.isEmpty()) return 100f
-        return ListOfProduct.maxOf { product -> product.prezzo }
+        return ListOfProduct.maxOf { product -> 
+            val discount = ListOfCoupon.filter { it.products.contains(product) }.maxOfOrNull { it.discount } ?: 0f
+            product.prezzo * (1 - discount / 100)
+        }
     }
 }
 
@@ -399,7 +405,9 @@ fun searchProduct(filterData: FilterData): List<Product> {
     }
     // Filtro prezzo
     list = list.filter { product ->
-        product.prezzo >= filterData.minPrice && product.prezzo <= filterData.maxPrice
+        val discount = ListOfCoupon.filter { it.products.contains(product) }.maxOfOrNull { it.discount } ?: 0f
+        val actualPrice = product.prezzo * (1 - discount / 100)
+        actualPrice >= filterData.minPrice && actualPrice <= filterData.maxPrice
     }
 
     // Ordinamento combinato
