@@ -58,6 +58,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 
 
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
 fun WorkOfferPage(offer: WorkOffer?, navController: NavController?, paddingValues: PaddingValues) {
     val scrollState = rememberScrollState()
@@ -108,6 +109,22 @@ fun WorkOfferPage(offer: WorkOffer?, navController: NavController?, paddingValue
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center
                 )
+
+                Spacer(Modifier.height(16.dp))
+
+                // Riepilogo rapido a "pillole": aiuta a valutare l'offerta a colpo d'occhio
+                androidx.compose.foundation.layout.FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    offer?.let {
+                        InfoChip(Icons.Default.WorkOutline, it.ruoloEnum.nome)
+                        InfoChip(Icons.Default.WorkOutline, it.tipoContratto.nome)
+                        InfoChip(Icons.Default.Schedule, it.orario.nome)
+                        InfoChip(Icons.Default.LocationOn, "${it.distanzaKm} km")
+                    }
+                }
 
                 Spacer(Modifier.height(24.dp))
 

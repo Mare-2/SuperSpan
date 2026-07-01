@@ -299,9 +299,9 @@ fun CheckPassword(
     
     val strengthColor = when (score) {
         0, 1 -> com.example.superspan.ui.theme.AppError
-        2 -> Color(0xFFFFB74D) // Orange
-        3 -> Color(0xFF81C784) // Light green
-        4 -> Color(0xFF388E3C) // Dark green
+        2 -> com.example.superspan.ui.theme.AppWarning
+        3 -> Color(0xFF81C784) // Verde chiaro (forza media-alta)
+        4 -> com.example.superspan.ui.theme.AppSuccess
         else -> Color.LightGray
     }
 
@@ -370,7 +370,7 @@ fun PasswordCheckItem(condition: Boolean, text: String) {
             Icon(
                 Icons.Filled.Check,
                 contentDescription = null,
-                tint = Color(0xFF388E3C),
+                tint = com.example.superspan.ui.theme.AppSuccess,
                 modifier = Modifier.size(16.dp)
             )
         } else {
@@ -491,9 +491,9 @@ fun EditTextField(
     onValueChange: (String) -> Unit
 ) {
     val containerColor = when {
-        isError -> Color(0xFFFDECEA)
-        value.isNotEmpty() -> Color(0xFFF0F9F0)
-        else -> Color(0xFFF5F5F5)
+        isError -> Color(0xFFFDECEA)             // errore: rosso tenue
+        value.isNotEmpty() -> Color(0xFFF0F9F0)  // compilato: verde tenue
+        else -> Color.Transparent                // vuoto: trasparente (si fonde con card/Aura)
     }
 
     val borderColor = when {

@@ -36,7 +36,7 @@ import com.example.superspan.ui.theme.AppError
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class, androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
-fun AdminCandidaciesPage(navController: NavController?, paddingValues: PaddingValues, sliderContent: (@Composable () -> Unit)? = null) {
+fun AdminCandidaciesPage(navController: NavController?, paddingValues: PaddingValues, hideHeader: Boolean = false, sliderContent: (@Composable () -> Unit)? = null) {
     // Stati per i filtri
     val selectedRoles = remember { androidx.compose.runtime.mutableStateListOf<Role>() }
     var selectedSupermarket by remember { mutableStateOf<Supermarket?>(null) }
@@ -91,16 +91,20 @@ fun AdminCandidaciesPage(navController: NavController?, paddingValues: PaddingVa
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(bottom = paddingValues.calculateBottomPadding() + 32.dp)
         ) {
-            item {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 64.dp, bottom = 24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text("Gestione Candidature", fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, color = Color.Black)
-                    Text("Pannello di Amministrazione", fontSize = 16.sp, color = Color.Gray)
+            if (!hideHeader) {
+                item {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 64.dp, bottom = 24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("Gestione Candidature", fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, color = Color.Black)
+                        Text("Pannello di Amministrazione", fontSize = 16.sp, color = Color.Gray)
+                    }
                 }
+            } else {
+                item { Spacer(Modifier.height(8.dp)) }
             }
 
             if (sliderContent != null) {
@@ -227,9 +231,11 @@ fun AdminCandidaciesPage(navController: NavController?, paddingValues: PaddingVa
             // --- LISTA CANDIDATURE ---
             if (filteredCandidacies.isEmpty()) {
                 item {
-                    Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
-                        Text("Nessuna candidatura trovata", color = Color.Gray, fontSize = 16.sp)
-                    }
+                    EmptyState(
+                        icon = Icons.Default.Badge,
+                        title = "Nessuna candidatura",
+                        subtitle = "Nessun risultato per i filtri selezionati. Prova a modificarli o azzerarli."
+                    )
                 }
             } else {
                 items(filteredCandidacies) { candidacy ->

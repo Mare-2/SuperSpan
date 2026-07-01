@@ -196,16 +196,16 @@ fun CouponPageComplete(paddingValues: PaddingValues, navController: NavControlle
 
                 // 2. STICKY TABS
                 stickyHeader {
-                    Row(
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .background(com.example.superspan.ui.theme.Neutral50)
                             .padding(start = 20.dp, end = 20.dp, top = 28.dp, bottom = 12.dp)
-                            .shadow(4.dp, CircleShape)
-                            .background(Color(0xFFEDF7E7), CircleShape)
-                            .padding(4.dp)
                     ) {
-                        TabButton("Coupon", selectedTab == 0, Modifier.weight(1f)) { selectedTab = 0 }
-                        TabButton("Offerte", selectedTab == 1, Modifier.weight(1f)) { selectedTab = 1 }
+                        AnimatedSegmentedControl(
+                            options = listOf("Coupon", "Offerte"),
+                            selectedIndex = selectedTab
+                        ) { selectedTab = it }
                     }
                 }
 
@@ -294,31 +294,6 @@ fun formatDisplayDate(dateString: String): String {
         date.format(outputFormatter)
     } catch (e: Exception) {
         dateString
-    }
-}
-
-@Composable
-fun TabButton(text: String, isSelected: Boolean, modifier: Modifier, onClick: () -> Unit) {
-    // InteractionSource serve a gestire lo stato del clic senza effetti grafici
-    val interactionSource = remember { MutableInteractionSource() }
-
-    Surface(
-        modifier = modifier.clickable(
-            interactionSource = interactionSource,
-            indication = null // <-- QUESTO RIMUOVE IL RIQUADRO GRIGIO
-        ) { onClick() },
-        color = if (isSelected) Color.White else Color.Transparent,
-        shape = CircleShape,
-        shadowElevation = if (isSelected) 2.dp else 0.dp
-    ) {
-        Box(modifier = Modifier.height(40.dp), contentAlignment = Alignment.Center) {
-            Text(
-                text = text,
-                fontSize = 15.sp,
-                fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.SemiBold,
-                color = if (isSelected) com.example.superspan.ui.theme.LogoLeft else Color.DarkGray
-            )
-        }
     }
 }
 
@@ -478,11 +453,13 @@ fun OfferDetailPage(coupon: Coupon, navController: NavController? = null, onBack
                 Spacer(Modifier.height(12.dp))
             }
             Spacer(Modifier.height(32.dp))
-            Surface(modifier = Modifier.fillMaxWidth(), color = Color(0xFF388E3C).copy(0.1f), shape = RoundedCornerShape(16.dp), border = androidx.compose.foundation.BorderStroke(2.dp, Color(0xFF388E3C))) {
+            Surface(modifier = Modifier.fillMaxWidth(), color = com.example.superspan.ui.theme.AppSuccess.copy(0.1f), shape = RoundedCornerShape(16.dp), border = androidx.compose.foundation.BorderStroke(2.dp, com.example.superspan.ui.theme.AppSuccess)) {
                 Column(modifier = Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("MOSTRA ALLA CASSA", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color(0xFF388E3C))
+                    Text("MOSTRA ALLA CASSA", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = com.example.superspan.ui.theme.AppSuccess)
                     Spacer(Modifier.height(8.dp))
                     Text(text = coupon.code, fontSize = 36.sp, fontWeight = FontWeight.Black, letterSpacing = 6.sp, color = Color.Black)
+                    Spacer(Modifier.height(16.dp))
+                    FakeBarcode(coupon.code, modifier = Modifier.fillMaxWidth(0.9f))
                 }
             }
             Spacer(Modifier.height(40.dp))
@@ -527,12 +504,12 @@ private fun getExpirationStatus(dateString: String): ExpirationStatus {
         val today = LocalDate.now()
         val days = ChronoUnit.DAYS.between(today, expiry)
         when {
-            days < 0 -> ExpirationStatus("SCADUTO", Color.Gray)
-            days == 0L -> ExpirationStatus("SCADE OGGI", Color(0xFFD32F2F))
-            days <= 3 -> ExpirationStatus("SCADE TRA $days GG", Color(0xFFF57C00))
-            else -> ExpirationStatus("ATTIVO", Color(0xFF388E3C))
+            days < 0 -> ExpirationStatus("SCADUTO", com.example.superspan.ui.theme.AppExpired)
+            days == 0L -> ExpirationStatus("SCADE OGGI", com.example.superspan.ui.theme.AppError)
+            days <= 3 -> ExpirationStatus("SCADE TRA $days GG", com.example.superspan.ui.theme.AppWarning)
+            else -> ExpirationStatus("ATTIVO", com.example.superspan.ui.theme.AppSuccess)
         }
-    } catch (e: Exception) { ExpirationStatus("ATTIVO", Color(0xFF388E3C)) }
+    } catch (e: Exception) { ExpirationStatus("ATTIVO", com.example.superspan.ui.theme.AppSuccess) }
 }
 
 @Composable

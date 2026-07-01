@@ -99,10 +99,10 @@ fun Navigation(navController: NavHostController, startDestination: Destination, 
     NavHost(
         navController = navController, 
         startDestination = startDestination.route,
-        enterTransition = { androidx.compose.animation.EnterTransition.None },
-        exitTransition = { androidx.compose.animation.ExitTransition.None },
-        popEnterTransition = { androidx.compose.animation.EnterTransition.None },
-        popExitTransition = { androidx.compose.animation.ExitTransition.None }
+        enterTransition = { androidx.compose.animation.fadeIn(androidx.compose.animation.core.tween(180)) },
+        exitTransition = { androidx.compose.animation.fadeOut(androidx.compose.animation.core.tween(180)) },
+        popEnterTransition = { androidx.compose.animation.fadeIn(androidx.compose.animation.core.tween(180)) },
+        popExitTransition = { androidx.compose.animation.fadeOut(androidx.compose.animation.core.tween(180)) }
     ) {
         Destination.entries.forEach { destination ->
             composable(destination.route) {

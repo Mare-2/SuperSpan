@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.Photo
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.SearchOff
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -80,6 +81,8 @@ class SearchViewModel : ViewModel() {
     val productList: StateFlow<List<ProductUiState>> = _productList.asStateFlow()
 
     init {
+        // Popoliamo subito la lista, così alla prima apertura non compare un flash di "lista vuota"
+        eseguiRicerca()
         viewModelScope.launch {
             snapshotFlow {
                 // Leggiamo tutti gli stati rilevanti per innescare la ricerca
@@ -157,7 +160,7 @@ fun ProductCompose(uiState: ProductUiState, navController: NavController?) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(205.dp)
+            .height(215.dp)
             .clickable { navController?.navigate(Destination.PRODOTTO.route + "/${product.nome}") },
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -218,7 +221,9 @@ fun ProductCompose(uiState: ProductUiState, navController: NavController?) {
                 text = product.nome,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.SemiBold,
-                maxLines = 1,
+                maxLines = 2,
+                minLines = 2,
+                lineHeight = 16.sp,
                 overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
@@ -339,8 +344,8 @@ fun SearchPage(
         item(span = { GridItemSpan(maxLineSpan) }) {
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Surface(
-                    modifier = Modifier.weight(1f).height(56.dp),
-                    shape = RoundedCornerShape(28.dp),
+                    modifier = Modifier.weight(1f).height(50.dp),
+                    shape = RoundedCornerShape(25.dp),
                     shadowElevation = 6.dp,
                     color = Color.White
                 ) {
@@ -487,6 +492,16 @@ fun SearchPage(
                 }
             }
             Spacer(Modifier.height(16.dp))
+        }
+
+        if (productSearchList.isEmpty()) {
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                EmptyState(
+                    icon = Icons.Default.SearchOff,
+                    title = "Nessun prodotto trovato",
+                    subtitle = "Prova un altro termine di ricerca o cambia i filtri."
+                )
+            }
         }
 
         // 3. GRIGLIA PRODOTTI

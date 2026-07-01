@@ -13,6 +13,8 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.AssignmentTurnedIn
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -73,22 +75,17 @@ fun DraftsPage(navController: NavController?, padding: PaddingValues) {
             }
             
             stickyHeader {
-                // Tabs
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    color = Color.Transparent
+                // Selettore Bozze / Inviate
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color(0xFFF7FBF8))
+                        .padding(horizontal = 20.dp, vertical = 12.dp)
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 20.dp, vertical = 12.dp)
-                            .shadow(4.dp, CircleShape)
-                            .background(Color(0xFFEDF7E7), CircleShape)
-                            .padding(4.dp)
-                    ) {
-                        TabButton("Bozze", selectedTabIndex == 0, Modifier.weight(1f)) { selectedTabIndex = 0 }
-                        TabButton("Inviate", selectedTabIndex == 1, Modifier.weight(1f)) { selectedTabIndex = 1 }
-                    }
+                    AnimatedSegmentedControl(
+                        options = listOf("Bozze", "Inviate"),
+                        selectedIndex = selectedTabIndex
+                    ) { selectedTabIndex = it }
                 }
             }
 
@@ -96,10 +93,11 @@ fun DraftsPage(navController: NavController?, padding: PaddingValues) {
                 // --- BOZZE ---
                 if (draftsList.isEmpty()) {
                     item {
-                        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                            Spacer(Modifier.height(40.dp))
-                            Text("Nessuna bozza salvata.", color = Color.Gray)
-                        }
+                        EmptyState(
+                            icon = Icons.Default.Description,
+                            title = "Nessuna bozza",
+                            subtitle = "Le candidature che salvi per riprenderle più tardi compaiono qui."
+                        )
                     }
                 } else {
                     items(draftsList) { entry ->
@@ -171,10 +169,11 @@ fun DraftsPage(navController: NavController?, padding: PaddingValues) {
                 // --- INVIATE ---
                 if (submittedList.isEmpty()) {
                     item {
-                        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                            Spacer(Modifier.height(40.dp))
-                            Text("Nessuna candidatura inviata.", color = Color.Gray)
-                        }
+                        EmptyState(
+                            icon = Icons.Default.AssignmentTurnedIn,
+                            title = "Nessuna candidatura inviata",
+                            subtitle = "Quando invii una candidatura la ritrovi qui con il suo stato aggiornato."
+                        )
                     }
                 } else {
                     items(submittedList) { candidacy ->

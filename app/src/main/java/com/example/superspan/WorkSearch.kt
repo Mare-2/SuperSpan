@@ -211,8 +211,8 @@ fun WorkSearchPage(
                 androidx.compose.material3.Surface(
                     modifier = Modifier
                         .weight(1f)
-                        .height(56.dp),
-                    shape = RoundedCornerShape(28.dp),
+                        .height(50.dp),
+                    shape = RoundedCornerShape(25.dp),
                     shadowElevation = 6.dp,
                     color = Color.White
                 ) {
@@ -280,6 +280,15 @@ fun WorkSearchPage(
         }
 
         // 3. LISTA DELLE OFFERTE
+        if (workSearchList.isEmpty()) {
+            item {
+                EmptyState(
+                    icon = Icons.Default.WorkOff,
+                    title = "Nessuna offerta trovata",
+                    subtitle = "Prova ad ampliare la distanza o a rimuovere qualche filtro."
+                )
+            }
+        }
         items(workSearchList, key = { it.id }) { offer ->
             val hasCandidacy = AllCandidacies.any { it.userEmail == actualUser.email && it.offerId == offer.id }
             val hasDraft = actualUser.candidacyDraftsByOfferId.containsKey(offer.id)

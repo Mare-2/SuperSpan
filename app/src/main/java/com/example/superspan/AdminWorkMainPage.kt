@@ -17,6 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -28,42 +29,52 @@ import androidx.navigation.NavController
 @Composable
 fun AdminWorkMainPage(paddingValues: PaddingValues, navController: NavController?, initialTab: Int = 0) {
     var selectedTabIndex by remember { mutableStateOf(initialTab) }
-    val tabs = listOf("Posizioni Aperte", "Candidature")
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        val sliderContent: @Composable () -> Unit = {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 20.dp, end = 20.dp, top = 28.dp, bottom = 12.dp)
-                    .shadow(4.dp, CircleShape)
-                    .background(Color(0xFFEDF7E7), CircleShape)
-                    .padding(4.dp)
-            ) {
-                TabButton("Posizioni Aperte", selectedTabIndex == 0, Modifier.weight(1f)) { selectedTabIndex = 0 }
-                TabButton("Candidature", selectedTabIndex == 1, Modifier.weight(1f)) { selectedTabIndex = 1 }
+    Column(modifier = Modifier.fillMaxSize()) {
+        // Intestazione persistente: il titolo cambia in base alla sezione selezionata
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = paddingValues.calculateTopPadding() + 24.dp, bottom = 8.dp, start = 20.dp, end = 20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            if (selectedTabIndex == 0) {
+                Text("Lavora con noi!", fontSize = 30.sp, fontWeight = FontWeight.ExtraBold, color = Color(0xFF1A1A1A))
+                Text("Gestisci le posizioni aperte", fontSize = 15.sp, color = Color.Gray)
+            } else {
+                Text("Gestione Candidature", fontSize = 30.sp, fontWeight = FontWeight.ExtraBold, color = Color(0xFF1A1A1A))
+                Text("Pannello di Amministrazione", fontSize = 15.sp, color = Color.Gray)
             }
         }
 
-        when (selectedTabIndex) {
-            0 -> {
-                // Posizioni Aperte
-                WorkSearchPageComplete(
+        // Barra tab PERSISTENTE: restando montata attraverso il cambio di sezione,
+        // l'indicatore può scorrere animato invece di "saltare".
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 20.dp, end = 20.dp, bottom = 12.dp)
+        ) {
+            AnimatedSegmentedControl(
+                options = listOf("Posizioni Aperte", "Candidature"),
+                selectedIndex = selectedTabIndex
+            ) { selectedTabIndex = it }
+        }
+
+        // Sotto la barra cambia solo il contenuto. Le pagine non mostrano il proprio
+        // titolo/selettore (il tab qui sopra fa già da intestazione).
+        Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+            when (selectedTabIndex) {
+                0 -> WorkSearchPageComplete(
                     padding = paddingValues,
                     navController = navController,
-                    hideHeader = false,
-                    sliderContent = sliderContent
+                    hideHeader = true,
+                    sliderContent = null
                 )
-            }
-            1 -> {
-                // Candidature
-                AdminCandidaciesPage(
+                1 -> AdminCandidaciesPage(
                     navController = navController,
                     paddingValues = paddingValues,
-                    sliderContent = sliderContent
+                    hideHeader = true,
+                    sliderContent = null
                 )
             }
         }

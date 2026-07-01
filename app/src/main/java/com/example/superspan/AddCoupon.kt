@@ -205,6 +205,7 @@ fun AddCoupon(paddingValues: PaddingValues, navController: NavController?) {
                 MultiProductSelectionScreen(
                     initialSelection = initialSelectionForMulti,
                     maxSelection = maxSelectionForMulti,
+                    bottomInset = paddingValues.calculateBottomPadding(),
                     onBack = { isMultiSelectionOpen = false },
                     onConfirm = { products ->
                         pendingMultiProductSelection?.invoke(products)
@@ -367,7 +368,7 @@ private fun CouponForm(
         EditTextField(
             value = expirationDate,
             onValueChange = { expirationDate = it },
-            label = "Scadenza (yyyy-MM-dd)",
+            label = "Data Scadenza",
             keyboardType = KeyboardType.Text,
             isError = isExpirationError,
             errorMessage = "Il coupon deve avere una scadenza successiva all'odierna.",
@@ -571,10 +572,10 @@ private fun PromoForm(
         EditTextField(
             value = expirationDate,
             onValueChange = { expirationDate = it },
-            label = "Scadenza (yyyy-MM-dd)",
+            label = "Data Scadenza",
             keyboardType = KeyboardType.Text,
             isError = isExpirationError,
-            errorMessage = "Formato non valido, usa AAAA-MM-GG",
+            errorMessage = "La scadenza deve essere successiva a oggi.",
             readOnly = true,
             onClick = { showDatePicker = true },
             trailingIcon = {
@@ -673,6 +674,7 @@ private fun PromoForm(
 fun MultiProductSelectionScreen(
     initialSelection: List<Product>,
     maxSelection: Int,
+    bottomInset: androidx.compose.ui.unit.Dp = 0.dp,
     onBack: () -> Unit,
     onConfirm: (List<Product>) -> Unit
 ) {
@@ -743,9 +745,11 @@ fun MultiProductSelectionScreen(
                     )
                 }
 
+                Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
                 LazyColumn(
-                    modifier = Modifier.weight(1f),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    modifier = Modifier.fillMaxSize(),
+                    // Spazio extra in fondo: l'ultimo prodotto scorre sopra il pulsante flottante
+                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 96.dp + bottomInset),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(filteredList) { p ->
@@ -799,8 +803,9 @@ fun MultiProductSelectionScreen(
 
                 Box(
                     modifier = Modifier
+                        .align(Alignment.BottomCenter)
                         .fillMaxWidth()
-                        .padding(16.dp),
+                        .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 16.dp + bottomInset),
                     contentAlignment = Alignment.Center
                 ) {
                     Button(
@@ -812,6 +817,7 @@ fun MultiProductSelectionScreen(
                     ) {
                         Text("Conferma Selezione", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
                     }
+                }
                 }
             }
         }

@@ -67,16 +67,16 @@ fun ProfilePage(user: User, navController: NavController?, paddingValues: Paddin
         )
     }
 
+    AuraBackground(modifier = Modifier.fillMaxSize()) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
     ) {
-        // --- 1. HEADER CON GRADIENTE SFUMATO ---
+        // --- 1. HEADER (logo sopra lo sfondo Aura, niente rettangolo) ---
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(com.example.superspan.ui.theme.AppHeaderFadeBrush)
                 .padding(top = 60.dp, bottom = 32.dp, start = 24.dp, end = 24.dp),
             contentAlignment = Alignment.Center
         ) {
@@ -99,6 +99,21 @@ fun ProfilePage(user: User, navController: NavController?, paddingValues: Paddin
                     .padding(top = 8.dp), 
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                val initials = "${user.nome.firstOrNull()?.uppercaseChar() ?: ""}${user.cognome.firstOrNull()?.uppercaseChar() ?: ""}"
+                Box(
+                    modifier = Modifier
+                        .size(88.dp)
+                        .background(com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.15f), CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        initials,
+                        fontSize = 32.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = com.example.superspan.ui.theme.BrandDark
+                    )
+                }
+                Spacer(modifier = Modifier.height(12.dp))
                 Text("${user.nome} ${user.cognome}", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.ExtraBold)
                 Spacer(modifier = Modifier.height(4.dp))
                 Surface(
@@ -180,6 +195,7 @@ fun ProfilePage(user: User, navController: NavController?, paddingValues: Paddin
                 Spacer(Modifier.height(paddingValues.calculateBottomPadding() + 24.dp))
             }
         }
+    }
     }
 }
 
