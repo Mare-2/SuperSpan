@@ -125,42 +125,17 @@ fun AdminCandidaciesPage(
 
             item {
                 // --- BARRA DI RICERCA ---
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    androidx.compose.material3.Surface(
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(56.dp),
-                        shape = RoundedCornerShape(28.dp),
-                        shadowElevation = 6.dp,
-                        color = Color.White
-                    ) {
-                        androidx.compose.material3.TextField(
-                            value = searchQuery,
-                            onValueChange = { searchQuery = it },
-                            placeholder = { Text("Cerca candidato o ruolo...", color = Color.Gray) },
-                            modifier = Modifier.fillMaxSize(),
-                            leadingIcon = { Icon(Icons.Default.Search, null, tint = Color.Gray) },
-                            trailingIcon = {
-                                IconButton(onClick = { showFiltersPage = true }) {
-                                    Icon(Icons.Default.Tune, contentDescription = "Filtri", tint = LogoLeft)
-                                }
-                            },
-                            singleLine = true,
-                            colors = androidx.compose.material3.TextFieldDefaults.colors(
-                                focusedContainerColor = Color.Transparent,
-                                unfocusedContainerColor = Color.Transparent,
-                                focusedIndicatorColor = Color.Transparent,
-                                unfocusedIndicatorColor = Color.Transparent,
-                                cursorColor = LogoLeft
-                            )
-                        )
+                CustomSearchBar(
+                    query = searchQuery,
+                    onQueryChange = { searchQuery = it },
+                    placeholder = "Cerca candidato o ruolo...",
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    trailingIcon = {
+                        IconButton(onClick = { showFiltersPage = true }) {
+                            Icon(Icons.Default.Tune, contentDescription = "Filtri", tint = LogoLeft)
+                        }
                     }
-                }
+                )
             }
 
             // --- CHIPS DEI FILTRI ATTIVI ---

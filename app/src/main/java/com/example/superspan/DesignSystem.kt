@@ -5,6 +5,9 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.draw.clip
@@ -229,3 +232,59 @@ fun PrimaryHeader(title: String, subtitle: String, modifier: Modifier = Modifier
         )
     }
 }
+
+/**
+ * Barra di ricerca standardizzata per tutte le sezioni dell'app.
+ * Supporta placeholder dinamici e icona personalizzata (es. Filtri).
+ */
+@Composable
+fun CustomSearchBar(
+    query: String,
+    onQueryChange: (String) -> Unit,
+    placeholder: String,
+    modifier: Modifier = Modifier,
+    trailingIcon: @Composable (() -> Unit)? = null
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth().height(44.dp),
+        shape = RoundedCornerShape(22.dp),
+        shadowElevation = 4.dp,
+        color = Color.White
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp)
+        ) {
+            Icon(Icons.Default.Search, null, tint = Color.Gray, modifier = Modifier.size(20.dp))
+            Spacer(modifier = Modifier.width(8.dp))
+            Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
+                if (query.isEmpty()) {
+                    Text(placeholder, color = Color.Gray, fontSize = 14.sp)
+                }
+                androidx.compose.foundation.text.BasicTextField(
+                    value = query,
+                    onValueChange = onQueryChange,
+                    textStyle = androidx.compose.ui.text.TextStyle(fontSize = 14.sp, color = Neutral900),
+                    singleLine = true,
+                    cursorBrush = androidx.compose.ui.graphics.SolidColor(LogoLeft),
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+            if (trailingIcon != null) {
+                Spacer(modifier = Modifier.width(4.dp))
+                Box(modifier = Modifier.size(32.dp), contentAlignment = Alignment.Center) {
+                    trailingIcon()
+                }
+            } else if (query.isNotEmpty()) {
+                Spacer(modifier = Modifier.width(4.dp))
+                androidx.compose.material3.IconButton(
+                    onClick = { onQueryChange("") },
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(Icons.Default.Clear, contentDescription = "Cancella", tint = Color.Gray, modifier = Modifier.size(20.dp))
+                }
+            }
+        }
+    }
+}
+

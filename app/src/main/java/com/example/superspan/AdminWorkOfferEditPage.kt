@@ -455,49 +455,12 @@ fun SupermarketSelectionScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            androidx.compose.material3.Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-                    .height(56.dp),
-                shape = RoundedCornerShape(28.dp),
-                shadowElevation = 6.dp,
-                color = Color.White
-            ) {
-                TextField(
-                    value = query,
-                    onValueChange = { query = it },
-                    modifier = Modifier.fillMaxSize(),
-                    placeholder = { Text("Cerca per città, via o nome...") },
-                    leadingIcon = {
-                        Icon(
-                            Icons.Default.Search,
-                            contentDescription = null,
-                            tint = Color.Gray
-                        )
-                    },
-                    trailingIcon = {
-                        if (query.isNotEmpty()) {
-                            IconButton(onClick = { query = "" }) {
-                                Icon(
-                                    Icons.Default.Close,
-                                    contentDescription = "Cancella",
-                                    tint = Color.Gray
-                                )
-                            }
-                        }
-                    },
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        disabledIndicatorColor = Color.Transparent,
-                        cursorColor = com.example.superspan.ui.theme.LogoLeft
-                    ),
-                    singleLine = true
-                )
-            }
+            CustomSearchBar(
+                query = query,
+                onQueryChange = { query = it },
+                placeholder = "Cerca per città, via o nome...",
+                modifier = Modifier.padding(16.dp)
+            )
 
             LazyColumn(
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),

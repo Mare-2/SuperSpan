@@ -164,7 +164,8 @@ fun ProductCompose(uiState: ProductUiState, navController: NavController?) {
             .clickable { navController?.navigate(Destination.PRODOTTO.route + "/${product.nome}") },
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        border = BorderStroke(1.dp, Color.Black.copy(alpha = 0.05f))
     ) {
         Column(
             modifier = Modifier.fillMaxSize().padding(8.dp),
@@ -177,7 +178,7 @@ fun ProductCompose(uiState: ProductUiState, navController: NavController?) {
                     .fillMaxWidth()
                     .height(115.dp)
                     .clip(RoundedCornerShape(16.dp))
-                    .background(Color(0xFFF8F9FA)),
+                    .background(Color.White),
                 contentAlignment = Alignment.Center
             ) {
                 if (product.image != null) {
@@ -220,13 +221,14 @@ fun ProductCompose(uiState: ProductUiState, navController: NavController?) {
             Text(
                 text = product.nome,
                 fontSize = 13.sp,
-                fontWeight = FontWeight.SemiBold,
+                fontWeight = FontWeight.Bold,
                 maxLines = 2,
                 minLines = 2,
                 lineHeight = 16.sp,
                 overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
+                color = Color(0xFF222222),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp)
             )
 
             // --- PREZZI (in basso) ---
@@ -238,27 +240,22 @@ fun ProductCompose(uiState: ProductUiState, navController: NavController?) {
                         color = Color.Gray,
                         textDecoration = androidx.compose.ui.text.style.TextDecoration.LineThrough
                     )
-                    Surface(color = Color(0xFF2E7D32).copy(alpha = 0.12f), shape = CircleShape) {
+                    Surface(color = com.example.superspan.ui.theme.AppSuccess.copy(alpha = 0.1f), shape = CircleShape) {
                         Text(
                             text = "€ ${"%.2f".format(uiState.discountedPrice)}",
                             modifier = Modifier.padding(horizontal = 10.dp, vertical = 2.dp),
-                            fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32)
+                            fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = com.example.superspan.ui.theme.AppSuccess
                         )
                     }
                 }
             } else {
-                Surface(
-                    color = androidx.compose.material3.MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text(
-                        text = "€ ${"%.2f".format(product.prezzo)}",
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = androidx.compose.material3.MaterialTheme.colorScheme.primary
-                    )
-                }
+                Text(
+                    text = "€ ${"%.2f".format(product.prezzo)}",
+                    modifier = Modifier.padding(bottom = 6.dp),
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color.Black
+                )
             }
         }
     }
@@ -325,35 +322,16 @@ fun SearchPage(
 
         // 1. BARRA DI RICERCA
         item(span = { GridItemSpan(maxLineSpan) }) {
-            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Surface(
-                    modifier = Modifier.weight(1f).height(50.dp),
-                    shape = RoundedCornerShape(25.dp),
-                    shadowElevation = 6.dp,
-                    color = Color.White
-                ) {
-                    TextField(
-                        value = searchQuery, // Leggiamo lo stato dal ViewModel
-                        onValueChange = { viewModel.onSearchQueryChanged(it) }, // Inviamo l'evento al ViewModel
-                        placeholder = { Text("Cerca prodotto...", color = Color.Gray) },
-                        modifier = Modifier.fillMaxSize(),
-                        leadingIcon = { Icon(Icons.Default.Search, null, tint = Color.Gray) },
-                        trailingIcon = {
-                            IconButton(onClick = onOpenFilters) {
-                                Icon(Icons.Default.Tune, contentDescription = "Filtri", tint = com.example.superspan.ui.theme.LogoLeft)
-                            }
-                        },
-                        singleLine = true,
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent,
-                            cursorColor = com.example.superspan.ui.theme.LogoLeft
-                        )
-                    )
+            CustomSearchBar(
+                query = searchQuery,
+                onQueryChange = { viewModel.onSearchQueryChanged(it) },
+                placeholder = "Cerca prodotto...",
+                trailingIcon = {
+                    IconButton(onClick = onOpenFilters) {
+                        Icon(Icons.Default.Tune, contentDescription = "Filtri", tint = com.example.superspan.ui.theme.LogoLeft)
+                    }
                 }
-            }
+            )
         }
 
         val maxPossiblePrice = filterData.maxPossiblePrice()

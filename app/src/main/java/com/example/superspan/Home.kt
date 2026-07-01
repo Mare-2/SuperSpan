@@ -120,17 +120,22 @@ fun UserDashboard(navController: NavController?) {
                 Card(
                     modifier = Modifier
                         .width(220.dp)
-                        .height(140.dp),
-                    shape = RoundedCornerShape(16.dp),
+                        .height(140.dp)
+                        .clickable { navController?.navigateTopLevel(Destination.PROMOZIONI.route) },
+                    shape = RoundedCornerShape(20.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.White),
-                    elevation = CardDefaults.cardElevation(3.dp)
+                    elevation = CardDefaults.cardElevation(4.dp)
                 ) {
-                    Column(Modifier.padding(16.dp)) {
-                        TagChip("Sconto ${coupon.discount.toInt()}%", LogoRight)
-                        Spacer(Modifier.height(8.dp))
-                        Text(coupon.products.first().nome, fontWeight = FontWeight.Bold, fontSize = 16.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                        Spacer(Modifier.height(4.dp))
-                        Text(coupon.description, color = Color.Gray, fontSize = 12.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                    Column(Modifier.padding(16.dp).fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                            TagChip("Sconto ${coupon.discount.toInt()}%", LogoRight)
+                            Icon(Icons.Default.LocalOffer, null, tint = LogoRight.copy(0.3f), modifier = Modifier.size(20.dp))
+                        }
+                        Column {
+                            Text(coupon.products.first().nome, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            Spacer(Modifier.height(4.dp))
+                            Text(coupon.description, color = Color.Gray, fontSize = 12.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                        }
                     }
                 }
             }
@@ -162,18 +167,33 @@ fun UserDashboard(navController: NavController?) {
                     modifier = Modifier
                         .width(260.dp)
                         .height(140.dp),
-                    shape = RoundedCornerShape(16.dp),
+                    shape = RoundedCornerShape(20.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.White),
-                    elevation = CardDefaults.cardElevation(3.dp)
+                    elevation = CardDefaults.cardElevation(4.dp)
                 ) {
-                    Column(Modifier.padding(16.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(news.third, null, tint = LogoCenter, modifier = Modifier.size(24.dp))
-                            Spacer(Modifier.width(8.dp))
-                            Text(news.first, fontWeight = FontWeight.Bold, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(
+                                    androidx.compose.ui.graphics.Brush.horizontalGradient(
+                                        listOf(Color.White, LogoLeft.copy(alpha = 0.05f))
+                                    )
+                                )
+                        )
+                        Column(Modifier.padding(16.dp).fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(
+                                    modifier = Modifier.size(36.dp).background(LogoCenter.copy(0.15f), CircleShape),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(news.third, null, tint = LogoCenter, modifier = Modifier.size(20.dp))
+                                }
+                                Spacer(Modifier.width(12.dp))
+                                Text(news.first, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, color = Color.Black)
+                            }
+                            Text(news.second, color = Color.DarkGray, fontSize = 13.sp, maxLines = 3, overflow = TextOverflow.Ellipsis, lineHeight = 18.sp)
                         }
-                        Spacer(Modifier.height(12.dp))
-                        Text(news.second, color = Color.Gray, fontSize = 13.sp, maxLines = 3, overflow = TextOverflow.Ellipsis)
                     }
                 }
             }
@@ -300,19 +320,27 @@ fun QuickActionsSection(isAdmin: Boolean, navController: NavController?) {
 @Composable
 fun QuickActionItem(modifier: Modifier, label: String, icon: ImageVector, color: Color, onClick: () -> Unit) {
     Surface(
-        modifier = modifier.height(90.dp),
+        modifier = modifier.height(100.dp),
         onClick = onClick,
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(24.dp),
         color = Color.White,
-        shadowElevation = 2.dp
+        shadowElevation = 4.dp
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.padding(12.dp)
         ) {
-            Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(30.dp))
+            Box(
+                modifier = Modifier
+                    .size(44.dp)
+                    .background(color.copy(alpha = 0.1f), CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(24.dp))
+            }
             Spacer(Modifier.height(8.dp))
-            Text(label, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+            Text(label, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color(0xFF333333))
         }
     }
 }
