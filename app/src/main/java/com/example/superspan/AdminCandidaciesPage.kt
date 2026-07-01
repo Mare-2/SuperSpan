@@ -36,12 +36,24 @@ import com.example.superspan.ui.theme.AppError
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class, androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
-fun AdminCandidaciesPage(navController: NavController?, paddingValues: PaddingValues, hideHeader: Boolean = false, sliderContent: (@Composable () -> Unit)? = null) {
+fun AdminCandidaciesPage(
+    navController: NavController?,
+    paddingValues: PaddingValues,
+    hideHeader: Boolean = false,
+    sliderContent: (@Composable () -> Unit)? = null,
+    onFilterOpenChange: (Boolean) -> Unit = {}
+) {
     // Stati per i filtri
     val selectedRoles = remember { androidx.compose.runtime.mutableStateListOf<Role>() }
     var selectedSupermarket by remember { mutableStateOf<Supermarket?>(null) }
     var searchQuery by remember { mutableStateOf("") }
     var showFiltersPage by remember { mutableStateOf(false) }
+    var isSelectionOpen by remember { mutableStateOf(false) }
+
+    val isOverlayOpen = showFiltersPage || isSelectionOpen
+    LaunchedEffect(isOverlayOpen) {
+        onFilterOpenChange(isOverlayOpen)
+    }
     
     // Ordine data (Crescente/Decrescente)
     var dateDescending by remember { mutableStateOf(true) }
@@ -66,8 +78,6 @@ fun AdminCandidaciesPage(navController: NavController?, paddingValues: PaddingVa
             else a.dataInvio.compareTo(b.dataInvio)
         }
     }
-
-    var isSelectionOpen by remember { mutableStateOf(false) }
 
     if (isSelectionOpen) {
         SupermarketSelectionScreen(

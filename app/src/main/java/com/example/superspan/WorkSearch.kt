@@ -47,9 +47,14 @@ fun WorkSearchPageComplete(
     padding: PaddingValues,
     navController: NavController?,
     hideHeader: Boolean = false,
-    sliderContent: (@Composable () -> Unit)? = null
+    sliderContent: (@Composable () -> Unit)? = null,
+    onFilterOpenChange: (Boolean) -> Unit = {}
 ) {
     var enabled by remember { mutableStateOf(false) }
+
+    LaunchedEffect(enabled) {
+        onFilterOpenChange(enabled)
+    }
 
     // Utilizziamo un'istanza globale per mantenere i filtri attivi anche quando si cambia pagina
     val filterData = globalWorkFilterData

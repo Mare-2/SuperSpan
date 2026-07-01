@@ -29,35 +29,38 @@ import androidx.navigation.NavController
 @Composable
 fun AdminWorkMainPage(paddingValues: PaddingValues, navController: NavController?, initialTab: Int = 0) {
     var selectedTabIndex by remember { mutableStateOf(initialTab) }
+    var isFilterOpen by remember { mutableStateOf(false) }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        // Intestazione persistente: il titolo cambia in base alla sezione selezionata
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = paddingValues.calculateTopPadding() + 24.dp, bottom = 8.dp, start = 20.dp, end = 20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            if (selectedTabIndex == 0) {
-                Text("Lavora con noi!", fontSize = 30.sp, fontWeight = FontWeight.ExtraBold, color = Color(0xFF1A1A1A))
-                Text("Gestisci le posizioni aperte", fontSize = 15.sp, color = Color.Gray)
-            } else {
-                Text("Gestione Candidature", fontSize = 30.sp, fontWeight = FontWeight.ExtraBold, color = Color(0xFF1A1A1A))
-                Text("Pannello di Amministrazione", fontSize = 15.sp, color = Color.Gray)
+        if (!isFilterOpen) {
+            // Intestazione persistente: il titolo cambia in base alla sezione selezionata
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = paddingValues.calculateTopPadding() + 24.dp, bottom = 8.dp, start = 20.dp, end = 20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                if (selectedTabIndex == 0) {
+                    Text("Lavora con noi!", fontSize = 30.sp, fontWeight = FontWeight.ExtraBold, color = Color(0xFF1A1A1A))
+                    Text("Gestisci le posizioni aperte", fontSize = 15.sp, color = Color.Gray)
+                } else {
+                    Text("Gestione Candidature", fontSize = 30.sp, fontWeight = FontWeight.ExtraBold, color = Color(0xFF1A1A1A))
+                    Text("Pannello di Amministrazione", fontSize = 15.sp, color = Color.Gray)
+                }
             }
-        }
 
-        // Barra tab PERSISTENTE: restando montata attraverso il cambio di sezione,
-        // l'indicatore può scorrere animato invece di "saltare".
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 20.dp, end = 20.dp, bottom = 12.dp)
-        ) {
-            AnimatedSegmentedControl(
-                options = listOf("Posizioni Aperte", "Candidature"),
-                selectedIndex = selectedTabIndex
-            ) { selectedTabIndex = it }
+            // Barra tab PERSISTENTE: restando montata attraverso il cambio di sezione,
+            // l'indicatore può scorrere animato invece di "saltare".
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 20.dp, end = 20.dp, bottom = 12.dp)
+            ) {
+                AnimatedSegmentedControl(
+                    options = listOf("Posizioni Aperte", "Candidature"),
+                    selectedIndex = selectedTabIndex
+                ) { selectedTabIndex = it }
+            }
         }
 
         // Sotto la barra cambia solo il contenuto. Le pagine non mostrano il proprio
@@ -68,13 +71,15 @@ fun AdminWorkMainPage(paddingValues: PaddingValues, navController: NavController
                     padding = paddingValues,
                     navController = navController,
                     hideHeader = true,
-                    sliderContent = null
+                    sliderContent = null,
+                    onFilterOpenChange = { isFilterOpen = it }
                 )
                 1 -> AdminCandidaciesPage(
                     navController = navController,
                     paddingValues = paddingValues,
                     hideHeader = true,
-                    sliderContent = null
+                    sliderContent = null,
+                    onFilterOpenChange = { isFilterOpen = it }
                 )
             }
         }
