@@ -315,26 +315,26 @@ fun ApplyStep2Intro(navController: NavController?, padding: PaddingValues) {
                 AndroidView(factory = { ctx -> androidx.media3.ui.PlayerView(ctx).apply { player = exoPlayer; useController = true } }, Modifier.fillMaxSize())
             }
             Spacer(Modifier.height(16.dp))
-            Row(Modifier.fillMaxWidth(0.9f), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(Modifier.fillMaxWidth(0.9f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(
                     onClick = { navController?.navigate(Destination.APPLY_STEP_2_RECORD.route) }, 
-                    modifier = Modifier.weight(1f).height(55.dp), 
+                    modifier = Modifier.fillMaxWidth().height(55.dp), 
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEEEEEE), contentColor = Color.Black), 
                     shape = CircleShape
                 ) {
                     Icon(Icons.Default.Videocam, null, Modifier.size(18.dp))
-                    Spacer(Modifier.width(4.dp))
-                    Text("Registra", fontSize = 14.sp)
+                    Spacer(Modifier.width(8.dp))
+                    Text("Registra nuovamente il video", fontSize = 14.sp)
                 }
                 Button(
                     onClick = { videoPickerLauncher.launch("video/*") }, 
-                    modifier = Modifier.weight(1f).height(55.dp), 
+                    modifier = Modifier.fillMaxWidth().height(55.dp), 
                     shape = CircleShape, 
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEEEEEE), contentColor = Color.Black)
                 ) {
                     Icon(Icons.Default.PhotoLibrary, null, Modifier.size(18.dp))
-                    Spacer(Modifier.width(4.dp))
-                    Text("Galleria", fontSize = 14.sp)
+                    Spacer(Modifier.width(8.dp))
+                    Text("Carica dalla galleria", fontSize = 14.sp)
                 }
             }
             Spacer(Modifier.height(16.dp))
@@ -721,6 +721,13 @@ fun ApplyStep3(navController: NavController?, padding: PaddingValues) {
             onConfirm = {
                 showPreviewVideo = false
                 exoPlayer.stop()
+            },
+            altText = "Registra nuovamente",
+            onAlt = {
+                showPreviewVideo = false
+                exoPlayer.stop()
+                isReturnToSummary = true
+                navController?.navigate(Destination.APPLY_STEP_2_RECORD.route)
             }
         )
     }
