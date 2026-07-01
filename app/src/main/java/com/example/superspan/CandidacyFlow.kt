@@ -419,6 +419,10 @@ fun ApplyStep2Record(navController: NavController?, padding: PaddingValues) {
     var seconds by remember { mutableStateOf(0) }
     var isRecording by remember { mutableStateOf(false) }
     var errorMsg by remember { mutableStateOf("") }
+    // Numero del tentativo: incrementarlo fa ripartire la registrazione da zero (video troppo corto)
+    var attempt by remember { mutableStateOf(0) }
+    // Motivo dello stop letto dentro il callback: 0 = nessuno, 1 = salva (valido), 2 = scarta e ricomincia
+    val stopMode = remember { mutableStateOf(0) }
 
     LaunchedEffect(errorMsg) {
         if (errorMsg.isNotEmpty()) {
@@ -427,7 +431,7 @@ fun ApplyStep2Record(navController: NavController?, padding: PaddingValues) {
         }
     }
     
-    val videoFile = remember { File(context.filesDir, "video_${actualUser.email.replace("@", "_")}_off${currentOfferIdApplying}_${System.currentTimeMillis()}.mp4") }
+    val videoFile = remember(attempt) { File(context.filesDir, "video_${actualUser.email.replace("@", "_")}_off${currentOfferIdApplying}_${System.currentTimeMillis()}.mp4") }
 
     var hasPermissions by remember {
         mutableStateOf(ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED &&
@@ -438,18 +442,35 @@ fun ApplyStep2Record(navController: NavController?, padding: PaddingValues) {
         hasPermissions = p[Manifest.permission.CAMERA] == true && p[Manifest.permission.RECORD_AUDIO] == true
     }
 
-    LaunchedEffect(hasPermissions) {
-        if (!hasPermissions) permissionLauncher.launch(arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO))
-        else {
+    LaunchedEffect(hasPermissions, attempt) {
+        if (!hasPermissions) {
+            permissionLauncher.launch(arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO))
+        } else {
+            // (Ri)partenza pulita
+            stopMode.value = 0
+            seconds = 0
+            countdown = 3
             while (countdown > 0) { delay(1000); countdown-- }
             isRecording = true
             val opts = androidx.camera.video.FileOutputOptions.Builder(videoFile).build()
             activeRecording.value = videoCapture.output.prepareRecording(context, opts).withAudioEnabled()
                 .start(ContextCompat.getMainExecutor(context)) { event ->
                     if (event is androidx.camera.video.VideoRecordEvent.Finalize) {
-                        if (!event.hasError()) {
-                            currentDraft = currentDraft.copy(videoPath = videoFile.absolutePath)
-                            android.widget.Toast.makeText(context, "Video registrato con successo!", android.widget.Toast.LENGTH_SHORT).show()
+                        when (stopMode.value) {
+                            2 -> {
+                                // Troppo corto: buttiamo il file e ricominciamo da capo
+                                videoFile.delete()
+                                seconds = 0
+                                attempt++
+                            }
+                            1 -> {
+                                // Registrazione valida: salviamo
+                                if (!event.hasError()) {
+                                    currentDraft = currentDraft.copy(videoPath = videoFile.absolutePath)
+                                    android.widget.Toast.makeText(context, "Video registrato con successo!", android.widget.Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                            else -> { /* finalize inatteso: non facciamo nulla */ }
                         }
                     }
                 }
@@ -460,16 +481,20 @@ fun ApplyStep2Record(navController: NavController?, padding: PaddingValues) {
         if (isRecording) {
             while (seconds < 30 && isRecording) { delay(1000); seconds++ }
             if (seconds >= 30) {
+                stopMode.value = 1
                 activeRecording.value?.stop()
+                isRecording = false
                 delay(500)
                 navController?.popBackStack()
-                isRecording = false
             }
         }
     }
 
     Box(Modifier.fillMaxSize().background(Color.Black)) {
-        if (hasPermissions && countdown == 0) {
+        // Anteprima SEMPRE montata (finché ci sono i permessi): il countdown viene disegnato sopra.
+        // Così non viene rimontata a ogni riavvio, evitando che 'unbindAll' stacchi la fotocamera
+        // mentre parte la nuova registrazione (che altrimenti finiva in errore e non veniva salvata).
+        if (hasPermissions) {
             AndroidView(factory = { ctx ->
                 androidx.camera.view.PreviewView(ctx).apply {
                     val cf = androidx.camera.lifecycle.ProcessCameraProvider.getInstance(ctx)
@@ -536,17 +561,28 @@ fun ApplyStep2Record(navController: NavController?, padding: PaddingValues) {
 
         if (isRecording) {
             Box(Modifier.align(Alignment.BottomCenter).padding(bottom = 60.dp).size(80.dp).border(4.dp, Color.White, CircleShape).padding(8.dp).clip(CircleShape).background(com.example.superspan.ui.theme.AppError).clickable {
-                if (seconds < 15) { errorMsg = "Video troppo corto! (Min 15s)" }
-                else {
-                    activeRecording.value?.stop()
+                if (seconds < 15) {
+                    // Troppo corto: avvisiamo e facciamo ripartire la registrazione da zero.
+                    // Fermiamo la registrazione corrente; il riavvio avviene nel callback Finalize
+                    // (quando il file è chiuso), così non si sovrappongono due registrazioni.
+                    errorMsg = "Troppo corto! Si ricomincia da capo."
+                    stopMode.value = 2
                     isRecording = false
+                    activeRecording.value?.stop()
+                } else {
+                    stopMode.value = 1
+                    isRecording = false
+                    activeRecording.value?.stop()
                     navController?.popBackStack()
                 }
             })
-            if (errorMsg.isNotEmpty()) {
-                Surface(Modifier.align(Alignment.Center).padding(bottom = 100.dp), color = Color.Black.copy(0.7f), shape = RoundedCornerShape(8.dp)) {
-                    Text(errorMsg, color = Color.Yellow, modifier = Modifier.padding(12.dp))
-                }
+        }
+
+        // Messaggio (es. "troppo corto"): fuori dal blocco isRecording, così resta visibile
+        // anche durante il breve riavvio, quando isRecording è momentaneamente false.
+        if (errorMsg.isNotEmpty()) {
+            Surface(Modifier.align(Alignment.Center).padding(bottom = 100.dp), color = Color.Black.copy(0.7f), shape = RoundedCornerShape(8.dp)) {
+                Text(errorMsg, color = Color.Yellow, modifier = Modifier.padding(12.dp))
             }
         }
     }
