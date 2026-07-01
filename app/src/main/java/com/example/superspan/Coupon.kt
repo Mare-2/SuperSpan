@@ -132,65 +132,49 @@ fun CouponPageComplete(paddingValues: PaddingValues, navController: NavControlle
 
     Box(modifier = Modifier
         .fillMaxSize()
-        .padding(top = paddingValues.calculateTopPadding())
     ) {
         if (currentSelectedOffer == null) {
+            Column(modifier = Modifier.fillMaxSize()) {
+            PrimaryHeader("Offerte e Coupon", "Risparmia sulla tua spesa quotidiana")
             LazyColumn(
                 state = listState,
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(bottom = paddingValues.calculateBottomPadding() + 100.dp)
+                modifier = Modifier.weight(1f).fillMaxWidth(),
+                contentPadding = PaddingValues(top = 8.dp, bottom = paddingValues.calculateBottomPadding() + 100.dp)
             ) {
-                // 1. TITOLO
+
+                // 1b. BARRA DI RICERCA
                 item {
-                    Column(
+                    androidx.compose.material3.Surface(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 70.dp, start = 20.dp, end = 20.dp, bottom = 16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                            .height(50.dp),
+                        shape = RoundedCornerShape(25.dp),
+                        shadowElevation = 6.dp,
+                        color = Color.White
                     ) {
-                        Text(
-                            text = "Offerte e Coupon",
-                            fontSize = 32.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = Color(0xFF1A1A1A)
-                        )
-                        Text(
-                            text = "Risparmia sulla tua spesa quotidiana",
-                            fontSize = 16.sp,
-                            color = Color.Gray
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        androidx.compose.material3.Surface(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(56.dp),
-                            shape = RoundedCornerShape(28.dp),
-                            shadowElevation = 6.dp,
-                            color = Color.White
-                        ) {
-                            androidx.compose.material3.TextField(
-                                value = searchQuery,
-                                onValueChange = { searchQuery = it },
-                                placeholder = { Text("Cerca prodotto o offerta...", color = Color.Gray) },
-                                modifier = Modifier.fillMaxSize(),
-                                leadingIcon = { Icon(Icons.Default.Search, null, tint = Color.Gray) },
-                                trailingIcon = {
-                                    if (searchQuery.isNotEmpty()) {
-                                        IconButton(onClick = { searchQuery = "" }) {
-                                            Icon(Icons.Default.Clear, contentDescription = "Cancella", tint = Color.Gray)
-                                        }
+                        androidx.compose.material3.TextField(
+                            value = searchQuery,
+                            onValueChange = { searchQuery = it },
+                            placeholder = { Text("Cerca prodotto o offerta...", color = Color.Gray) },
+                            modifier = Modifier.fillMaxSize(),
+                            leadingIcon = { Icon(Icons.Default.Search, null, tint = Color.Gray) },
+                            trailingIcon = {
+                                if (searchQuery.isNotEmpty()) {
+                                    IconButton(onClick = { searchQuery = "" }) {
+                                        Icon(Icons.Default.Clear, contentDescription = "Cancella", tint = Color.Gray)
                                     }
-                                },
-                                singleLine = true,
-                                colors = androidx.compose.material3.TextFieldDefaults.colors(
-                                    focusedContainerColor = Color.Transparent,
-                                    unfocusedContainerColor = Color.Transparent,
-                                    focusedIndicatorColor = Color.Transparent,
-                                    unfocusedIndicatorColor = Color.Transparent,
-                                    cursorColor = androidx.compose.material3.MaterialTheme.colorScheme.primary
-                                )
+                                }
+                            },
+                            singleLine = true,
+                            colors = androidx.compose.material3.TextFieldDefaults.colors(
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent,
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent,
+                                cursorColor = androidx.compose.material3.MaterialTheme.colorScheme.primary
                             )
-                        }
+                        )
                     }
                 }
 
@@ -200,7 +184,7 @@ fun CouponPageComplete(paddingValues: PaddingValues, navController: NavControlle
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(com.example.superspan.ui.theme.Neutral50)
-                            .padding(start = 20.dp, end = 20.dp, top = 28.dp, bottom = 12.dp)
+                            .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp)
                     ) {
                         AnimatedSegmentedControl(
                             options = listOf("Coupon", "Offerte"),
@@ -238,6 +222,7 @@ fun CouponPageComplete(paddingValues: PaddingValues, navController: NavControlle
                         }
                     }
                 }
+            }
             }
         } else {
             OfferDetailPage(currentSelectedOffer!!, navController) { selectedOffer = null }

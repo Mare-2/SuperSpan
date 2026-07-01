@@ -170,34 +170,16 @@ fun WorkSearchPage(
         )
     }
 
+    Column(modifier = Modifier.fillMaxSize()) {
+    if (!hideHeader) {
+        PrimaryHeader("Lavora con noi!", "Trova la posizione adatta a te")
+    }
     LazyColumn(
         state = listState,
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(bottom = padding.calculateBottomPadding() + 32.dp),
+        modifier = Modifier.weight(1f).fillMaxWidth(),
+        contentPadding = PaddingValues(top = 12.dp, bottom = padding.calculateBottomPadding() + 32.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        // 1. HEADER (Scorre con la pagina)
-        if (!hideHeader) {
-            item {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 64.dp, bottom = 24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "Lavora con noi!",
-                        fontSize = 32.sp,
-                        fontWeight = FontWeight.ExtraBold
-                    )
-                    Text(
-                        text = "Trova la posizione adatta a te",
-                        fontSize = 16.sp,
-                        color = Color.Gray
-                    )
-                }
-            }
-        }
 
         if (sliderContent != null) {
             stickyHeader {
@@ -308,8 +290,8 @@ fun WorkSearchPage(
                 exit = slideOutHorizontally(targetOffsetX = { it }, animationSpec = tween(400)) + fadeOut(animationSpec = tween(400))
             ) {
                 WorkOfferCompose(
-                    workOffer = offer, 
-                    navController = navController, 
+                    workOffer = offer,
+                    navController = navController,
                     isHighlighted = (highlightCurrentId == offer.id),
                     isDisabled = hasCandidacy || hasDraft,
                     badgeText = badgeText,
@@ -317,6 +299,7 @@ fun WorkSearchPage(
                 )
             }
         }
+    }
     }
 }
 

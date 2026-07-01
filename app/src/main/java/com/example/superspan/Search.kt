@@ -307,38 +307,21 @@ fun SearchPage(
 
     val listState = rememberLazyGridState()
 
+    Column(modifier = Modifier.fillMaxSize()) {
+    PrimaryHeader("I nostri prodotti", "Trova quello che cerchi")
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         state = listState,
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.weight(1f).fillMaxWidth(),
         contentPadding = PaddingValues(
             start = 16.dp,
             end = 16.dp,
+            top = 16.dp,
             bottom = padding.calculateBottomPadding() + 100.dp
         ),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // 0. HEADER TITOLO
-        item(span = { GridItemSpan(maxLineSpan) }) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 64.dp, bottom = 24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "I nostri prodotti",
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.ExtraBold
-                )
-                Text(
-                    text = "Trova quello che cerchi",
-                    fontSize = 16.sp,
-                    color = Color.Gray
-                )
-            }
-        }
 
         // 1. BARRA DI RICERCA
         item(span = { GridItemSpan(maxLineSpan) }) {
@@ -511,6 +494,7 @@ fun SearchPage(
         ) { product ->
             ProductCompose(uiState = product, navController = navController)
         }
+    }
     }
 }
 

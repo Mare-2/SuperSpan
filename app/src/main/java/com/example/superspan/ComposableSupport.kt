@@ -104,7 +104,7 @@ fun Header(modifier: Modifier = Modifier) {
             .background(com.example.superspan.ui.theme.AppHeaderFadeBrush)
             .padding(top = 60.dp, bottom = 32.dp, start = 24.dp, end = 24.dp)
     ) {
-        Column {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 androidx.compose.foundation.Image(
                     painter = androidx.compose.ui.res.painterResource(id = R.drawable.superspan),
@@ -117,14 +117,16 @@ fun Header(modifier: Modifier = Modifier) {
             Text(
                 text = "Ciao ${actualUser.nome}!",
                 style = MaterialTheme.typography.displayLarge,
-                color = com.example.superspan.ui.theme.LogoLeft
+                color = com.example.superspan.ui.theme.LogoLeft,
+                textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = "Cosa cerchi oggi?",
                 style = MaterialTheme.typography.bodyLarge,
                 color = Color.DarkGray,
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Medium,
+                textAlign = TextAlign.Center
             )
         }
     }

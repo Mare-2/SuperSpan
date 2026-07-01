@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -186,5 +187,45 @@ fun AnimatedSegmentedControl(
                 }
             }
         }
+    }
+}
+
+/**
+ * Intestazione standard delle pagine principali (Ricerca, Offerte, Lavoro):
+ * titolo grande + sottotitolo allineati a sinistra, con l'inset della status bar gestito qui.
+ * Uniforma posizione, tipografia e spaziatura tra le pagine.
+ */
+@Composable
+fun PrimaryHeader(title: String, subtitle: String, modifier: Modifier = Modifier) {
+    // Banda "hero" a tutta larghezza (fino ai bordi e sopra), angoli arrotondati solo in basso.
+    // Lo sfondo colorato copre anche l'area della status bar; il testo resta sotto grazie all'inset.
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp))
+            .background(
+                Brush.linearGradient(
+                    listOf(Color(0xFFCDE8EC), Color(0xFFDCEFCE))
+                )
+            )
+            .windowInsetsPadding(WindowInsets.statusBars)
+            .padding(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 22.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = title,
+            fontSize = 25.sp,
+            fontWeight = FontWeight.ExtraBold,
+            color = BrandDark,
+            lineHeight = 30.sp,
+            textAlign = TextAlign.Center
+        )
+        Spacer(Modifier.height(3.dp))
+        Text(
+            text = subtitle,
+            fontSize = 14.sp,
+            color = Neutral600,
+            textAlign = TextAlign.Center
+        )
     }
 }
