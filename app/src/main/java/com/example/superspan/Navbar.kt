@@ -377,7 +377,7 @@ fun CustomAnimatedBottomBar(currentRoute: String, onNavigate: (String, Boolean) 
     ) {
         Surface(
             modifier = Modifier.fillMaxWidth().height(70.dp),
-            color = Color.White.copy(alpha = 0.85f),
+            color = Color.White,
             shape = RoundedCornerShape(35.dp),
             shadowElevation = 8.dp
         ) {

@@ -54,6 +54,8 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.WorkOutline
+import androidx.compose.material.icons.filled.Storefront
+import androidx.compose.material.icons.filled.LocationCity
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 
@@ -70,52 +72,47 @@ fun WorkOfferPage(offer: WorkOffer?, navController: NavController?, paddingValue
                 .padding(paddingValues)
                 .verticalScroll(scrollState)
         ) {
-            // --- HEADER (Senza rettangolo bianco, testo scuro) ---
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp, bottom = 16.dp)
-            ) {
-                Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Dettaglio Offerta", color = Color.Black, fontSize = 22.sp, fontWeight = FontWeight.Bold)
-                    Text(offer?.supermarket?.citta ?: "", color = Color.DarkGray, fontSize = 12.sp)
-                }
-
-                if (actualUser.admin && offer != null) {
-                    IconButton(
-                        onClick = { navController?.navigate("${Destination.EDIT_WORK_OFFER.route}/${offer.id}") },
-                        modifier = Modifier
-                            .align(Alignment.CenterEnd)
-                            .padding(end = 8.dp)
-                            .background(Color.White.copy(alpha = 0.7f), CircleShape)
-                    ) {
-                        Icon(Icons.Default.Edit, contentDescription = "Modifica", tint = Color.Black)
-                    }
-                }
-            }
-
-            // Tutto il contenuto centrato
+            // --- HERO: etichetta + titolo + città (allineati a sinistra, look "da annuncio") ---
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .padding(horizontal = 24.dp)
             ) {
+                Spacer(Modifier.height(72.dp)) // spazio per i pulsanti flottanti (indietro / modifica)
+
+                Text(
+                    text = "OFFERTA DI LAVORO",
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    letterSpacing = 1.5.sp,
+                    color = com.example.superspan.ui.theme.LogoLeft
+                )
+                Spacer(Modifier.height(6.dp))
                 Text(
                     text = offer?.titolo ?: "",
-                    fontSize = 26.sp,
+                    fontSize = 28.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    color = Color.Black,
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center
+                    color = Color(0xFF1A1A1A),
+                    lineHeight = 34.sp
                 )
+                Spacer(Modifier.height(10.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.LocationOn, null, tint = com.example.superspan.ui.theme.LogoLeft, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(6.dp))
+                    Text(
+                        text = offer?.supermarket?.citta ?: "-",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.DarkGray
+                    )
+                }
 
                 Spacer(Modifier.height(16.dp))
 
-                // Riepilogo rapido a "pillole": aiuta a valutare l'offerta a colpo d'occhio
+                // Riepilogo rapido a "pillole"
                 androidx.compose.foundation.layout.FlowRow(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     offer?.let {
@@ -125,9 +122,16 @@ fun WorkOfferPage(offer: WorkOffer?, navController: NavController?, paddingValue
                         InfoChip(Icons.Default.LocationOn, "${it.distanzaKm} km")
                     }
                 }
+            }
 
-                Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(24.dp))
 
+            // --- CONTENUTO (card informative) ---
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+            ) {
                 androidx.compose.material3.Card(
                     colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = Color.White),
                     shape = RoundedCornerShape(16.dp),
@@ -136,6 +140,10 @@ fun WorkOfferPage(offer: WorkOffer?, navController: NavController?, paddingValue
                 ) {
                     Column(modifier = Modifier.padding(20.dp)) {
                         Text("Informazioni Generali", Modifier.fillMaxWidth().padding(bottom = 16.dp), fontWeight = FontWeight.Bold, color = com.example.superspan.ui.theme.LogoLeft, fontSize = 17.sp)
+                        InfoRowItem(Icons.Default.Storefront, "Sede:", offer?.supermarket?.nome ?: "-")
+                        Spacer(Modifier.height(8.dp))
+                        InfoRowItem(Icons.Default.LocationCity, "Città:", offer?.supermarket?.citta ?: "-")
+                        Spacer(Modifier.height(8.dp))
                         InfoRowItem(Icons.Default.LocationOn, "Indirizzo:", offer?.supermarket?.indirizzo ?: "-")
                         Spacer(Modifier.height(8.dp))
                         InfoRowItem(Icons.Default.Schedule, "Orario:", offer?.orario?.nome ?: "-")
@@ -273,6 +281,20 @@ fun WorkOfferPage(offer: WorkOffer?, navController: NavController?, paddingValue
                 .size(48.dp)
         ) {
             Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = com.example.superspan.ui.theme.LogoLeft)
+        }
+
+        // Floating Edit Button (solo admin)
+        if (actualUser.admin && offer != null) {
+            IconButton(
+                onClick = { navController?.navigate("${Destination.EDIT_WORK_OFFER.route}/${offer.id}") },
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = 16.dp + paddingValues.calculateTopPadding(), end = 16.dp)
+                    .background(Color.White.copy(alpha = 0.7f), CircleShape)
+                    .size(48.dp)
+            ) {
+                Icon(Icons.Default.Edit, "Modifica", tint = com.example.superspan.ui.theme.LogoLeft)
+            }
         }
     } // Chiude Box root
 }
