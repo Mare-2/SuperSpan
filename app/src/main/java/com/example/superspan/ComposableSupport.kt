@@ -141,9 +141,8 @@ fun FilterTitle(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(top = paddingValues.calculateTopPadding())
             .background(com.example.superspan.ui.theme.AppHeaderFadeBrush)
-            .padding(top = 64.dp, bottom = 32.dp, start = 24.dp, end = 24.dp)
+            .padding(top = paddingValues.calculateTopPadding() + 64.dp, bottom = 32.dp, start = 24.dp, end = 24.dp)
     ) {
         Text(
             text = title,
@@ -159,13 +158,7 @@ fun FloatingFilterActions(
     onReset: (() -> Unit)?,
     paddingValues: PaddingValues
 ) {
-    Column(Modifier.fillMaxWidth()) {
-        Box(
-            Modifier
-                .fillMaxWidth()
-                .height(paddingValues.calculateTopPadding())
-                .background(com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.30f))
-        )
+    Column(Modifier.fillMaxWidth().padding(top = paddingValues.calculateTopPadding())) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -194,7 +187,7 @@ fun FloatingFilterActions(
                         .background(Color.White.copy(alpha = 0.9f), CircleShape)
                         .height(45.dp)
                 ) {
-                    Text("Reset", color = com.example.superspan.ui.theme.AppError, fontWeight = FontWeight.Bold)
+                    Text("Reset", color = com.example.superspan.ui.theme.LogoLeft, fontWeight = FontWeight.Bold)
                 }
             } else {
                 Spacer(Modifier.size(45.dp))
@@ -513,7 +506,9 @@ fun EditTextField(
                 label = { Text(label) },
                 modifier = Modifier.fillMaxWidth().background(containerColor, RoundedCornerShape(12.dp)),
                 shape = RoundedCornerShape(12.dp),
-                singleLine = singleLine,
+                // Se il campo chiede più righe, dev'essere multi-riga: altrimenti 'singleLine=true'
+                // vincerebbe e taglierebbe il testo lungo a una sola riga.
+                singleLine = singleLine && minLines <= 1,
                 minLines = minLines,
                 isError = isError,
                 readOnly = readOnly,

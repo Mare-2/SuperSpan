@@ -50,7 +50,9 @@ fun AdminCandidaciesPage(
     var showFiltersPage by remember { mutableStateOf(false) }
     var isSelectionOpen by remember { mutableStateOf(false) }
 
-    val isOverlayOpen = showFiltersPage || isSelectionOpen
+    val expanded = isExpandedScreen()
+    // Su tablet il pannello filtri è a lato: non conta come "overlay" (l'header admin resta visibile)
+    val isOverlayOpen = isSelectionOpen || (showFiltersPage && !expanded)
     LaunchedEffect(isOverlayOpen) {
         onFilterOpenChange(isOverlayOpen)
     }
@@ -79,15 +81,7 @@ fun AdminCandidaciesPage(
         }
     }
 
-    if (isSelectionOpen) {
-        SupermarketSelectionScreen(
-            onBack = { isSelectionOpen = false },
-            onSelected = {
-                selectedSupermarket = it
-                isSelectionOpen = false
-            }
-        )
-    } else if (showFiltersPage) {
+    val filterPanel: @Composable () -> Unit = {
         AdminCandidaciesFilterPage(
             selectedRoles = selectedRoles,
             selectedSupermarket = selectedSupermarket,
@@ -96,47 +90,42 @@ fun AdminCandidaciesPage(
             onDismiss = { showFiltersPage = false },
             onOpenSelection = { isSelectionOpen = true }
         )
-    } else {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(bottom = paddingValues.calculateBottomPadding() + 32.dp)
-        ) {
+    }
+
+    val listContent: @Composable () -> Unit = {
+        Column(modifier = Modifier.fillMaxSize()) {
             if (!hideHeader) {
-                item {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 64.dp, bottom = 24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text("Gestione Candidature", fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, color = Color.Black)
-                        Text("Pannello di Amministrazione", fontSize = 16.sp, color = Color.Gray)
-                    }
-                }
-            } else {
-                item { Spacer(Modifier.height(8.dp)) }
-            }
-
-            if (sliderContent != null) {
-                stickyHeader {
-                    sliderContent()
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 64.dp, bottom = 24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text("Gestione Candidature", fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, color = Color.Black)
+                    Text("Pannello di Amministrazione", fontSize = 16.sp, color = Color.Gray)
                 }
             }
 
-            item {
-                // --- BARRA DI RICERCA ---
-                CustomSearchBar(
-                    query = searchQuery,
-                    onQueryChange = { searchQuery = it },
-                    placeholder = "Cerca candidato o ruolo...",
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                    trailingIcon = {
-                        IconButton(onClick = { showFiltersPage = true }) {
-                            Icon(Icons.Default.Tune, contentDescription = "Filtri", tint = LogoLeft)
-                        }
+            // --- BARRA DI RICERCA ---
+            CustomSearchBar(
+                query = searchQuery,
+                onQueryChange = { searchQuery = it },
+                placeholder = "Cerca candidato o ruolo...",
+                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 8.dp),
+                trailingIcon = {
+                    IconButton(onClick = { showFiltersPage = true }) {
+                        Icon(Icons.Default.Tune, contentDescription = "Filtri", tint = LogoLeft)
                     }
-                )
-            }
+                }
+            )
+
+            LazyColumn(
+                modifier = Modifier.weight(1f).fillMaxWidth(),
+                contentPadding = PaddingValues(bottom = paddingValues.calculateBottomPadding() + 32.dp)
+            ) {
+                if (sliderContent != null) {
+                    item { sliderContent() }
+                }
 
             // --- CHIPS DEI FILTRI ATTIVI ---
             val hasActiveFilters = selectedRoles.isNotEmpty() || selectedSupermarket != null
@@ -176,7 +165,7 @@ fun AdminCandidaciesPage(
                     Button(
                         onClick = { dateDescending = !dateDescending },
                         modifier = Modifier
-                            .height(44.dp)
+                            .height(34.dp)
                             .wrapContentWidth(),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = LogoLeft,
@@ -185,7 +174,7 @@ fun AdminCandidaciesPage(
                         border = null,
                         elevation = ButtonDefaults.buttonElevation(defaultElevation = 6.dp, pressedElevation = 2.dp),
                         shape = androidx.compose.foundation.shape.CircleShape,
-                        contentPadding = PaddingValues(horizontal = 16.dp)
+                        contentPadding = PaddingValues(horizontal = 12.dp)
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -194,19 +183,19 @@ fun AdminCandidaciesPage(
                             Icon(
                                 imageVector = Icons.Default.DateRange,
                                 contentDescription = null,
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(Modifier.width(8.dp))
-                            Text(
-                                text = "Data",
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Bold
+                                modifier = Modifier.size(16.dp)
                             )
                             Spacer(Modifier.width(6.dp))
+                            Text(
+                                text = "Data",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(Modifier.width(4.dp))
                             Icon(
                                 imageVector = if (!dateDescending) Icons.Default.ArrowUpward else Icons.Default.ArrowDownward,
                                 contentDescription = null,
-                                modifier = Modifier.size(16.dp)
+                                modifier = Modifier.size(14.dp)
                             )
                         }
                     }
@@ -230,6 +219,29 @@ fun AdminCandidaciesPage(
                 }
             }
         }
+        }
+    }
+
+    if (isSelectionOpen) {
+        SupermarketSelectionScreen(
+            onBack = { isSelectionOpen = false },
+            onSelected = {
+                selectedSupermarket = it
+                isSelectionOpen = false
+            }
+        )
+    } else if (expanded) {
+        // TABLET: lista a sinistra (2/3), filtri agganciati a destra (1/3)
+        Row(Modifier.fillMaxSize()) {
+            Box(Modifier.weight(2f).fillMaxHeight()) { listContent() }
+            if (showFiltersPage) {
+                Box(Modifier.fillMaxHeight().width(1.dp).background(Color.LightGray.copy(alpha = 0.4f)))
+                Box(Modifier.weight(1f).fillMaxHeight()) { filterPanel() }
+            }
+        }
+    } else {
+        // TELEFONO: comportamento attuale (a schermo intero)
+        if (showFiltersPage) filterPanel() else listContent()
     }
 }
 

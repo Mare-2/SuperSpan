@@ -278,8 +278,8 @@ val ListOfCoupon = mutableStateListOf<Coupon>(
         ListOfProduct.find { it.nome == "Biscotti al Cioccolato" }!!
     ),
     Coupon("Sconto20", 20f, "20% di sconto su Kit Pranzo Veloce", "2026-07-15",
-        ListOfProduct.find { it.nome == "Pasta Barilla 500g" }!!,
-        ListOfProduct.find { it.nome == "Salsa di Pomodoro" }!!,
+        ListOfProduct.find { it.nome == "Spaghetti Barilla 500g" }!!,
+        ListOfProduct.find { it.nome == "Salsa di Pomodoro Mutti" }!!,
         ListOfProduct.find { it.nome == "Parmigiano Reggiano 200g" }!!
     ),
     Coupon("FRESCO25", 25f, "25% di sconto su Kit Frutta e Verdura", "2026-07-20",
@@ -305,10 +305,10 @@ val ListOfCoupon = mutableStateListOf<Coupon>(
         ListOfProduct.find { it.nome == "Latte Intero 1L" }!!
     ),
     Coupon("PASTA10", 10f, "Sconto 10% su Pasta Barilla", "2026-07-08",
-        ListOfProduct.find { it.nome == "Pasta Barilla 500g" }!!
+        ListOfProduct.find { it.nome == "Spaghetti Barilla 500g" }!!
     ),
     Coupon("POMODORO7", 7f, "Sconto 7% su Salsa di Pomodoro", "2026-07-22",
-        ListOfProduct.find { it.nome == "Salsa di Pomodoro" }!!
+        ListOfProduct.find { it.nome == "Salsa di Pomodoro Mutti" }!!
     ),
     Coupon("UOVA12", 12f, "Sconto 12% su Uova confezione da 6", "2026-07-05",
         ListOfProduct.find { it.nome == "Uova (confezione da 6)" }!!

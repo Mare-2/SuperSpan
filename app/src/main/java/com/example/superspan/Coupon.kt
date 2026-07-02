@@ -136,32 +136,31 @@ fun CouponPageComplete(paddingValues: PaddingValues, navController: NavControlle
         if (currentSelectedOffer == null) {
             Column(modifier = Modifier.fillMaxSize()) {
             PrimaryHeader("Offerte e Coupon", "Risparmia sulla tua spesa quotidiana")
-            Box(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 12.dp)
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
                 AnimatedSegmentedControl(
                     options = listOf("Coupon", "Offerte"),
                     selectedIndex = selectedTab
                 ) { selectedTab = it }
+                
+                Spacer(Modifier.height(8.dp))
+                
+                CustomSearchBar(
+                    query = searchQuery,
+                    onQueryChange = { searchQuery = it },
+                    placeholder = "Cerca prodotto o offerta..."
+                )
             }
 
+            val couponColumns = if (isExpandedScreen()) 2 else 1
             LazyColumn(
                 state = listState,
                 modifier = Modifier.weight(1f).fillMaxWidth(),
-                contentPadding = PaddingValues(top = 12.dp, bottom = paddingValues.calculateBottomPadding() + 100.dp)
+                contentPadding = PaddingValues(top = 8.dp, bottom = paddingValues.calculateBottomPadding() + 100.dp)
             ) {
-
-                // 1b. BARRA DI RICERCA
-                item {
-                    CustomSearchBar(
-                        query = searchQuery,
-                        onQueryChange = { searchQuery = it },
-                        placeholder = "Cerca prodotto o offerta...",
-                        modifier = Modifier.padding(horizontal = 16.dp)
-                    )
-                }
 
                 // 3. LISTA FILTRATA
                 val filteredList = (if (selectedTab == 0) {
@@ -174,21 +173,31 @@ fun CouponPageComplete(paddingValues: PaddingValues, navController: NavControlle
                     coupon.products.any { it.nome.contains(searchQuery, ignoreCase = true) }
                 }
 
-                items(filteredList, key = { it.code }) { item ->
-                    val isDeleting = deletingCouponCodes.contains(item.code)
-                    val isHighlighted = highlightedCouponCode == item.code
+                items(filteredList.chunked(couponColumns), key = { it.first().code }) { rowItems ->
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        rowItems.forEach { item ->
+                            Column(modifier = Modifier.weight(1f)) {
+                                val isDeleting = deletingCouponCodes.contains(item.code)
+                                val isHighlighted = highlightedCouponCode == item.code
 
-                    AnimatedVisibility(
-                        visible = !isDeleting,
-                        enter = fadeIn(),
-                        exit = slideOutHorizontally(targetOffsetX = { it }, animationSpec = tween(400)) + fadeOut(animationSpec = tween(400))
-                    ) {
-                        Box(modifier = Modifier.padding(vertical = 6.dp)) {
-                            if (selectedTab == 0) {
-                                CouponTicketCard(item, isHighlighted, navController, onDeleteClick = { couponToDelete = item }) { selectedOffer = item }
-                            } else {
-                                OfferPromoCard(item, isHighlighted, navController, onDeleteClick = { couponToDelete = item })
+                                AnimatedVisibility(
+                                    visible = !isDeleting,
+                                    enter = fadeIn(),
+                                    exit = slideOutHorizontally(targetOffsetX = { it }, animationSpec = tween(400)) + fadeOut(animationSpec = tween(400))
+                                ) {
+                                    Box(modifier = Modifier.padding(vertical = 6.dp)) {
+                                        if (selectedTab == 0) {
+                                            CouponTicketCard(item, isHighlighted, navController, onDeleteClick = { couponToDelete = item }) { selectedOffer = item }
+                                        } else {
+                                            OfferPromoCard(item, isHighlighted, navController, onDeleteClick = { couponToDelete = item })
+                                        }
+                                    }
+                                }
                             }
+                        }
+                        // Se l'ultima riga è dispari, riempie lo spazio mancante
+                        repeat(couponColumns - rowItems.size) {
+                            Spacer(modifier = Modifier.weight(1f))
                         }
                     }
                 }

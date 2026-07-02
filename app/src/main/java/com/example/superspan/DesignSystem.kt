@@ -144,7 +144,7 @@ fun AnimatedSegmentedControl(
     BoxWithConstraints(
         modifier = modifier
             .fillMaxWidth()
-            .height(48.dp)
+            .height(44.dp)
             .clip(CircleShape)
             .background(LogoLeft.copy(alpha = 0.12f))
             .padding(4.dp)

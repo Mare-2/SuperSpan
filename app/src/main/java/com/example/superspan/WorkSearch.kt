@@ -51,9 +51,11 @@ fun WorkSearchPageComplete(
     onFilterOpenChange: (Boolean) -> Unit = {}
 ) {
     var enabled by remember { mutableStateOf(false) }
+    val expanded = isExpandedScreen()
 
-    LaunchedEffect(enabled) {
-        onFilterOpenChange(enabled)
+    // Su tablet i filtri sono un pannello a lato: non segnaliamo "filtro aperto" (l'header admin resta)
+    LaunchedEffect(enabled, expanded) {
+        onFilterOpenChange(enabled && !expanded)
     }
 
     // Utilizziamo un'istanza globale per mantenere i filtri attivi anche quando si cambia pagina
@@ -62,41 +64,88 @@ fun WorkSearchPageComplete(
     val snackbarHostState = remember { SnackbarHostState() }
     val listState = rememberLazyListState()
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        if (!enabled) {
-            WorkSearchPage(
-                navController = navController,
-                filterData = filterData,
-                listState = listState,
-                snackbarHostState = snackbarHostState,
-                padding = padding,
-                hideHeader = hideHeader,
-                sliderContent = sliderContent,
-                onOpenFilters = { enabled = true }
-            )
-        } else {
-            WorkFilterPage(
-                modifier = Modifier.fillMaxSize(),
-                filterData = filterData,
-                padding = padding,
-                onDismiss = { enabled = false }
-            )
+    if (expanded) {
+        // TABLET: header in cima a tutta larghezza; sotto, lista a sinistra (2/3) e filtri a destra (1/3)
+        Column(Modifier.fillMaxSize()) {
+            if (!hideHeader) {
+                PrimaryHeader("Lavora con noi!", "Trova la posizione adatta a te")
+            }
+            Row(Modifier.weight(1f).fillMaxWidth()) {
+                Box(modifier = Modifier.weight(2f).fillMaxHeight()) {
+                    WorkSearchPage(
+                        navController = navController,
+                        filterData = filterData,
+                        listState = listState,
+                        snackbarHostState = snackbarHostState,
+                        padding = padding,
+                        hideHeader = true, // header ora è sopra la divisione
+                        sliderContent = sliderContent,
+                        onOpenFilters = { enabled = !enabled }
+                    )
+                    SnackbarHost(hostState = snackbarHostState, modifier = Modifier.align(Alignment.BottomCenter))
+                    if (actualUser.admin) {
+                        FloatingActionButton(
+                            onClick = { navController?.navigate(Destination.ADD_WORK_OFFER.route) },
+                            containerColor = com.example.superspan.ui.theme.LogoLeft,
+                            contentColor = Color.White,
+                            shape = CircleShape,
+                            modifier = Modifier.align(Alignment.BottomEnd).padding(end = 24.dp, bottom = padding.calculateBottomPadding() + 24.dp)
+                        ) {
+                            Icon(Icons.Default.Add, "Aggiungi")
+                        }
+                    }
+                }
+                if (enabled) {
+                    Box(Modifier.fillMaxHeight().width(1.dp).background(Color.LightGray.copy(alpha = 0.4f)))
+                    Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
+                        WorkFilterPage(
+                            modifier = Modifier.fillMaxSize(),
+                            filterData = filterData,
+                            padding = PaddingValues(bottom = padding.calculateBottomPadding()),
+                            onDismiss = { enabled = false }
+                        )
+                    }
+                }
+            }
         }
-        
-        SnackbarHost(
-            hostState = snackbarHostState,
-            modifier = Modifier.align(Alignment.BottomCenter)
-        )
+    } else {
+        // TELEFONO: comportamento attuale (a schermo intero)
+        Box(modifier = Modifier.fillMaxSize()) {
+            if (!enabled) {
+                WorkSearchPage(
+                    navController = navController,
+                    filterData = filterData,
+                    listState = listState,
+                    snackbarHostState = snackbarHostState,
+                    padding = padding,
+                    hideHeader = hideHeader,
+                    sliderContent = sliderContent,
+                    onOpenFilters = { enabled = true }
+                )
+            } else {
+                WorkFilterPage(
+                    modifier = Modifier.fillMaxSize(),
+                    filterData = filterData,
+                    padding = padding,
+                    onDismiss = { enabled = false }
+                )
+            }
 
-        if (actualUser.admin && !enabled) {
-            FloatingActionButton(
-                onClick = { navController?.navigate(Destination.ADD_WORK_OFFER.route) },
-                containerColor = com.example.superspan.ui.theme.LogoLeft,
-                contentColor = Color.White,
-                shape = CircleShape,
-                modifier = Modifier.align(Alignment.BottomEnd).padding(end = 24.dp, bottom = padding.calculateBottomPadding() + 24.dp)
-            ) {
-                Icon(Icons.Default.Add, "Aggiungi")
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier.align(Alignment.BottomCenter)
+            )
+
+            if (actualUser.admin && !enabled) {
+                FloatingActionButton(
+                    onClick = { navController?.navigate(Destination.ADD_WORK_OFFER.route) },
+                    containerColor = com.example.superspan.ui.theme.LogoLeft,
+                    contentColor = Color.White,
+                    shape = CircleShape,
+                    modifier = Modifier.align(Alignment.BottomEnd).padding(end = 24.dp, bottom = padding.calculateBottomPadding() + 24.dp)
+                ) {
+                    Icon(Icons.Default.Add, "Aggiungi")
+                }
             }
         }
     }
@@ -139,7 +188,7 @@ fun WorkSearchPage(
                 // Scorriamo aggiungendo +2 per l'header e la barra di ricerca
                 listState.animateScrollToItem(index + 2)
             }
-            android.widget.Toast.makeText(context, "Offerta inserita con successo!", android.widget.Toast.LENGTH_SHORT).show()
+            android.widget.Toast.makeText(context, "Annuncio inserito con successo!", android.widget.Toast.LENGTH_SHORT).show()
             kotlinx.coroutines.delay(1500)
             highlightCurrentId = null
             highlightedWorkOfferId = null
@@ -150,8 +199,8 @@ fun WorkSearchPage(
         val offer = offerToDelete!!
         ModernAlertDialog(
             onDismissRequest = { offerToDelete = null },
-            title = "Elimina Offerta",
-            text = "Sei sicuro di voler eliminare l'offerta di lavoro \"${offer.titolo}\"?",
+            title = "Elimina Annuncio",
+            text = "Sei sicuro di voler eliminare l'annuncio di lavoro \"${offer.titolo}\"?",
             icon = Icons.Default.Delete,
             isDestructive = true,
             confirmText = "Elimina",
@@ -170,36 +219,38 @@ fun WorkSearchPage(
         )
     }
 
+    // Su tablet: 2 offerte per riga
+    val gridColumns = if (isExpandedScreen()) 2 else 1
+
     Column(modifier = Modifier.fillMaxSize()) {
     if (!hideHeader) {
         PrimaryHeader("Lavora con noi!", "Trova la posizione adatta a te")
     }
+
+    // 2. BARRA DI RICERCA + TASTO FILTRI
+    CustomSearchBar(
+        query = filterData.nome,
+        onQueryChange = { filterData.nome = it },
+        placeholder = "Cerca ruolo o città...",
+        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 8.dp),
+        trailingIcon = {
+            IconButton(onClick = onOpenFilters) {
+                Icon(Icons.Default.Tune, contentDescription = "Filtri", tint = com.example.superspan.ui.theme.LogoLeft)
+            }
+        }
+    )
+
     LazyColumn(
         state = listState,
         modifier = Modifier.weight(1f).fillMaxWidth(),
-        contentPadding = PaddingValues(top = 12.dp, bottom = padding.calculateBottomPadding() + 32.dp),
+        contentPadding = PaddingValues(top = 8.dp, bottom = padding.calculateBottomPadding() + 32.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
 
         if (sliderContent != null) {
-            stickyHeader {
+            item {
                 sliderContent()
             }
-        }
-
-        // 2. BARRA DI RICERCA + TASTO FILTRI
-        item {
-            CustomSearchBar(
-                query = filterData.nome,
-                onQueryChange = { filterData.nome = it },
-                placeholder = "Cerca ruolo o città...",
-                modifier = Modifier.padding(horizontal = 16.dp),
-                trailingIcon = {
-                    IconButton(onClick = onOpenFilters) {
-                        Icon(Icons.Default.Tune, contentDescription = "Filtri", tint = com.example.superspan.ui.theme.LogoLeft)
-                    }
-                }
-            )
         }
 
         val hasActiveFilters = filterData.ruoli.isNotEmpty() || filterData.tipiContratto.isNotEmpty() || filterData.orari.isNotEmpty() || filterData.distanzaMax < 1000f
@@ -251,27 +302,37 @@ fun WorkSearchPage(
                 )
             }
         }
-        items(workSearchList, key = { it.id }) { offer ->
-            val hasCandidacy = AllCandidacies.any { it.userEmail == actualUser.email && it.offerId == offer.id }
-            val hasDraft = actualUser.candidacyDraftsByOfferId.containsKey(offer.id)
-            val hasViewed = actualUser.viewedOffers.contains(offer.id)
-            
-            val badgeText = if (hasCandidacy) "Inviata" else if (hasDraft) "Bozza" else if (hasViewed) null else "Nuova"
-            
-            val isDeleting = deletingWorkOfferIds.contains(offer.id)
-            AnimatedVisibility(
-                visible = !isDeleting,
-                enter = fadeIn(),
-                exit = slideOutHorizontally(targetOffsetX = { it }, animationSpec = tween(400)) + fadeOut(animationSpec = tween(400))
-            ) {
-                WorkOfferCompose(
-                    workOffer = offer,
-                    navController = navController,
-                    isHighlighted = (highlightCurrentId == offer.id),
-                    isDisabled = hasCandidacy || hasDraft,
-                    badgeText = badgeText,
-                    onDeleteClick = { offerToDelete = offer }
-                )
+        items(workSearchList.chunked(gridColumns), key = { it.first().id }) { rowOffers ->
+            Row(modifier = Modifier.fillMaxWidth()) {
+                rowOffers.forEach { offer ->
+                    Column(modifier = Modifier.weight(1f)) {
+                        val hasCandidacy = AllCandidacies.any { it.userEmail == actualUser.email && it.offerId == offer.id }
+                        val hasDraft = actualUser.candidacyDraftsByOfferId.containsKey(offer.id)
+                        val hasViewed = actualUser.viewedOffers.contains(offer.id)
+
+                        val badgeText = if (hasCandidacy) "Inviata" else if (hasDraft) "Bozza" else if (hasViewed) null else "Nuova"
+
+                        val isDeleting = deletingWorkOfferIds.contains(offer.id)
+                        AnimatedVisibility(
+                            visible = !isDeleting,
+                            enter = fadeIn(),
+                            exit = slideOutHorizontally(targetOffsetX = { it }, animationSpec = tween(400)) + fadeOut(animationSpec = tween(400))
+                        ) {
+                            WorkOfferCompose(
+                                workOffer = offer,
+                                navController = navController,
+                                isHighlighted = (highlightCurrentId == offer.id),
+                                isDisabled = hasCandidacy || hasDraft,
+                                badgeText = badgeText,
+                                onDeleteClick = { offerToDelete = offer }
+                            )
+                        }
+                    }
+                }
+                // Se l'ultima riga è dispari, riempie lo spazio mancante
+                repeat(gridColumns - rowOffers.size) {
+                    Spacer(modifier = Modifier.weight(1f))
+                }
             }
         }
     }
