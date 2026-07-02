@@ -188,7 +188,7 @@ fun WorkSearchPage(
                 // Scorriamo aggiungendo +2 per l'header e la barra di ricerca
                 listState.animateScrollToItem(index + 2)
             }
-            android.widget.Toast.makeText(context, "Offerta inserita con successo!", android.widget.Toast.LENGTH_SHORT).show()
+            android.widget.Toast.makeText(context, "Annuncio inserito con successo!", android.widget.Toast.LENGTH_SHORT).show()
             kotlinx.coroutines.delay(1500)
             highlightCurrentId = null
             highlightedWorkOfferId = null
@@ -199,8 +199,8 @@ fun WorkSearchPage(
         val offer = offerToDelete!!
         ModernAlertDialog(
             onDismissRequest = { offerToDelete = null },
-            title = "Elimina Offerta",
-            text = "Sei sicuro di voler eliminare l'offerta di lavoro \"${offer.titolo}\"?",
+            title = "Elimina Annuncio",
+            text = "Sei sicuro di voler eliminare l'annuncio di lavoro \"${offer.titolo}\"?",
             icon = Icons.Default.Delete,
             isDestructive = true,
             confirmText = "Elimina",

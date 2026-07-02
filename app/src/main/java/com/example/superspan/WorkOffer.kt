@@ -81,7 +81,7 @@ fun WorkOfferPage(offer: WorkOffer?, navController: NavController?, paddingValue
                 Spacer(Modifier.height(72.dp)) // spazio per i pulsanti flottanti (indietro / modifica)
 
                 Text(
-                    text = "OFFERTA DI LAVORO",
+                    text = "ANNUNCIO DI LAVORO",
                     fontSize = 12.sp,
                     fontWeight = FontWeight.ExtraBold,
                     letterSpacing = 1.5.sp,

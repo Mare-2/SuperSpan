@@ -113,7 +113,7 @@ fun DraftsPage(navController: NavController?, padding: PaddingValues) {
                                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                             ) {
                                 Column(Modifier.padding(20.dp)) {
-                                    Text(offer?.titolo ?: "Offerta #$offerId", fontWeight = FontWeight.ExtraBold, fontSize = 18.sp, color = com.example.superspan.ui.theme.LogoLeft)
+                                    Text(offer?.titolo ?: "Annuncio #$offerId", fontWeight = FontWeight.ExtraBold, fontSize = 18.sp, color = com.example.superspan.ui.theme.LogoLeft)
                                     Spacer(Modifier.height(4.dp))
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Icon(Icons.Default.LocationOn, null, tint = Color.Gray, modifier = Modifier.size(16.dp))
@@ -202,7 +202,7 @@ fun DraftsPage(navController: NavController?, padding: PaddingValues) {
             ModernAlertDialog(
                 onDismissRequest = { showDeleteConfirmFor = null },
                 title = "Elimina bozza",
-                text = "Sei sicuro di eliminare la bozza per l'offerta #$idToDelete ?",
+                text = "Sei sicuro di eliminare questa bozza?",
                 icon = Icons.Default.Delete,
                 isDestructive = true,
                 confirmText = "Elimina",

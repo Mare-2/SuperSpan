@@ -91,7 +91,7 @@ fun AdminWorkOfferEditPage(
                 ) {
                     Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
-                            text = if (offer == null) "Aggiungi Offerta" else "Modifica Offerta",
+                            text = if (offer == null) "Aggiungi Annuncio di lavoro" else "Modifica Annuncio di lavoro",
                             color = Color.Black,
                             fontSize = 22.sp,
                             fontWeight = FontWeight.Bold
@@ -223,7 +223,7 @@ fun AdminWorkOfferEditPage(
                             modifier = Modifier.fillMaxWidth().padding(20.dp),
                             verticalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
-                            Text("Dettagli dell'Offerta", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFF1A1A1A))
+                            Text("Dettagli dell'annuncio", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFF1A1A1A))
                             
                             EditTextField(value = titolo, onValueChange = { titolo = it }, label = "Titolo Offerta", modifier = Modifier.fillMaxWidth())
                             EditTextField(value = descrizioneBreve, onValueChange = { descrizioneBreve = it }, label = "Descrizione Breve", modifier = Modifier.fillMaxWidth(), singleLine = false)
@@ -313,7 +313,7 @@ fun AdminWorkOfferEditPage(
                     colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = com.example.superspan.ui.theme.LogoLeft),
                     enabled = titolo.isNotBlank() && descrizioneBreve.isNotBlank() && selectedSupermarket != null && ruoloEnum != null
                 ) {
-                    Text("Salva Offerta", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    Text("Salva Annuncio", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 }
                 
                 Spacer(modifier = Modifier.height(paddingValues.calculateBottomPadding() + 24.dp))
