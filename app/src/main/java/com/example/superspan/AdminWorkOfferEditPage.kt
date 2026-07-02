@@ -226,7 +226,7 @@ fun AdminWorkOfferEditPage(
                             Text("Dettagli dell'Offerta", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFF1A1A1A))
                             
                             EditTextField(value = titolo, onValueChange = { titolo = it }, label = "Titolo Offerta", modifier = Modifier.fillMaxWidth())
-                            EditTextField(value = descrizioneBreve, onValueChange = { descrizioneBreve = it }, label = "Descrizione Breve", modifier = Modifier.fillMaxWidth())
+                            EditTextField(value = descrizioneBreve, onValueChange = { descrizioneBreve = it }, label = "Descrizione Breve", modifier = Modifier.fillMaxWidth(), singleLine = false)
                             EditTextField(value = descrizioneEstesa, onValueChange = { descrizioneEstesa = it }, label = "Descrizione Estesa", modifier = Modifier.fillMaxWidth(), minLines = 3)
                             EditTextField(value = requisiti, onValueChange = { requisiti = it }, label = "Requisiti", modifier = Modifier.fillMaxWidth(), minLines = 2)
 

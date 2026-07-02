@@ -513,7 +513,9 @@ fun EditTextField(
                 label = { Text(label) },
                 modifier = Modifier.fillMaxWidth().background(containerColor, RoundedCornerShape(12.dp)),
                 shape = RoundedCornerShape(12.dp),
-                singleLine = singleLine,
+                // Se il campo chiede più righe, dev'essere multi-riga: altrimenti 'singleLine=true'
+                // vincerebbe e taglierebbe il testo lungo a una sola riga.
+                singleLine = singleLine && minLines <= 1,
                 minLines = minLines,
                 isError = isError,
                 readOnly = readOnly,
