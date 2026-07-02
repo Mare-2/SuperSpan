@@ -132,81 +132,35 @@ fun CouponPageComplete(paddingValues: PaddingValues, navController: NavControlle
 
     Box(modifier = Modifier
         .fillMaxSize()
-        .padding(top = paddingValues.calculateTopPadding())
     ) {
         if (currentSelectedOffer == null) {
+            Column(modifier = Modifier.fillMaxSize()) {
+            PrimaryHeader("Offerte e Coupon", "Risparmia sulla tua spesa quotidiana")
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 12.dp)
+            ) {
+                AnimatedSegmentedControl(
+                    options = listOf("Coupon", "Offerte"),
+                    selectedIndex = selectedTab
+                ) { selectedTab = it }
+            }
+
             LazyColumn(
                 state = listState,
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(bottom = paddingValues.calculateBottomPadding() + 100.dp)
+                modifier = Modifier.weight(1f).fillMaxWidth(),
+                contentPadding = PaddingValues(top = 12.dp, bottom = paddingValues.calculateBottomPadding() + 100.dp)
             ) {
-                // 1. TITOLO
-                item {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 70.dp, start = 20.dp, end = 20.dp, bottom = 16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = "Offerte e Coupon",
-                            fontSize = 32.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = Color(0xFF1A1A1A)
-                        )
-                        Text(
-                            text = "Risparmia sulla tua spesa quotidiana",
-                            fontSize = 16.sp,
-                            color = Color.Gray
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        androidx.compose.material3.Surface(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(56.dp),
-                            shape = RoundedCornerShape(28.dp),
-                            shadowElevation = 6.dp,
-                            color = Color.White
-                        ) {
-                            androidx.compose.material3.TextField(
-                                value = searchQuery,
-                                onValueChange = { searchQuery = it },
-                                placeholder = { Text("Cerca prodotto o offerta...", color = Color.Gray) },
-                                modifier = Modifier.fillMaxSize(),
-                                leadingIcon = { Icon(Icons.Default.Search, null, tint = Color.Gray) },
-                                trailingIcon = {
-                                    if (searchQuery.isNotEmpty()) {
-                                        IconButton(onClick = { searchQuery = "" }) {
-                                            Icon(Icons.Default.Clear, contentDescription = "Cancella", tint = Color.Gray)
-                                        }
-                                    }
-                                },
-                                singleLine = true,
-                                colors = androidx.compose.material3.TextFieldDefaults.colors(
-                                    focusedContainerColor = Color.Transparent,
-                                    unfocusedContainerColor = Color.Transparent,
-                                    focusedIndicatorColor = Color.Transparent,
-                                    unfocusedIndicatorColor = Color.Transparent,
-                                    cursorColor = androidx.compose.material3.MaterialTheme.colorScheme.primary
-                                )
-                            )
-                        }
-                    }
-                }
 
-                // 2. STICKY TABS
-                stickyHeader {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(com.example.superspan.ui.theme.Neutral50)
-                            .padding(start = 20.dp, end = 20.dp, top = 28.dp, bottom = 12.dp)
-                    ) {
-                        AnimatedSegmentedControl(
-                            options = listOf("Coupon", "Offerte"),
-                            selectedIndex = selectedTab
-                        ) { selectedTab = it }
-                    }
+                // 1b. BARRA DI RICERCA
+                item {
+                    CustomSearchBar(
+                        query = searchQuery,
+                        onQueryChange = { searchQuery = it },
+                        placeholder = "Cerca prodotto o offerta...",
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
                 }
 
                 // 3. LISTA FILTRATA
@@ -238,6 +192,7 @@ fun CouponPageComplete(paddingValues: PaddingValues, navController: NavControlle
                         }
                     }
                 }
+            }
             }
         } else {
             OfferDetailPage(currentSelectedOffer!!, navController) { selectedOffer = null }
@@ -305,7 +260,7 @@ fun CouponTicketCard(coupon: Coupon, isHighlighted: Boolean = false, navControll
     Card(
         modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth().alpha(if(isExpired) 0.6f else 1f).clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = if (isHighlighted) Color(0xFFE0E0E0) else Color.White),
+        colors = CardDefaults.cardColors(containerColor = if (isHighlighted) Color(0xFFF0F0F0) else Color.White),
         elevation = CardDefaults.cardElevation(if(isExpired) 0.dp else 2.dp)
     ) {
         Column {
@@ -319,20 +274,32 @@ fun CouponTicketCard(coupon: Coupon, isHighlighted: Boolean = false, navControll
                         Text(text = "Scade: ${formatDisplayDate(coupon.dateOfExpiration)}", fontSize = 11.sp, color = status.color, fontWeight = FontWeight.SemiBold)
                     }
                     Spacer(Modifier.height(8.dp))
-                    Text(coupon.description, fontWeight = FontWeight.Bold, fontSize = 16.sp, textDecoration = if(isExpired) TextDecoration.LineThrough else null)
+                    Text(coupon.description, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.Black, textDecoration = if(isExpired) TextDecoration.LineThrough else null)
+                    Spacer(Modifier.height(4.dp))
                     Text("Valido su: ${coupon.products.joinToString(", ") { it.nome }}", fontSize = 12.sp, color = Color.Gray)
                     Spacer(Modifier.height(12.dp))
-                    Surface(color = if(isExpired) Color.Transparent else Color(0xFFF1F1F1), shape = RoundedCornerShape(8.dp), border = androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray.copy(0.5f))) {
-                        Text(coupon.code, modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp), fontWeight = FontWeight.ExtraBold, letterSpacing = 2.sp, color = if(isExpired) Color.Gray else Color.DarkGray)
+                    Surface(color = if(isExpired) Color.Transparent else com.example.superspan.ui.theme.LogoLeft.copy(alpha=0.08f), shape = RoundedCornerShape(8.dp), border = androidx.compose.foundation.BorderStroke(1.dp, if(isExpired) Color.LightGray.copy(0.5f) else com.example.superspan.ui.theme.LogoLeft.copy(alpha=0.3f))) {
+                        Text(coupon.code, modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp), fontWeight = FontWeight.ExtraBold, letterSpacing = 2.sp, color = if(isExpired) Color.Gray else com.example.superspan.ui.theme.BrandDark)
                     }
                 }
-                Box(Modifier.fillMaxHeight().width(1.dp).background(Color.LightGray))
+                
+                // Tratteggio per simulare il coupon strappabile
+                androidx.compose.foundation.Canvas(Modifier.fillMaxHeight().width(1.dp).padding(vertical = 12.dp)) {
+                    drawLine(
+                        color = Color.LightGray,
+                        start = androidx.compose.ui.geometry.Offset(0f, 0f),
+                        end = androidx.compose.ui.geometry.Offset(0f, size.height),
+                        pathEffect = androidx.compose.ui.graphics.PathEffect.dashPathEffect(floatArrayOf(15f, 10f), 0f),
+                        strokeWidth = 3f
+                    )
+                }
+
                 Column(
-                    modifier = Modifier.fillMaxHeight().width(90.dp).background(if(isExpired) Color.LightGray.copy(0.2f) else status.color.copy(0.05f)),
+                    modifier = Modifier.fillMaxHeight().width(100.dp).background(if(isExpired) Color.LightGray.copy(0.15f) else status.color.copy(0.05f)),
                     horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center
                 ) {
-                    Text("SCONTO", fontSize = 10.sp, color = Color.Gray)
-                    Text("-${coupon.discount.toInt()}%", fontSize = 26.sp, fontWeight = FontWeight.Black, color = if(isExpired) Color.Gray else status.color)
+                    Text("SCONTO", fontSize = 10.sp, color = if(isExpired) Color.Gray else status.color.copy(alpha=0.8f), fontWeight = FontWeight.Bold)
+                    Text("-${coupon.discount.toInt()}%", fontSize = 28.sp, fontWeight = FontWeight.Black, color = if(isExpired) Color.Gray else status.color)
                 }
             }
             if (actualUser.admin) {
@@ -347,15 +314,15 @@ fun CouponTicketCard(coupon: Coupon, isHighlighted: Boolean = false, navControll
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        TextButton(onClick = { navController?.navigate("${Destination.EDIT_COUPON.route}/${coupon.code}") }) {
-                            Icon(Icons.Default.Edit, contentDescription = "Modifica", modifier = Modifier.size(16.dp), tint = Color.DarkGray)
-                            Spacer(Modifier.width(6.dp))
-                            Text("Modifica", color = Color.DarkGray, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                        }
                         TextButton(onClick = onDeleteClick) {
                             Icon(Icons.Default.Delete, contentDescription = "Elimina", modifier = Modifier.size(16.dp), tint = com.example.superspan.ui.theme.AppError.copy(0.8f))
                             Spacer(Modifier.width(6.dp))
                             Text("Elimina", color = com.example.superspan.ui.theme.AppError.copy(0.8f), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        }
+                        TextButton(onClick = { navController?.navigate("${Destination.EDIT_COUPON.route}/${coupon.code}") }) {
+                            Icon(Icons.Default.Edit, contentDescription = "Modifica", modifier = Modifier.size(16.dp), tint = com.example.superspan.ui.theme.LogoLeft)
+                            Spacer(Modifier.width(6.dp))
+                            Text("Modifica", color = com.example.superspan.ui.theme.LogoLeft, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -410,15 +377,15 @@ fun OfferPromoCard(coupon: Coupon, isHighlighted: Boolean = false, navController
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        TextButton(onClick = { navController?.navigate("${Destination.EDIT_COUPON.route}/${coupon.code}") }) {
-                            Icon(Icons.Default.Edit, contentDescription = "Modifica", modifier = Modifier.size(16.dp), tint = Color.DarkGray)
-                            Spacer(Modifier.width(6.dp))
-                            Text("Modifica", color = Color.DarkGray, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                        }
                         TextButton(onClick = onDeleteClick) {
                             Icon(Icons.Default.Delete, contentDescription = "Elimina", modifier = Modifier.size(16.dp), tint = com.example.superspan.ui.theme.AppError.copy(0.8f))
                             Spacer(Modifier.width(6.dp))
                             Text("Elimina", color = com.example.superspan.ui.theme.AppError.copy(0.8f), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        }
+                        TextButton(onClick = { navController?.navigate("${Destination.EDIT_COUPON.route}/${coupon.code}") }) {
+                            Icon(Icons.Default.Edit, contentDescription = "Modifica", modifier = Modifier.size(16.dp), tint = com.example.superspan.ui.theme.LogoLeft)
+                            Spacer(Modifier.width(6.dp))
+                            Text("Modifica", color = com.example.superspan.ui.theme.LogoLeft, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -431,18 +398,23 @@ fun OfferPromoCard(coupon: Coupon, isHighlighted: Boolean = false, navController
 
 @Composable
 fun OfferDetailPage(coupon: Coupon, navController: NavController? = null, onBack: () -> Unit) {
-    AuraBackground(Modifier.fillMaxSize()) {
-        Column(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp).verticalScroll(rememberScrollState())) {
-            Spacer(Modifier.height(80.dp))
+    Box(
+        Modifier
+            .fillMaxSize()
+            .background(com.example.superspan.ui.theme.LogoRight.copy(alpha = 0.03f))
+    ) {
+        Column(modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp).verticalScroll(rememberScrollState())) {
+            Spacer(Modifier.height(80.dp + androidx.compose.foundation.layout.WindowInsets.statusBars.asPaddingValues().calculateTopPadding()))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(coupon.description, fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, lineHeight = 34.sp, modifier = Modifier.weight(1f))
+                Text(coupon.description, fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, color = Color.Black, lineHeight = 34.sp, modifier = Modifier.weight(1f))
                 if (actualUser.admin) {
                     IconButton(onClick = { navController?.navigate("${Destination.EDIT_COUPON.route}/${coupon.code}") }) {
                         Icon(Icons.Default.Edit, contentDescription = "Modifica", tint = Color.Gray)
                     }
                 }
             }
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 8.dp)) {
+            Spacer(Modifier.height(8.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.Event, null, tint = Color.Gray, modifier = Modifier.size(16.dp))
                 Spacer(Modifier.width(6.dp))
                 Text("Offerta valida fino al ${formatDisplayDate(coupon.dateOfExpiration)}", color = Color.Gray, fontSize = 14.sp)
@@ -450,10 +422,15 @@ fun OfferDetailPage(coupon: Coupon, navController: NavController? = null, onBack
             Spacer(Modifier.height(24.dp))
             coupon.products.forEach { product ->
                 ProductDiscountItem(product, coupon)
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(16.dp))
             }
-            Spacer(Modifier.height(32.dp))
-            Surface(modifier = Modifier.fillMaxWidth(), color = com.example.superspan.ui.theme.AppSuccess.copy(0.1f), shape = RoundedCornerShape(16.dp), border = androidx.compose.foundation.BorderStroke(2.dp, com.example.superspan.ui.theme.AppSuccess)) {
+            Spacer(Modifier.height(16.dp))
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                color = Color.White,
+                shape = RoundedCornerShape(16.dp),
+                shadowElevation = 2.dp
+            ) {
                 Column(modifier = Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("MOSTRA ALLA CASSA", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = com.example.superspan.ui.theme.AppSuccess)
                     Spacer(Modifier.height(8.dp))
@@ -482,17 +459,28 @@ fun OfferDetailPage(coupon: Coupon, navController: NavController? = null, onBack
 @Composable
 fun ProductDiscountItem(product: Product, coupon: Coupon) {
     val discountedPrice = coupon.calculateDiscountedPrice(product)
-    Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp), colors = CardDefaults.cardColors(containerColor = Color(0xFFF1F1F1))) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        color = Color.White,
+        shadowElevation = 2.dp
+    ) {
         Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
-                Text(product.nome, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(product.nome, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.Black)
+                Spacer(Modifier.height(4.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("€%.2f".format(product.prezzo), textDecoration = TextDecoration.LineThrough, color = Color.Gray, fontSize = 14.sp)
                     Spacer(Modifier.width(8.dp))
-                    Text("€%.2f".format(discountedPrice), color = Color(0xFF1B5E20), fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
+                    Text("€%.2f".format(discountedPrice), color = com.example.superspan.ui.theme.AppSuccess, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
                 }
             }
-            Text("-${coupon.discount.toInt()}%", fontWeight = FontWeight.Black, color = Color(0xFFD32F2F), fontSize = 20.sp)
+            Surface(
+                color = com.example.superspan.ui.theme.AppSuccess,
+                shape = RoundedCornerShape(6.dp)
+            ) {
+                Text("-${coupon.discount.toInt()}%", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
+            }
         }
     }
 }

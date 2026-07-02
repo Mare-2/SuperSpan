@@ -170,34 +170,16 @@ fun WorkSearchPage(
         )
     }
 
+    Column(modifier = Modifier.fillMaxSize()) {
+    if (!hideHeader) {
+        PrimaryHeader("Lavora con noi!", "Trova la posizione adatta a te")
+    }
     LazyColumn(
         state = listState,
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(bottom = padding.calculateBottomPadding() + 32.dp),
+        modifier = Modifier.weight(1f).fillMaxWidth(),
+        contentPadding = PaddingValues(top = 12.dp, bottom = padding.calculateBottomPadding() + 32.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        // 1. HEADER (Scorre con la pagina)
-        if (!hideHeader) {
-            item {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 64.dp, bottom = 24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "Lavora con noi!",
-                        fontSize = 32.sp,
-                        fontWeight = FontWeight.ExtraBold
-                    )
-                    Text(
-                        text = "Trova la posizione adatta a te",
-                        fontSize = 16.sp,
-                        color = Color.Gray
-                    )
-                }
-            }
-        }
 
         if (sliderContent != null) {
             stickyHeader {
@@ -207,42 +189,17 @@ fun WorkSearchPage(
 
         // 2. BARRA DI RICERCA + TASTO FILTRI
         item {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                androidx.compose.material3.Surface(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(50.dp),
-                    shape = RoundedCornerShape(25.dp),
-                    shadowElevation = 6.dp,
-                    color = Color.White
-                ) {
-                    androidx.compose.material3.TextField(
-                        value = filterData.nome,
-                        onValueChange = { filterData.nome = it },
-                        placeholder = { Text("Cerca ruolo o città...", color = Color.Gray) },
-                        modifier = Modifier.fillMaxSize(),
-                        leadingIcon = { Icon(Icons.Default.Search, null, tint = Color.Gray) },
-                        trailingIcon = {
-                            IconButton(onClick = onOpenFilters) {
-                                Icon(Icons.Default.Tune, contentDescription = "Filtri", tint = com.example.superspan.ui.theme.LogoLeft)
-                            }
-                        },
-                        singleLine = true,
-                        colors = androidx.compose.material3.TextFieldDefaults.colors(
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent,
-                            cursorColor = com.example.superspan.ui.theme.LogoLeft
-                        )
-                    )
+            CustomSearchBar(
+                query = filterData.nome,
+                onQueryChange = { filterData.nome = it },
+                placeholder = "Cerca ruolo o città...",
+                modifier = Modifier.padding(horizontal = 16.dp),
+                trailingIcon = {
+                    IconButton(onClick = onOpenFilters) {
+                        Icon(Icons.Default.Tune, contentDescription = "Filtri", tint = com.example.superspan.ui.theme.LogoLeft)
+                    }
                 }
-            }
+            )
         }
 
         val hasActiveFilters = filterData.ruoli.isNotEmpty() || filterData.tipiContratto.isNotEmpty() || filterData.orari.isNotEmpty() || filterData.distanzaMax < 1000f
@@ -308,8 +265,8 @@ fun WorkSearchPage(
                 exit = slideOutHorizontally(targetOffsetX = { it }, animationSpec = tween(400)) + fadeOut(animationSpec = tween(400))
             ) {
                 WorkOfferCompose(
-                    workOffer = offer, 
-                    navController = navController, 
+                    workOffer = offer,
+                    navController = navController,
                     isHighlighted = (highlightCurrentId == offer.id),
                     isDisabled = hasCandidacy || hasDraft,
                     badgeText = badgeText,
@@ -317,6 +274,7 @@ fun WorkSearchPage(
                 )
             }
         }
+    }
     }
 }
 
@@ -445,15 +403,15 @@ fun WorkOfferCompose(workOffer: WorkOffer, navController: NavController?, isHigh
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        TextButton(onClick = onDeleteClick, colors = ButtonDefaults.textButtonColors(contentColor = com.example.superspan.ui.theme.AppError.copy(0.8f))) {
+                            Icon(Icons.Default.Delete, contentDescription = "Elimina", modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("Elimina")
+                        }
                         TextButton(onClick = { navController?.navigate("edit_work_offer/${workOffer.id}") }) {
                             Icon(Icons.Default.Edit, contentDescription = "Modifica", modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(4.dp))
                             Text("Modifica")
-                        }
-                        TextButton(onClick = onDeleteClick, colors = ButtonDefaults.textButtonColors(contentColor = Color.Red)) {
-                            Icon(Icons.Default.Delete, contentDescription = "Elimina", modifier = Modifier.size(16.dp))
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("Elimina")
                         }
                     }
                 }

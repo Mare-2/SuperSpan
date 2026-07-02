@@ -2,6 +2,7 @@ package com.example.superspan
 
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -102,13 +103,19 @@ fun ProfilePage(user: User, navController: NavController?, paddingValues: Paddin
                 val initials = "${user.nome.firstOrNull()?.uppercaseChar() ?: ""}${user.cognome.firstOrNull()?.uppercaseChar() ?: ""}"
                 Box(
                     modifier = Modifier
-                        .size(88.dp)
-                        .background(com.example.superspan.ui.theme.LogoLeft.copy(alpha = 0.15f), CircleShape),
+                        .size(96.dp)
+                        .background(
+                            androidx.compose.ui.graphics.Brush.linearGradient(
+                                listOf(com.example.superspan.ui.theme.LogoLeft.copy(alpha=0.2f), com.example.superspan.ui.theme.LogoRight.copy(alpha=0.2f))
+                            ), 
+                            CircleShape
+                        )
+                        .border(2.dp, Color.White, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         initials,
-                        fontSize = 32.sp,
+                        fontSize = 36.sp,
                         fontWeight = FontWeight.ExtraBold,
                         color = com.example.superspan.ui.theme.BrandDark
                     )
@@ -172,23 +179,21 @@ fun ProfilePage(user: User, navController: NavController?, paddingValues: Paddin
                     }
                 }
 
-                Spacer(modifier = Modifier.height(40.dp)) // Spinge il bottone Esci verso il basso
+                Spacer(modifier = Modifier.height(24.dp))
 
                 // --- 3. TASTO ESCI ---
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                    Button(
-                        onClick = { showLogoutDialog = true },
-                        modifier = Modifier.width(180.dp).height(56.dp),
-                        shape = RoundedCornerShape(16.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = com.example.superspan.ui.theme.AppError.copy(alpha = 0.2f),
-                            contentColor = com.example.superspan.ui.theme.AppError
-                        ),
-                        elevation = ButtonDefaults.buttonElevation(0.dp)
+                ProfileMenuGroup {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { showLogoutDialog = true }
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
                     ) {
-                        Icon(Icons.AutoMirrored.Filled.Logout, null, modifier = Modifier.size(20.dp))
-                        Spacer(Modifier.width(8.dp))
-                        Text("Esci", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                        Icon(Icons.AutoMirrored.Filled.Logout, null, modifier = Modifier.size(24.dp), tint = com.example.superspan.ui.theme.AppError)
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Text("Esci dal tuo account", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = com.example.superspan.ui.theme.AppError)
                     }
                 }
                 
@@ -217,9 +222,10 @@ fun ProfileSectionTitle(title: String) {
 fun ProfileMenuGroup(content: @Composable ColumnScope.() -> Unit) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(20.dp),
         color = Color.White,
-        shadowElevation = 2.dp
+        shadowElevation = 2.dp,
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.3f))
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             content()

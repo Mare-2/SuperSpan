@@ -33,20 +33,11 @@ fun AdminWorkMainPage(paddingValues: PaddingValues, navController: NavController
 
     Column(modifier = Modifier.fillMaxSize()) {
         if (!isFilterOpen) {
-            // Intestazione persistente: il titolo cambia in base alla sezione selezionata
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = paddingValues.calculateTopPadding() + 24.dp, bottom = 8.dp, start = 20.dp, end = 20.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                if (selectedTabIndex == 0) {
-                    Text("Lavora con noi!", fontSize = 30.sp, fontWeight = FontWeight.ExtraBold, color = Color(0xFF1A1A1A))
-                    Text("Gestisci le posizioni aperte", fontSize = 15.sp, color = Color.Gray)
-                } else {
-                    Text("Gestione Candidature", fontSize = 30.sp, fontWeight = FontWeight.ExtraBold, color = Color(0xFF1A1A1A))
-                    Text("Pannello di Amministrazione", fontSize = 15.sp, color = Color.Gray)
-                }
+            // Intestazione persistente (stessa dell'app): il titolo cambia in base alla sezione
+            if (selectedTabIndex == 0) {
+                PrimaryHeader("Lavora con noi!", "Gestisci le posizioni aperte")
+            } else {
+                PrimaryHeader("Gestione Candidature", "Pannello di Amministrazione")
             }
 
             // Barra tab PERSISTENTE: restando montata attraverso il cambio di sezione,
@@ -54,7 +45,7 @@ fun AdminWorkMainPage(paddingValues: PaddingValues, navController: NavController
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 20.dp, end = 20.dp, bottom = 12.dp)
+                    .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 12.dp)
             ) {
                 AnimatedSegmentedControl(
                     options = listOf("Posizioni Aperte", "Candidature"),
