@@ -79,7 +79,11 @@ fun AccountSettingsPage(user: User, navController: NavController?, paddingValues
 
             // --- FORM ---
             Column(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .fillMaxWidth()
+                        .widthIn(max = 520.dp) // Su tablet: più stretto e centrato
+                        .padding(horizontal = 24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Spacer(Modifier.height(8.dp))

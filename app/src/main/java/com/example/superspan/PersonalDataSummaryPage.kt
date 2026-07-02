@@ -57,6 +57,9 @@ fun PersonalDataSummaryPage(navController: NavController?, padding: PaddingValue
             // --- CONTENUTO ---
             Column(
                 modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .fillMaxWidth()
+                    .widthIn(max = 520.dp) // Su tablet: più stretto e centrato
                     .padding(24.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally

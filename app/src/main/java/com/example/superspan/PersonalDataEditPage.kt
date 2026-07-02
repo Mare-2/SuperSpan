@@ -100,7 +100,9 @@ fun PersonalDataEditPage(navController: NavController?, padding: PaddingValues) 
             }
             Column(
                 modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
                     .fillMaxWidth()
+                    .widthIn(max = 520.dp) // Su tablet: più stretto e centrato
                     .padding(horizontal = 24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {

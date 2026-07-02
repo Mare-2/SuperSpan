@@ -142,8 +142,10 @@ fun ProfilePage(user: User, navController: NavController?, paddingValues: Paddin
             // --- SEZIONI CONTENUTO (TILES) ---
             Column(
                 modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
                     .fillMaxWidth()
-                    .padding(horizontal = 24.dp), 
+                    .widthIn(max = 520.dp) // Su tablet: card più strette e centrate
+                    .padding(horizontal = 24.dp),
                 verticalArrangement = Arrangement.Top
             ) {
                 // Sezione Comune

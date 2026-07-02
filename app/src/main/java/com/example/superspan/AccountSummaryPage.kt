@@ -55,7 +55,9 @@ fun AccountSummaryPage(user: User, navController: NavController?, padding: Paddi
             // --- CONTENUTO ---
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .align(Alignment.CenterHorizontally)
+                    .fillMaxWidth()
+                    .widthIn(max = 520.dp) // Su tablet: più stretto e centrato
                     .padding(24.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally

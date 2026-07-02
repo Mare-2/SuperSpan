@@ -155,6 +155,7 @@ fun CouponPageComplete(paddingValues: PaddingValues, navController: NavControlle
                 )
             }
 
+            val couponColumns = if (isExpandedScreen()) 2 else 1
             LazyColumn(
                 state = listState,
                 modifier = Modifier.weight(1f).fillMaxWidth(),
@@ -172,21 +173,31 @@ fun CouponPageComplete(paddingValues: PaddingValues, navController: NavControlle
                     coupon.products.any { it.nome.contains(searchQuery, ignoreCase = true) }
                 }
 
-                items(filteredList, key = { it.code }) { item ->
-                    val isDeleting = deletingCouponCodes.contains(item.code)
-                    val isHighlighted = highlightedCouponCode == item.code
+                items(filteredList.chunked(couponColumns), key = { it.first().code }) { rowItems ->
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        rowItems.forEach { item ->
+                            Column(modifier = Modifier.weight(1f)) {
+                                val isDeleting = deletingCouponCodes.contains(item.code)
+                                val isHighlighted = highlightedCouponCode == item.code
 
-                    AnimatedVisibility(
-                        visible = !isDeleting,
-                        enter = fadeIn(),
-                        exit = slideOutHorizontally(targetOffsetX = { it }, animationSpec = tween(400)) + fadeOut(animationSpec = tween(400))
-                    ) {
-                        Box(modifier = Modifier.padding(vertical = 6.dp)) {
-                            if (selectedTab == 0) {
-                                CouponTicketCard(item, isHighlighted, navController, onDeleteClick = { couponToDelete = item }) { selectedOffer = item }
-                            } else {
-                                OfferPromoCard(item, isHighlighted, navController, onDeleteClick = { couponToDelete = item })
+                                AnimatedVisibility(
+                                    visible = !isDeleting,
+                                    enter = fadeIn(),
+                                    exit = slideOutHorizontally(targetOffsetX = { it }, animationSpec = tween(400)) + fadeOut(animationSpec = tween(400))
+                                ) {
+                                    Box(modifier = Modifier.padding(vertical = 6.dp)) {
+                                        if (selectedTab == 0) {
+                                            CouponTicketCard(item, isHighlighted, navController, onDeleteClick = { couponToDelete = item }) { selectedOffer = item }
+                                        } else {
+                                            OfferPromoCard(item, isHighlighted, navController, onDeleteClick = { couponToDelete = item })
+                                        }
+                                    }
+                                }
                             }
+                        }
+                        // Se l'ultima riga è dispari, riempie lo spazio mancante
+                        repeat(couponColumns - rowItems.size) {
+                            Spacer(modifier = Modifier.weight(1f))
                         }
                     }
                 }

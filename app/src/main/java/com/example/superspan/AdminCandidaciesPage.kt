@@ -50,7 +50,9 @@ fun AdminCandidaciesPage(
     var showFiltersPage by remember { mutableStateOf(false) }
     var isSelectionOpen by remember { mutableStateOf(false) }
 
-    val isOverlayOpen = showFiltersPage || isSelectionOpen
+    val expanded = isExpandedScreen()
+    // Su tablet il pannello filtri è a lato: non conta come "overlay" (l'header admin resta visibile)
+    val isOverlayOpen = isSelectionOpen || (showFiltersPage && !expanded)
     LaunchedEffect(isOverlayOpen) {
         onFilterOpenChange(isOverlayOpen)
     }
@@ -79,15 +81,7 @@ fun AdminCandidaciesPage(
         }
     }
 
-    if (isSelectionOpen) {
-        SupermarketSelectionScreen(
-            onBack = { isSelectionOpen = false },
-            onSelected = {
-                selectedSupermarket = it
-                isSelectionOpen = false
-            }
-        )
-    } else if (showFiltersPage) {
+    val filterPanel: @Composable () -> Unit = {
         AdminCandidaciesFilterPage(
             selectedRoles = selectedRoles,
             selectedSupermarket = selectedSupermarket,
@@ -96,7 +90,9 @@ fun AdminCandidaciesPage(
             onDismiss = { showFiltersPage = false },
             onOpenSelection = { isSelectionOpen = true }
         )
-    } else {
+    }
+
+    val listContent: @Composable () -> Unit = {
         Column(modifier = Modifier.fillMaxSize()) {
             if (!hideHeader) {
                 Column(
@@ -224,6 +220,28 @@ fun AdminCandidaciesPage(
             }
         }
         }
+    }
+
+    if (isSelectionOpen) {
+        SupermarketSelectionScreen(
+            onBack = { isSelectionOpen = false },
+            onSelected = {
+                selectedSupermarket = it
+                isSelectionOpen = false
+            }
+        )
+    } else if (expanded) {
+        // TABLET: lista a sinistra (2/3), filtri agganciati a destra (1/3)
+        Row(Modifier.fillMaxSize()) {
+            Box(Modifier.weight(2f).fillMaxHeight()) { listContent() }
+            if (showFiltersPage) {
+                Box(Modifier.fillMaxHeight().width(1.dp).background(Color.LightGray.copy(alpha = 0.4f)))
+                Box(Modifier.weight(1f).fillMaxHeight()) { filterPanel() }
+            }
+        }
+    } else {
+        // TELEFONO: comportamento attuale (a schermo intero)
+        if (showFiltersPage) filterPanel() else listContent()
     }
 }
 

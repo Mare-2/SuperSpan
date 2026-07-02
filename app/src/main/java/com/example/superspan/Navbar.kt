@@ -359,7 +359,8 @@ fun CustomAnimatedBottomBar(currentRoute: String, onNavigate: (String, Boolean) 
     val configuration = LocalConfiguration.current
     val horizontalPadding = 20.dp
     val screenWidth = configuration.screenWidthDp.dp
-    val barWidth = screenWidth - (horizontalPadding * 2)
+    // Su schermi larghi (tablet) la navbar non si allarga all'infinito: larghezza massima, centrata
+    val barWidth = minOf(screenWidth - (horizontalPadding * 2), 460.dp)
     val tabWidth = barWidth / items.size
 
     val animatedOffsetX by animateDpAsState(
@@ -376,7 +377,7 @@ fun CustomAnimatedBottomBar(currentRoute: String, onNavigate: (String, Boolean) 
         contentAlignment = Alignment.BottomCenter
     ) {
         Surface(
-            modifier = Modifier.fillMaxWidth().height(70.dp),
+            modifier = Modifier.width(barWidth).height(70.dp),
             color = Color.White,
             shape = RoundedCornerShape(35.dp),
             shadowElevation = 8.dp

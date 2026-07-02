@@ -295,7 +295,8 @@ fun SearchPage(
     navController: NavController?,
     padding: PaddingValues,
     onOpenFilters: () -> Unit,
-    viewModel: SearchViewModel = viewModel() // Iniettiamo il ViewModel
+    viewModel: SearchViewModel = viewModel(), // Iniettiamo il ViewModel
+    hideHeader: Boolean = false
 ) {
     // Osserviamo gli stati dal ViewModel in modo reattivo
     val filterData = viewModel.filterData
@@ -305,7 +306,7 @@ fun SearchPage(
     val listState = rememberLazyGridState()
 
     Column(modifier = Modifier.fillMaxSize()) {
-    PrimaryHeader("I nostri prodotti", "Trova quello che cerchi")
+    if (!hideHeader) PrimaryHeader("I nostri prodotti", "Trova quello che cerchi")
     // 1. BARRA DI RICERCA
     CustomSearchBar(
         query = searchQuery,
@@ -320,7 +321,8 @@ fun SearchPage(
     )
 
     LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
+        // Colonne per fascia: 2 su telefono, 3 su schermi medi, 4 su tablet
+        columns = GridCells.Fixed(productGridColumns()),
         state = listState,
         modifier = Modifier.weight(1f).fillMaxWidth(),
         contentPadding = PaddingValues(
@@ -687,20 +689,50 @@ fun SearchPageComplete(navController: NavController?, padding: PaddingValues) {
     var showFilters by remember { mutableStateOf(false) }
     val viewModel: SearchViewModel = viewModel()
 
-    if (showFilters) {
-        FilterPage(
-            modifier = Modifier.fillMaxSize(),
-            filterData = viewModel.filterData,
-            padding = padding,
-            onDismiss = { showFilters = false }
-        )
+    if (isExpandedScreen()) {
+        // TABLET: header in cima a tutta larghezza; sotto, lista a sinistra (2/3) e filtri a destra (1/3)
+        Column(Modifier.fillMaxSize()) {
+            PrimaryHeader("I nostri prodotti", "Trova quello che cerchi")
+            Row(Modifier.weight(1f).fillMaxWidth()) {
+                Box(Modifier.weight(2f).fillMaxHeight()) {
+                    SearchPage(
+                        navController = navController,
+                        padding = padding,
+                        onOpenFilters = { showFilters = !showFilters },
+                        viewModel = viewModel,
+                        hideHeader = true
+                    )
+                }
+                if (showFilters) {
+                    Box(Modifier.fillMaxHeight().width(1.dp).background(Color.LightGray.copy(alpha = 0.4f)))
+                    Box(Modifier.weight(1f).fillMaxHeight()) {
+                        FilterPage(
+                            modifier = Modifier.fillMaxSize(),
+                            filterData = viewModel.filterData,
+                            padding = PaddingValues(bottom = padding.calculateBottomPadding()),
+                            onDismiss = { showFilters = false }
+                        )
+                    }
+                }
+            }
+        }
     } else {
-        SearchPage(
-            navController = navController,
-            padding = padding,
-            onOpenFilters = { showFilters = true },
-            viewModel = viewModel
-        )
+        // TELEFONO: comportamento attuale (a schermo intero)
+        if (showFilters) {
+            FilterPage(
+                modifier = Modifier.fillMaxSize(),
+                filterData = viewModel.filterData,
+                padding = padding,
+                onDismiss = { showFilters = false }
+            )
+        } else {
+            SearchPage(
+                navController = navController,
+                padding = padding,
+                onOpenFilters = { showFilters = true },
+                viewModel = viewModel
+            )
+        }
     }
 }
 
