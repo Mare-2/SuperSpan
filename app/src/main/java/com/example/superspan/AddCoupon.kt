@@ -329,7 +329,7 @@ private fun CouponForm(
         EditTextField(
             value = description,
             onValueChange = { description = it },
-            label = "Descrizione (es. Kit Pranzo Veloce)",
+            label = "Descrizione",
             keyboardType = KeyboardType.Text,
             minLines = 2,
             singleLine = false,
