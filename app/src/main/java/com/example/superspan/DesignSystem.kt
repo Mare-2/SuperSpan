@@ -205,14 +205,13 @@ fun PrimaryHeader(title: String, subtitle: String, modifier: Modifier = Modifier
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp))
             .background(
                 Brush.linearGradient(
-                    listOf(Color(0xFFCDE8EC), Color(0xFFDCEFCE))
+                    listOf(Color(0xFFCDE8EC).copy(alpha = 0.85f), Color(0xFFDCEFCE).copy(alpha = 0.85f))
                 )
             )
             .windowInsetsPadding(WindowInsets.statusBars)
-            .padding(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 22.dp),
+            .padding(start = 20.dp, end = 20.dp, top = 10.dp, bottom = 14.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(

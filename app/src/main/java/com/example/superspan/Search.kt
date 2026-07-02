@@ -313,7 +313,7 @@ fun SearchPage(
         query = searchQuery,
         onQueryChange = { viewModel.onSearchQueryChanged(it) },
         placeholder = "Cerca prodotto...",
-        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 8.dp),
+        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
         trailingIcon = {
             IconButton(onClick = onOpenFilters) {
                 Icon(Icons.Default.Tune, contentDescription = "Filtri", tint = com.example.superspan.ui.theme.LogoLeft)
