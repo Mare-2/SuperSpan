@@ -79,7 +79,6 @@ fun DraftsPage(navController: NavController?, padding: PaddingValues) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(Color(0xFFF7FBF8))
                         .padding(horizontal = 20.dp, vertical = 12.dp)
                 ) {
                     AnimatedSegmentedControl(

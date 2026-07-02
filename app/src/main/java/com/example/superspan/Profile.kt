@@ -182,7 +182,11 @@ fun ProfilePage(user: User, navController: NavController?, paddingValues: Paddin
                 Spacer(modifier = Modifier.height(24.dp))
 
                 // --- 3. TASTO ESCI ---
-                ProfileMenuGroup {
+                ProfileMenuGroup(
+                    containerColor = com.example.superspan.ui.theme.AppError.copy(alpha = 0.08f),
+                    borderColor = com.example.superspan.ui.theme.AppError.copy(alpha = 0.2f),
+                    shadowElevation = 0.dp
+                ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -219,13 +223,18 @@ fun ProfileSectionTitle(title: String) {
 }
 
 @Composable
-fun ProfileMenuGroup(content: @Composable ColumnScope.() -> Unit) {
+fun ProfileMenuGroup(
+    containerColor: Color = Color.White,
+    borderColor: Color = Color.LightGray.copy(alpha = 0.3f),
+    shadowElevation: androidx.compose.ui.unit.Dp = 2.dp,
+    content: @Composable ColumnScope.() -> Unit
+) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
-        color = Color.White,
-        shadowElevation = 2.dp,
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.3f))
+        color = containerColor,
+        shadowElevation = shadowElevation,
+        border = androidx.compose.foundation.BorderStroke(1.dp, borderColor)
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             content()

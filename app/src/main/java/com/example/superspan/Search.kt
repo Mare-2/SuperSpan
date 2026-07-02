@@ -306,6 +306,19 @@ fun SearchPage(
 
     Column(modifier = Modifier.fillMaxSize()) {
     PrimaryHeader("I nostri prodotti", "Trova quello che cerchi")
+    // 1. BARRA DI RICERCA
+    CustomSearchBar(
+        query = searchQuery,
+        onQueryChange = { viewModel.onSearchQueryChanged(it) },
+        placeholder = "Cerca prodotto...",
+        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 8.dp),
+        trailingIcon = {
+            IconButton(onClick = onOpenFilters) {
+                Icon(Icons.Default.Tune, contentDescription = "Filtri", tint = com.example.superspan.ui.theme.LogoLeft)
+            }
+        }
+    )
+
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         state = listState,
@@ -313,26 +326,12 @@ fun SearchPage(
         contentPadding = PaddingValues(
             start = 16.dp,
             end = 16.dp,
-            top = 16.dp,
+            top = 8.dp,
             bottom = padding.calculateBottomPadding() + 100.dp
         ),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-
-        // 1. BARRA DI RICERCA
-        item(span = { GridItemSpan(maxLineSpan) }) {
-            CustomSearchBar(
-                query = searchQuery,
-                onQueryChange = { viewModel.onSearchQueryChanged(it) },
-                placeholder = "Cerca prodotto...",
-                trailingIcon = {
-                    IconButton(onClick = onOpenFilters) {
-                        Icon(Icons.Default.Tune, contentDescription = "Filtri", tint = com.example.superspan.ui.theme.LogoLeft)
-                    }
-                }
-            )
-        }
 
         val maxPossiblePrice = filterData.maxPossiblePrice()
         val hasActiveFilters = filterData.categorie.isNotEmpty() || filterData.minPrice > 0.0 || filterData.maxPrice < maxPossiblePrice
@@ -385,7 +384,7 @@ fun SearchPage(
                             filterData.ordinamentoNomeCrescente = null
                         }
                     },
-                    modifier = Modifier.height(44.dp).wrapContentWidth(),
+                    modifier = Modifier.height(34.dp).wrapContentWidth(),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = if (nomeAttivo) com.example.superspan.ui.theme.LogoLeft else Color.White,
                         contentColor = if (nomeAttivo) Color.White else Color.Gray
@@ -393,11 +392,11 @@ fun SearchPage(
                     border = null,
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 6.dp, pressedElevation = 2.dp),
                     shape = CircleShape,
-                    contentPadding = PaddingValues(horizontal = 20.dp)
+                    contentPadding = PaddingValues(horizontal = 16.dp)
                 ) {
                     Text(
                         text = if (nomeAttivo && filterData.ordinamentoNomeCrescente == false) "Z-A" else "A-Z",
-                        fontSize = 13.sp,
+                        fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center
                     )
@@ -418,7 +417,7 @@ fun SearchPage(
                             filterData.ordinamentoPrezzoCrescente = null
                         }
                     },
-                    modifier = Modifier.height(44.dp).wrapContentWidth(),
+                    modifier = Modifier.height(34.dp).wrapContentWidth(),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = if (prezzoAttivo) com.example.superspan.ui.theme.LogoLeft else Color.White,
                         contentColor = if (prezzoAttivo) Color.White else Color.Gray
@@ -426,7 +425,7 @@ fun SearchPage(
                     border = null,
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 6.dp, pressedElevation = 2.dp),
                     shape = CircleShape,
-                    contentPadding = PaddingValues(horizontal = 16.dp)
+                    contentPadding = PaddingValues(horizontal = 12.dp)
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -435,19 +434,19 @@ fun SearchPage(
                         Icon(
                             imageVector = Icons.Default.Payments,
                             contentDescription = null,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(Modifier.width(8.dp))
-                        Text(
-                            text = "Prezzo",
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold
+                            modifier = Modifier.size(16.dp)
                         )
                         Spacer(Modifier.width(6.dp))
+                        Text(
+                            text = "Prezzo",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(Modifier.width(4.dp))
                         Icon(
                             imageVector = if (filterData.ordinamentoPrezzoCrescente == true) Icons.Default.ArrowUpward else Icons.Default.ArrowDownward,
                             contentDescription = null,
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(14.dp)
                         )
                     }
                 }

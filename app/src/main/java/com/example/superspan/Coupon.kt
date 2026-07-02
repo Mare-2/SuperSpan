@@ -136,32 +136,30 @@ fun CouponPageComplete(paddingValues: PaddingValues, navController: NavControlle
         if (currentSelectedOffer == null) {
             Column(modifier = Modifier.fillMaxSize()) {
             PrimaryHeader("Offerte e Coupon", "Risparmia sulla tua spesa quotidiana")
-            Box(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 12.dp)
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
                 AnimatedSegmentedControl(
                     options = listOf("Coupon", "Offerte"),
                     selectedIndex = selectedTab
                 ) { selectedTab = it }
+                
+                Spacer(Modifier.height(8.dp))
+                
+                CustomSearchBar(
+                    query = searchQuery,
+                    onQueryChange = { searchQuery = it },
+                    placeholder = "Cerca prodotto o offerta..."
+                )
             }
 
             LazyColumn(
                 state = listState,
                 modifier = Modifier.weight(1f).fillMaxWidth(),
-                contentPadding = PaddingValues(top = 12.dp, bottom = paddingValues.calculateBottomPadding() + 100.dp)
+                contentPadding = PaddingValues(top = 8.dp, bottom = paddingValues.calculateBottomPadding() + 100.dp)
             ) {
-
-                // 1b. BARRA DI RICERCA
-                item {
-                    CustomSearchBar(
-                        query = searchQuery,
-                        onQueryChange = { searchQuery = it },
-                        placeholder = "Cerca prodotto o offerta...",
-                        modifier = Modifier.padding(horizontal = 16.dp)
-                    )
-                }
 
                 // 3. LISTA FILTRATA
                 val filteredList = (if (selectedTab == 0) {

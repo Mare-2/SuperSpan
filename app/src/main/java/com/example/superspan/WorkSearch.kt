@@ -174,32 +174,31 @@ fun WorkSearchPage(
     if (!hideHeader) {
         PrimaryHeader("Lavora con noi!", "Trova la posizione adatta a te")
     }
+
+    // 2. BARRA DI RICERCA + TASTO FILTRI
+    CustomSearchBar(
+        query = filterData.nome,
+        onQueryChange = { filterData.nome = it },
+        placeholder = "Cerca ruolo o città...",
+        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 8.dp),
+        trailingIcon = {
+            IconButton(onClick = onOpenFilters) {
+                Icon(Icons.Default.Tune, contentDescription = "Filtri", tint = com.example.superspan.ui.theme.LogoLeft)
+            }
+        }
+    )
+
     LazyColumn(
         state = listState,
         modifier = Modifier.weight(1f).fillMaxWidth(),
-        contentPadding = PaddingValues(top = 12.dp, bottom = padding.calculateBottomPadding() + 32.dp),
+        contentPadding = PaddingValues(top = 8.dp, bottom = padding.calculateBottomPadding() + 32.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
 
         if (sliderContent != null) {
-            stickyHeader {
+            item {
                 sliderContent()
             }
-        }
-
-        // 2. BARRA DI RICERCA + TASTO FILTRI
-        item {
-            CustomSearchBar(
-                query = filterData.nome,
-                onQueryChange = { filterData.nome = it },
-                placeholder = "Cerca ruolo o città...",
-                modifier = Modifier.padding(horizontal = 16.dp),
-                trailingIcon = {
-                    IconButton(onClick = onOpenFilters) {
-                        Icon(Icons.Default.Tune, contentDescription = "Filtri", tint = com.example.superspan.ui.theme.LogoLeft)
-                    }
-                }
-            )
         }
 
         val hasActiveFilters = filterData.ruoli.isNotEmpty() || filterData.tipiContratto.isNotEmpty() || filterData.orari.isNotEmpty() || filterData.distanzaMax < 1000f

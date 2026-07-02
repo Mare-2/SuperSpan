@@ -97,46 +97,39 @@ fun AdminCandidaciesPage(
             onOpenSelection = { isSelectionOpen = true }
         )
     } else {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(bottom = paddingValues.calculateBottomPadding() + 32.dp)
-        ) {
+        Column(modifier = Modifier.fillMaxSize()) {
             if (!hideHeader) {
-                item {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 64.dp, bottom = 24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text("Gestione Candidature", fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, color = Color.Black)
-                        Text("Pannello di Amministrazione", fontSize = 16.sp, color = Color.Gray)
-                    }
-                }
-            } else {
-                item { Spacer(Modifier.height(8.dp)) }
-            }
-
-            if (sliderContent != null) {
-                stickyHeader {
-                    sliderContent()
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 64.dp, bottom = 24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text("Gestione Candidature", fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, color = Color.Black)
+                    Text("Pannello di Amministrazione", fontSize = 16.sp, color = Color.Gray)
                 }
             }
 
-            item {
-                // --- BARRA DI RICERCA ---
-                CustomSearchBar(
-                    query = searchQuery,
-                    onQueryChange = { searchQuery = it },
-                    placeholder = "Cerca candidato o ruolo...",
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                    trailingIcon = {
-                        IconButton(onClick = { showFiltersPage = true }) {
-                            Icon(Icons.Default.Tune, contentDescription = "Filtri", tint = LogoLeft)
-                        }
+            // --- BARRA DI RICERCA ---
+            CustomSearchBar(
+                query = searchQuery,
+                onQueryChange = { searchQuery = it },
+                placeholder = "Cerca candidato o ruolo...",
+                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 8.dp),
+                trailingIcon = {
+                    IconButton(onClick = { showFiltersPage = true }) {
+                        Icon(Icons.Default.Tune, contentDescription = "Filtri", tint = LogoLeft)
                     }
-                )
-            }
+                }
+            )
+
+            LazyColumn(
+                modifier = Modifier.weight(1f).fillMaxWidth(),
+                contentPadding = PaddingValues(bottom = paddingValues.calculateBottomPadding() + 32.dp)
+            ) {
+                if (sliderContent != null) {
+                    item { sliderContent() }
+                }
 
             // --- CHIPS DEI FILTRI ATTIVI ---
             val hasActiveFilters = selectedRoles.isNotEmpty() || selectedSupermarket != null
@@ -176,7 +169,7 @@ fun AdminCandidaciesPage(
                     Button(
                         onClick = { dateDescending = !dateDescending },
                         modifier = Modifier
-                            .height(44.dp)
+                            .height(34.dp)
                             .wrapContentWidth(),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = LogoLeft,
@@ -185,7 +178,7 @@ fun AdminCandidaciesPage(
                         border = null,
                         elevation = ButtonDefaults.buttonElevation(defaultElevation = 6.dp, pressedElevation = 2.dp),
                         shape = androidx.compose.foundation.shape.CircleShape,
-                        contentPadding = PaddingValues(horizontal = 16.dp)
+                        contentPadding = PaddingValues(horizontal = 12.dp)
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -194,19 +187,19 @@ fun AdminCandidaciesPage(
                             Icon(
                                 imageVector = Icons.Default.DateRange,
                                 contentDescription = null,
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(Modifier.width(8.dp))
-                            Text(
-                                text = "Data",
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Bold
+                                modifier = Modifier.size(16.dp)
                             )
                             Spacer(Modifier.width(6.dp))
+                            Text(
+                                text = "Data",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(Modifier.width(4.dp))
                             Icon(
                                 imageVector = if (!dateDescending) Icons.Default.ArrowUpward else Icons.Default.ArrowDownward,
                                 contentDescription = null,
-                                modifier = Modifier.size(16.dp)
+                                modifier = Modifier.size(14.dp)
                             )
                         }
                     }
@@ -229,6 +222,7 @@ fun AdminCandidaciesPage(
                     }
                 }
             }
+        }
         }
     }
 }
