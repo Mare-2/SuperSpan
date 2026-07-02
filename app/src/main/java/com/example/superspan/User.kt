@@ -154,6 +154,16 @@ class WorkFilterData() {
     var orari: MutableList<OrarioLavoro> = mutableStateListOf<OrarioLavoro>()
     var ruoli: MutableList<Role> = mutableStateListOf<Role>()
     var distanzaMax: Float by mutableStateOf(100f)
+
+    fun reset() {
+        nome = ""
+        ordinamento = "Nome"
+        ordinamentoCrescente = true
+        tipiContratto.clear()
+        orari.clear()
+        ruoli.clear()
+        distanzaMax = 1000f
+    }
 }
 
 
@@ -281,7 +291,7 @@ val ListOfCoupon = mutableStateListOf<Coupon>(
         ListOfProduct.find { it.nome == "Biscotti al Cioccolato" }!!
     ),
     Coupon("Sconto20", 20f, "20% di sconto su Kit Pranzo Veloce", "2026-07-15",
-        ListOfProduct.find { it.nome == "Spaghetti Barilla 500g" }!!,
+        ListOfProduct.find { it.nome == "Spaghetti - Pasta Barilla 500g" }!!,
         ListOfProduct.find { it.nome == "Salsa di Pomodoro Mutti" }!!,
         ListOfProduct.find { it.nome == "Parmigiano Reggiano 200g" }!!
     ),
@@ -308,7 +318,7 @@ val ListOfCoupon = mutableStateListOf<Coupon>(
         ListOfProduct.find { it.nome == "Latte Intero 1L" }!!
     ),
     Coupon("PASTA10", 10f, "Sconto 10% su Pasta Barilla", "2026-07-08",
-        ListOfProduct.find { it.nome == "Spaghetti Barilla 500g" }!!
+        ListOfProduct.find { it.nome == "Spaghetti - Pasta Barilla 500g" }!!
     ),
     Coupon("POMODORO7", 7f, "Sconto 7% su Salsa di Pomodoro", "2026-07-22",
         ListOfProduct.find { it.nome == "Salsa di Pomodoro Mutti" }!!

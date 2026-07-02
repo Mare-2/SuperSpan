@@ -56,6 +56,7 @@ fun ProfilePage(user: User, navController: NavController?, paddingValues: Paddin
             confirmText = "Esci",
             onConfirm = {
                 showLogoutDialog = false
+                globalWorkFilterData.reset()
                 Destination.entries.forEach { dest ->
                     navController?.clearBackStack(dest.route)
                 }
